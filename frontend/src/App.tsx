@@ -1,4 +1,4 @@
-import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
+import { RouterProvider, createRouter, createRoute, createRootRoute } from '@tanstack/react-router';
 import Layout from './components/Layout';
 import Home from './pages/Home';
 import RegisterIP from './pages/RegisterIP';
@@ -14,11 +14,7 @@ try {
 }
 
 const rootRoute = createRootRoute({
-  component: () => (
-    <Layout>
-      <Outlet />
-    </Layout>
-  ),
+  component: Layout,
 });
 
 const homeRoute = createRoute({

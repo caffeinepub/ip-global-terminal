@@ -1,173 +1,130 @@
+import React from 'react';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
-import { CheckCircle2, FlaskConical } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { useMemo } from 'react';
+import { CheckCircle, Shield, ExternalLink } from 'lucide-react';
 
 interface RegistrationSuccessModalProps {
   open: boolean;
-  onClose: () => void;
   ipId: bigint | null;
+  onClose: () => void;
 }
 
-function generateMockEthTxId(): string {
-  const chars = '0123456789abcdef';
-  let result = '0x';
-  for (let i = 0; i < 64; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-}
-
-function generateMockEthBlock(): number {
-  return Math.floor(19_000_000 + Math.random() * 2_000_000);
-}
-
-function generateMockSolanaSig(): string {
-  const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-  let result = '';
-  for (let i = 0; i < 88; i++) {
-    result += chars[Math.floor(Math.random() * chars.length)];
-  }
-  return result;
-}
-
-function generateMockSolanaSlot(): number {
-  return Math.floor(250_000_000 + Math.random() * 10_000_000);
-}
-
-export default function RegistrationSuccessModal({
-  open,
-  onClose,
-  ipId,
-}: RegistrationSuccessModalProps) {
-  const mockEthTxId = useMemo(() => generateMockEthTxId(), [open]);
-  const mockEthBlock = useMemo(() => generateMockEthBlock(), [open]);
-  const mockSolanaSig = useMemo(() => generateMockSolanaSig(), [open]);
-  const mockSolanaSlot = useMemo(() => generateMockSolanaSlot(), [open]);
+export default function RegistrationSuccessModal({ open, ipId, onClose }: RegistrationSuccessModalProps) {
+  const mockEthTxId = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
+  const mockEthBlock = Math.floor(19_000_000 + Math.random() * 500_000);
+  const mockSolSig = Array.from({ length: 88 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]).join('');
+  const mockSolSlot = Math.floor(250_000_000 + Math.random() * 5_000_000);
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
       <DialogContent
-        className="max-w-lg border border-gold/30 text-gray-100"
-        style={{ background: 'oklch(0.13 0.03 240)' }}
+        className="max-w-lg"
+        style={{
+          backgroundColor: 'oklch(0.09 0 0)',
+          border: '1px solid oklch(0.78 0.15 85 / 0.4)',
+          color: 'oklch(0.97 0 0)',
+        }}
       >
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-1">
-            <div className="w-10 h-10 rounded-sm bg-green-500/15 border border-green-500/30 flex items-center justify-center">
-              <CheckCircle2 className="w-5 h-5 text-green-400" />
+          <div className="flex flex-col items-center text-center gap-3 mb-2">
+            <div
+              className="w-16 h-16 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: 'oklch(0.78 0.15 85 / 0.15)', border: '2px solid oklch(0.78 0.15 85 / 0.5)' }}
+            >
+              <CheckCircle className="w-8 h-8" style={{ color: 'oklch(0.78 0.15 85)' }} />
             </div>
-            <DialogTitle className="font-serif text-xl text-gold">IP Registered!</DialogTitle>
+            <DialogTitle
+              className="text-2xl font-bold"
+              style={{ color: 'oklch(0.97 0 0)', fontFamily: 'Playfair Display, serif' }}
+            >
+              IP Successfully Registered
+            </DialogTitle>
+            <DialogDescription style={{ color: 'oklch(0.60 0 0)' }}>
+              Your intellectual property has been permanently recorded on the Internet Computer blockchain.
+            </DialogDescription>
           </div>
-          <DialogDescription className="text-gray-400 text-sm">
-            Your intellectual property has been successfully registered on the blockchain.
-          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-3 mt-2">
-          {ipId !== null && (
-            <div
-              className="flex items-center justify-between p-3 rounded-sm border border-gold/15"
-              style={{ background: 'oklch(0.10 0.025 240)' }}
-            >
-              <span className="text-gray-400 text-sm">IP Record ID</span>
-              <span className="text-gold font-mono font-semibold">
-                #{String(ipId).padStart(4, '0')}
-              </span>
-            </div>
-          )}
-
+        <div className="space-y-4">
+          {/* IP ID */}
           <div
-            className="flex items-center justify-between p-3 rounded-sm border border-green-500/20"
-            style={{ background: 'oklch(0.10 0.025 240)' }}
+            className="p-4 rounded-lg text-center"
+            style={{ backgroundColor: 'oklch(0.78 0.15 85 / 0.1)', border: '1px solid oklch(0.78 0.15 85 / 0.3)' }}
           >
-            <span className="text-gray-400 text-sm">ICP Canister</span>
-            <span className="text-green-400 font-semibold text-sm">Recorded ✓</span>
+            <p className="text-xs tracking-widest uppercase mb-1" style={{ color: 'oklch(0.78 0.15 85)' }}>
+              IP Record ID
+            </p>
+            <p className="text-3xl font-bold" style={{ color: 'oklch(0.78 0.15 85)', fontFamily: 'Playfair Display, serif' }}>
+              #{ipId?.toString() ?? '—'}
+            </p>
           </div>
 
-          <p className="text-xs text-gray-500 leading-relaxed">
-            Your IP record is now permanently stored on the Internet Computer blockchain — immutable, timestamped, and publicly verifiable.
-          </p>
-
-          {/* Simulated Cross-Chain Section */}
+          {/* ICP confirmation */}
           <div
-            className="rounded-sm border border-gold/20 overflow-hidden"
-            style={{ background: 'oklch(0.10 0.025 240)' }}
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: 'oklch(0.13 0 0)', border: '1px solid oklch(0.22 0 0)' }}
           >
-            <div className="flex items-center gap-2 px-3 py-2 border-b border-gold/15"
-              style={{ background: 'oklch(0.11 0.028 240)' }}
-            >
-              <FlaskConical className="w-3.5 h-3.5 text-gold/70" />
-              <span className="text-gold/80 text-xs font-semibold uppercase tracking-wider">
-                Also Recorded On
+            <div className="flex items-center gap-2 mb-2">
+              <Shield className="w-4 h-4" style={{ color: 'oklch(0.78 0.15 85)' }} />
+              <span className="text-sm font-semibold" style={{ color: 'oklch(0.78 0.15 85)' }}>
+                Internet Computer — Confirmed
               </span>
-              <span className="ml-auto text-xs text-gray-600 italic">
-                Future Integration — Simulated Reference
-              </span>
+              <div className="w-2 h-2 rounded-full ml-auto" style={{ backgroundColor: 'oklch(0.78 0.15 85)' }} />
             </div>
+            <p className="text-xs" style={{ color: 'oklch(0.55 0 0)' }}>
+              Finalized on-chain. Immutable and tamper-proof.
+            </p>
+          </div>
 
-            {/* Ethereum */}
-            <div className="p-3 border-b border-white/5">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-400 text-[8px] font-bold">Ξ</span>
-                </div>
-                <span className="text-gray-300 text-xs font-semibold">Ethereum</span>
+          {/* Future integrations */}
+          <div
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: 'oklch(0.11 0 0)', border: '1px solid oklch(0.20 0 0)' }}
+          >
+            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: 'oklch(0.45 0 0)' }}>
+              Also Recorded On — Future Integration (Simulated Reference)
+            </p>
+            <div className="space-y-3">
+              {/* Ethereum */}
+              <div>
+                <p className="text-xs font-medium mb-1" style={{ color: 'oklch(0.65 0 0)' }}>Ethereum</p>
+                <p className="text-xs font-mono truncate" style={{ color: 'oklch(0.45 0 0)' }}>
+                  Tx: {mockEthTxId.slice(0, 20)}…
+                </p>
+                <p className="text-xs" style={{ color: 'oklch(0.40 0 0)' }}>
+                  Block #{mockEthBlock.toLocaleString()}
+                </p>
               </div>
-              <div className="space-y-1 pl-6">
-                <div className="flex items-start gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Tx ID</span>
-                  <span className="font-mono text-xs text-gray-400 break-all leading-relaxed">
-                    {mockEthTxId}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Block</span>
-                  <span className="font-mono text-xs text-gray-400">
-                    {mockEthBlock.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Solana */}
-            <div className="p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-purple-400 text-[8px] font-bold">◎</span>
-                </div>
-                <span className="text-gray-300 text-xs font-semibold">Solana</span>
-              </div>
-              <div className="space-y-1 pl-6">
-                <div className="flex items-start gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Sig</span>
-                  <span className="font-mono text-xs text-gray-400 break-all leading-relaxed">
-                    {mockSolanaSig}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Slot</span>
-                  <span className="font-mono text-xs text-gray-400">
-                    {mockSolanaSlot.toLocaleString()}
-                  </span>
-                </div>
+              {/* Solana */}
+              <div>
+                <p className="text-xs font-medium mb-1" style={{ color: 'oklch(0.65 0 0)' }}>Solana</p>
+                <p className="text-xs font-mono truncate" style={{ color: 'oklch(0.45 0 0)' }}>
+                  Sig: {mockSolSig.slice(0, 20)}…
+                </p>
+                <p className="text-xs" style={{ color: 'oklch(0.40 0 0)' }}>
+                  Slot #{mockSolSlot.toLocaleString()}
+                </p>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="mt-4">
-          <Button
+          <button
             onClick={onClose}
-            className="w-full bg-gold text-navy font-semibold hover:bg-gold/90"
+            className="w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200"
+            style={{
+              backgroundColor: 'oklch(0.78 0.15 85)',
+              color: 'oklch(0.08 0 0)',
+            }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'oklch(0.85 0.14 85)';
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'oklch(0.78 0.15 85)';
+            }}
           >
-            Done
-          </Button>
+            Close
+          </button>
         </div>
       </DialogContent>
     </Dialog>

@@ -1,11 +1,10 @@
 # Specification
 
 ## Summary
-**Goal:** Remove the admin token gate so the IP Global Terminal app is fully publicly accessible via a clean shareable URL without requiring any `caffeineAdminToken` fragment.
+**Goal:** Fix the animated world map continent colors and sharpen the hero background.
 
 **Planned changes:**
-- Remove any token-checking logic from `urlParams.ts` that reads, persists, or validates a `caffeineAdminToken` URL parameter
-- Remove any token gate, token prompt, or access-denied component that blocks app access based on a missing admin token
-- Ensure all four public routes (Home, Register IP, IP Database, Whitepaper) load normally for any visitor without a token
+- Change continent fill/outline color in `AnimatedWorldMap.tsx` from blue to near-black (e.g., `#0a0a0a` or `#111111`) to match the Black, Gold & White theme
+- Reduce pixelation and blurriness on the hero background in `Home.tsx` by improving canvas/image rendering quality and setting appropriate `image-rendering` CSS properties
 
-**User-visible outcome:** Anyone can visit the app URL directly without any token in the URL and the app loads fully with all routes accessible.
+**User-visible outcome:** Continents on the animated world map appear dark/black instead of blue, and the hero section background looks sharp and crisp without noticeable blur or pixelation.

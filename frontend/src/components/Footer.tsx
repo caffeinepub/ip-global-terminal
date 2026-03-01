@@ -1,41 +1,70 @@
-import { Link } from '@tanstack/react-router';
-import { Shield } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from '@tanstack/react-router';
+import { Shield, Heart } from 'lucide-react';
 
 export default function Footer() {
+  const navigate = useNavigate();
   const year = new Date().getFullYear();
   const appId = encodeURIComponent(window.location.hostname || 'ip-global-terminal');
 
   return (
-    <footer className="bg-charcoal border-t border-white/10">
-      <div className="max-w-7xl mx-auto px-6 py-16">
-        <div className="grid md:grid-cols-3 gap-12 mb-12">
+    <footer
+      className="border-t"
+      style={{
+        backgroundColor: 'oklch(0.06 0 0)',
+        borderColor: 'oklch(0.78 0.15 85 / 0.2)',
+      }}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           {/* Brand */}
           <div>
-            <div className="flex items-center gap-2 mb-4">
-              <img src="/assets/generated/ipgt-logo.dim_128x128.png" alt="IPGT Logo" className="w-8 h-8" />
-              <span className="font-serif text-lg font-bold text-white">IP Global Terminal</span>
+            <div className="flex items-center gap-3 mb-4">
+              <div
+                className="w-9 h-9 rounded flex items-center justify-center"
+                style={{ backgroundColor: 'oklch(0.78 0.15 85 / 0.15)', border: '1px solid oklch(0.78 0.15 85 / 0.4)' }}
+              >
+                <Shield className="w-5 h-5" style={{ color: 'oklch(0.78 0.15 85)' }} />
+              </div>
+              <div>
+                <div
+                  className="text-sm font-bold tracking-widest uppercase"
+                  style={{ color: 'oklch(0.78 0.15 85)', fontFamily: 'Playfair Display, serif' }}
+                >
+                  IPGT
+                </div>
+                <div className="text-xs" style={{ color: 'oklch(0.55 0 0)' }}>
+                  IP Global Terminal
+                </div>
+              </div>
             </div>
-            <p className="text-white/50 text-sm leading-relaxed">
-              A decentralized platform for registering and protecting intellectual property rights on the Internet Computer blockchain.
+            <p className="text-sm leading-relaxed" style={{ color: 'oklch(0.55 0 0)' }}>
+              Decentralised intellectual property registration on the Internet Computer blockchain. WIPO-free, sovereign, and immutable.
             </p>
           </div>
 
           {/* Navigation */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Platform</h4>
+            <h3
+              className="text-xs font-semibold tracking-widest uppercase mb-4"
+              style={{ color: 'oklch(0.78 0.15 85)' }}
+            >
+              Platform
+            </h3>
             <ul className="space-y-2">
               {[
-                { label: 'Home', to: '/' },
-                { label: 'IP Database', to: '/database' },
-                { label: 'Whitepaper', to: '/whitepaper' },
+                { label: 'Home', path: '/' },
+                { label: 'IP Database', path: '/database' },
+                { label: 'Whitepaper', path: '/whitepaper' },
               ].map((link) => (
-                <li key={link.to}>
-                  <Link
-                    to={link.to}
-                    className="text-white/50 hover:text-gold transition-colors text-sm"
+                <li key={link.path}>
+                  <button
+                    onClick={() => navigate({ to: link.path })}
+                    className="text-sm transition-colors hover:text-white"
+                    style={{ color: 'oklch(0.55 0 0)' }}
                   >
                     {link.label}
-                  </Link>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -43,18 +72,21 @@ export default function Footer() {
 
           {/* Features */}
           <div>
-            <h4 className="text-white font-semibold mb-4 text-sm uppercase tracking-wider">Features</h4>
+            <h3
+              className="text-xs font-semibold tracking-widest uppercase mb-4"
+              style={{ color: 'oklch(0.78 0.15 85)' }}
+            >
+              Features
+            </h3>
             <ul className="space-y-2">
               {[
-                'Blockchain IP Registration',
+                'On-Chain Registration',
                 'SHA-256 Document Hashing',
-                'Immutable On-Chain Records',
-                'Open Cryptographic Auditing',
-                'Automated Filing Strategy',
-                'SME-First Infrastructure',
+                'Global Jurisdiction Support',
+                'WIPO-Free & Sovereign',
+                'Immutable Blockchain Record',
               ].map((feature) => (
-                <li key={feature} className="flex items-center gap-2 text-white/50 text-sm">
-                  <Shield className="w-3 h-3 text-gold flex-shrink-0" />
+                <li key={feature} className="text-sm" style={{ color: 'oklch(0.55 0 0)' }}>
                   {feature}
                 </li>
               ))}
@@ -62,19 +94,24 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-white/40 text-sm">
+        {/* Bottom bar */}
+        <div
+          className="mt-10 pt-6 border-t flex flex-col sm:flex-row items-center justify-between gap-4"
+          style={{ borderColor: 'oklch(0.78 0.15 85 / 0.15)' }}
+        >
+          <p className="text-xs" style={{ color: 'oklch(0.45 0 0)' }}>
             © {year} IP Global Terminal. All rights reserved.
           </p>
-          <p className="text-white/40 text-sm">
+          <p className="text-xs flex items-center gap-1" style={{ color: 'oklch(0.45 0 0)' }}>
             Built with{' '}
-            <span className="text-gold">♥</span>{' '}
+            <Heart className="w-3 h-3 inline" style={{ color: 'oklch(0.78 0.15 85)' }} fill="oklch(0.78 0.15 85)" />{' '}
             using{' '}
             <a
               href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appId}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-gold hover:text-gold/80 transition-colors"
+              className="hover:underline transition-colors"
+              style={{ color: 'oklch(0.78 0.15 85)' }}
             >
               caffeine.ai
             </a>

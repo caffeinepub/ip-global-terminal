@@ -1,39 +1,52 @@
 {
   "kind": "build_request",
-  "title": "Remove admin token gate for public shareable URL access",
-  "projectName": "IP Global Terminal",
+  "title": "Darken continents to near-black and sharpen background",
   "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a `caffeineAdminToken` URL fragment. The app should load normally for any visitor at the clean URL (e.g., `https://ip-global-terminal-2sw.caffeine.xyz/`) without checking for or redirecting based on any token.",
+      "text": "In AnimatedWorldMap.tsx, change the continent fill/outline color from blue to near-black (e.g., #0a0a0a or #111111) so continents match the Black, Gold & White theme instead of appearing blue.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-2"
+          "msg-1"
         ],
         "quotes": [
-          "it still requires an admin token can we make it so that it just a shareable URL",
-          "remove the admin token gate so the app is publicly accessible via a clean shareable URL — no token required"
+          "The contintents are blue make them darker and black"
         ]
       },
       "acceptanceCriteria": [
-        "Visiting the app URL without any `#caffeineAdminToken=...` fragment loads the app normally with no authentication prompt or token check.",
-        "The `urlParams.ts` utility no longer reads, persists, or validates any `caffeineAdminToken` parameter.",
-        "No component in the app renders a token gate, token prompt, or access-denied state based on a missing admin token.",
-        "All four public routes (Home, Register IP, IP Database, Whitepaper) are accessible without any token in the URL."
+        "Continents on the animated world map render in a near-black color, not blue",
+        "Continent color is visually consistent with the Black, Gold & White theme"
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "text": "Reduce pixelation and blurriness on the hero background in Home.tsx and any related background image or canvas rendering. Ensure the background appears sharp and crisp — use higher-resolution rendering, avoid CSS scaling artifacts, and set image-rendering to crisp or pixelated where appropriate.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-1"
+        ],
+        "quotes": [
+          "its still blurry please clear up the background so its let pixelated"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The hero section background is visually sharp with no noticeable pixelation or blur",
+        "Background does not appear stretched or scaled in a lossy way",
+        "Sharpness is consistent across common viewport sizes"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
-    "Do not add any new authentication or access control mechanisms."
+    "Do not alter the Black, Gold & White color palette or overall theme",
+    "Do not modify files listed in frontend.immutablePaths"
   ],
   "nonGoals": [
-    "Adding Internet Identity login or user authentication flows.",
-    "Changing any backend authorization logic.",
-    "Modifying any IP record registration or querying functionality."
+    "Adding new features or sections to the home page",
+    "Changes to backend logic",
+    "Modifying the gold pulsing dots or arc animations"
   ],
   "imageRequirements": {
     "required": [],

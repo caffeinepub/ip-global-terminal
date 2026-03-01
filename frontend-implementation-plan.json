@@ -1,37 +1,46 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove admin token gate for public shareable URL access",
+  "title": "Darken continents to near-black and sharpen background",
   "requirements": [
     {
       "id": "REQ-1",
-      "summary": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a caffeineAdminToken URL fragment",
+      "summary": "Change continent fill/outline color from blue to near-black in AnimatedWorldMap.tsx to match the Black, Gold & White theme",
       "acceptanceCriteria": [
-        "Visiting the app URL without any `#caffeineAdminToken=...` fragment loads the app normally with no authentication prompt or token check.",
-        "The `urlParams.ts` utility no longer reads, persists, or validates any `caffeineAdminToken` parameter.",
-        "No component in the app renders a token gate, token prompt, or access-denied state based on a missing admin token.",
-        "All four public routes (Home, Register IP, IP Database, Whitepaper) are accessible without any token in the URL."
+        "Continents on the animated world map render in a near-black color, not blue",
+        "Continent color is visually consistent with the Black, Gold & White theme"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/utils/urlParams.ts",
+          "path": "frontend/src/components/AnimatedWorldMap.tsx",
           "operation": "modify",
-          "description": "Remove all logic related to reading, persisting, or validating the `caffeineAdminToken` parameter. Keep only the generic URL parameter utility functions if they serve other purposes, or simplify the module to remove token-specific code entirely."
+          "description": "Update the continent stroke color from the current blue (#0ea5e9) to near-black (#0a0a0a or #111111). Locate the stroke style assignment for continent paths in the canvas rendering loop and replace the color value with a near-black hex value that matches the app's Black, Gold & White theme."
+        }
+      ]
+    },
+    {
+      "id": "REQ-2",
+      "summary": "Reduce pixelation and blurriness on the hero background to ensure sharp, crisp rendering across viewport sizes",
+      "acceptanceCriteria": [
+        "The hero section background is visually sharp with no noticeable pixelation or blur",
+        "Background does not appear stretched or scaled in a lossy way",
+        "Sharpness is consistent across common viewport sizes"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/Home.tsx",
+          "operation": "modify",
+          "description": "Improve background image sharpness in the hero section by setting image-rendering CSS property to 'crisp-edges' or 'pixelated', ensuring the background image uses the highest-resolution asset available (frontend/public/assets/generated/world-map-bg-4k.dim_3840x2160.png), and applying object-fit and object-position properties to prevent lossy scaling. Verify that no CSS transform or filter properties introduce blur artifacts."
         },
         {
-          "path": "frontend/src/App.tsx",
+          "path": "frontend/src/components/AnimatedWorldMap.tsx",
           "operation": "modify",
-          "description": "Remove any token gate checks, conditional rendering based on `caffeineAdminToken`, or access-denied redirects. Ensure all four public routes (Home, Register IP, IP Database, Whitepaper) are unconditionally accessible without token validation."
+          "description": "Ensure the canvas renders at native resolution without pixelation by setting canvas width/height attributes to match the CSS display size multiplied by devicePixelRatio, then scaling the canvas context accordingly. This prevents the canvas overlay from contributing to perceived blur or pixelation on high-DPI displays."
         },
         {
-          "path": "frontend/src/components/Header.tsx",
+          "path": "frontend/src/index.css",
           "operation": "modify",
-          "description": "Remove any UI elements, state checks, or conditional rendering related to the admin token gate. Ensure the header displays the IPGT logo and navigation links without any token-based access restrictions."
-        },
-        {
-          "path": "frontend/src/main.tsx",
-          "operation": "modify",
-          "description": "Remove any initialization logic that checks for or validates the `caffeineAdminToken` before mounting the app. Ensure the app mounts immediately for all visitors without token checks."
+          "description": "Add a global CSS rule for image-rendering to prevent browser interpolation on background images. Apply 'image-rendering: crisp-edges' or 'image-rendering: -webkit-optimize-contrast' to relevant selectors to ensure sharp rendering across browsers. Ensure this does not conflict with other image assets that need smooth rendering."
         }
       ]
     }

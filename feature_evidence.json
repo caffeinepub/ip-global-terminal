@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-remove-the-admin-token-gate-from-the-frontend-so-the-app-is-fully-publicly-accessible-without-requiring-a-caffeineadmintoken-url-fragment-the-app-should-load-normally-for-any-visitor-at-the-clean-url-e-g-https-ip-global-terminal-2sw-caffeine-xyz-without-checking-for-or-redirecting-based-on-any-token",
-      "featureTitle": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a `caffeineAdminToken` URL fragment. The app should load normally for any visitor at the clean URL (e.g., `https://ip-global-terminal-2sw.caffeine.xyz/`) without checking for or redirecting based on any token.",
+      "featureId": "feature-in-animatedworldmap-tsx-change-the-continent-fill-outline-color-from-blue-to-near-black-e-g-0a0a0a-or-111111-so-continents-match-the-black-gold-white-theme-instead-of-appearing-blue",
+      "featureTitle": "In AnimatedWorldMap.tsx, change the continent fill/outline color from blue to near-black (e.g., #0a0a0a or #111111) so continents match the Black, Gold & White theme instead of appearing blue.",
       "files": [
-        "frontend/src/App.tsx",
-        "frontend/src/utils/urlParams.ts"
+        "frontend/src/components/AnimatedWorldMap.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -19,6 +18,27 @@
       ],
       "testIds": [
         "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-reduce-pixelation-and-blurriness-on-the-hero-background-in-home-tsx-and-any-related-background-image-or-canvas-rendering-ensure-the-background-appears-sharp-and-crisp-use-higher-resolution-rendering-avoid-css-scaling-artifacts-and-set-image-rendering-to-crisp-or-pixelated-where-appropriate",
+      "featureTitle": "Reduce pixelation and blurriness on the hero background in Home.tsx and any related background image or canvas rendering. Ensure the background appears sharp and crisp — use higher-resolution rendering, avoid CSS scaling artifacts, and set image-rendering to crisp or pixelated where appropriate.",
+      "files": [
+        "frontend/src/components/AnimatedWorldMap.tsx",
+        "frontend/src/pages/Home.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-2"
       ],
       "confidence": "high"
     }

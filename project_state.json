@@ -1,32 +1,39 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "IP Global Terminal app — removing admin token gate so the app is publicly accessible via a clean shareable URL without requiring a caffeineAdminToken fragment.",
+  "summary": "A globe/map visualization project with a Black, Gold & White theme. Currently working on visual polish: darkening continents to near-black and sharpening/reducing pixelation on the background.",
   "architectural_notes": [
-    "App previously required a #caffeineAdminToken URL fragment for access; this gate is being removed for public sharing."
+    "Black, Gold & White color theme throughout",
+    "Deep black background required",
+    "Continents should be near-black (not blue)",
+    "Background must be sharp and non-pixelated"
   ],
-  "known_issues": [],
-  "isFixRequest": false,
+  "known_issues": [
+    "Background appears blurry/pixelated — needs sharpening",
+    "Continents rendering in blue instead of near-black"
+  ],
+  "isFixRequest": true,
   "existing_features": [
     {
-      "id": "feature-remove-the-admin-token-gate-from-the-frontend-so-the-app-is-fully-publicly-accessible-without-requiring-a-caffeineadmintoken-url-fragment-the-app-should-load-normally-for-any-visitor-at-the-clean-url-e-g-https-ip-global-terminal-2sw-caffeine-xyz-without-checking-for-or-redirecting-based-on-any-token",
-      "title": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a `caffeineAdminToken` URL fragment. The app should load normally for any visitor at the clean URL (e.g., `https://ip-global-terminal-2sw.caffeine.xyz/`) without checking for or redirecting based on any token.",
+      "id": "feature-in-animatedworldmap-tsx-change-the-continent-fill-outline-color-from-blue-to-near-black-e-g-0a0a0a-or-111111-so-continents-match-the-black-gold-white-theme-instead-of-appearing-blue",
+      "title": "In AnimatedWorldMap.tsx, change the continent fill/outline color from blue to near-black (e.g., #0a0a0a or #111111) so continents match the Black, Gold & White theme instead of appearing blue.",
       "reqIds": [
         "REQ-1"
       ],
       "version": 1
-    }
-  ],
-  "new_feature_requests": [
+    },
     {
-      "id": "AR-1",
-      "summary": "Remove admin token gate so the app is publicly accessible via a clean shareable URL",
-      "reqIds": [],
-      "status": "pending"
+      "id": "feature-reduce-pixelation-and-blurriness-on-the-hero-background-in-home-tsx-and-any-related-background-image-or-canvas-rendering-ensure-the-background-appears-sharp-and-crisp-use-higher-resolution-rendering-avoid-css-scaling-artifacts-and-set-image-rendering-to-crisp-or-pixelated-where-appropriate",
+      "title": "Reduce pixelation and blurriness on the hero background in Home.tsx and any related background image or canvas rendering. Ensure the background appears sharp and crisp — use higher-resolution rendering, avoid CSS scaling artifacts, and set image-rendering to crisp or pixelated where appropriate.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "version": 1
     }
   ],
+  "new_feature_requests": [],
   "gameProjectType": "none",
-  "projectName": "IP Global Terminal",
+  "projectName": "Darken continents to near-black and sharpen background",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

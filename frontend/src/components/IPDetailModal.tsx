@@ -1,273 +1,194 @@
-import { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import { IPRecord, IPCategory } from '../backend';
 import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
+  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
 } from '@/components/ui/dialog';
-import { Copy, Check, Download, FlaskConical } from 'lucide-react';
+import { Calendar, Globe, Tag, FileText, Hash, Copy, Check, User } from 'lucide-react';
 
 interface IPDetailModalProps {
   record: IPRecord | null;
-  open: boolean;
   onClose: () => void;
 }
 
-const categoryLabels: Record<string, string> = {
-  [IPCategory.patent]: 'Patent',
-  [IPCategory.trademark]: 'Trademark',
-  [IPCategory.copyright]: 'Copyright',
-};
-
-function seededHex(seed: string, length: number): string {
-  const chars = '0123456789abcdef';
-  let result = '';
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+function categoryLabel(cat: IPCategory): string {
+  switch (cat) {
+    case IPCategory.patent: return 'Patent';
+    case IPCategory.trademark: return 'Trademark';
+    case IPCategory.copyright: return 'Copyright';
+    default: return 'Unknown';
   }
-  for (let i = 0; i < length; i++) {
-    hash = (hash * 1664525 + 1013904223) >>> 0;
-    result += chars[hash % 16];
-  }
-  return result;
 }
 
-function seededBase58(seed: string, length: number): string {
-  const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
-  let result = '';
-  let hash = 0;
-  for (let i = 0; i < seed.length; i++) {
-    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
-  }
-  for (let i = 0; i < length; i++) {
-    hash = (hash * 1664525 + 1013904223) >>> 0;
-    result += chars[hash % chars.length];
-  }
-  return result;
+function formatDate(timestamp: bigint): string {
+  const ms = Number(timestamp) / 1_000_000;
+  return new Date(ms).toLocaleDateString('en-GB', {
+    day: '2-digit', month: 'long', year: 'numeric',
+    hour: '2-digit', minute: '2-digit',
+  });
 }
 
-export default function IPDetailModal({ record, open, onClose }: IPDetailModalProps) {
-  const [copied, setCopied] = useState(false);
+function toHex(bytes: Uint8Array): string {
+  return Array.from(bytes).map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+export default function IPDetailModal({ record, onClose }: IPDetailModalProps) {
+  const [copiedDocHash, setCopiedDocHash] = useState(false);
   const [copiedSha, setCopiedSha] = useState(false);
-
-  const hashHex = useMemo(() => {
-    if (!record) return '';
-    return Array.from(record.documentHash)
-      .map((b) => b.toString(16).padStart(2, '0'))
-      .join('');
-  }, [record]);
-
-  const mockEthTxId = useMemo(() => {
-    if (!record) return '';
-    return '0x' + seededHex(String(record.id) + record.title, 64);
-  }, [record]);
-
-  const mockEthBlock = useMemo(() => {
-    if (!record) return 0;
-    let hash = 0;
-    const s = String(record.id) + record.title;
-    for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
-    return 19_000_000 + (hash % 2_000_000);
-  }, [record]);
-
-  const mockSolanaSig = useMemo(() => {
-    if (!record) return '';
-    return seededBase58(record.title + String(record.id), 88);
-  }, [record]);
-
-  const mockSolanaSlot = useMemo(() => {
-    if (!record) return 0;
-    let hash = 0;
-    const s = record.title + String(record.id);
-    for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
-    return 250_000_000 + (hash % 10_000_000);
-  }, [record]);
 
   if (!record) return null;
 
-  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
+  const docHashHex = toHex(record.documentHash);
 
-  const handleCopy = async () => {
-    await navigator.clipboard.writeText(hashHex);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+  const copyToClipboard = async (text: string, setter: (v: boolean) => void) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setter(true);
+      setTimeout(() => setter(false), 2000);
+    } catch {
+      // ignore
+    }
   };
-
-  const handleCopySha = async () => {
-    if (!record.hash) return;
-    await navigator.clipboard.writeText(record.hash);
-    setCopiedSha(true);
-    setTimeout(() => setCopiedSha(false), 2000);
-  };
-
-  const fields = [
-    { label: 'IP ID', value: `#${String(record.id).padStart(4, '0')}` },
-    { label: 'Category', value: categoryLabels[record.category] ?? record.category },
-    { label: 'Jurisdiction', value: record.jurisdiction },
-    { label: 'Owner Principal', value: record.owner.toString(), mono: true },
-    { label: 'Registration Date', value: date },
-  ];
 
   return (
-    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+    <Dialog open={!!record} onOpenChange={(open) => { if (!open) onClose(); }}>
       <DialogContent
-        className="max-w-2xl border border-gold/30 text-gray-100 max-h-[90vh] overflow-y-auto"
-        style={{ background: 'oklch(0.13 0.03 240)' }}
+        className="max-w-2xl max-h-[85vh] overflow-y-auto"
+        style={{
+          backgroundColor: 'oklch(0.09 0 0)',
+          border: '1px solid oklch(0.78 0.15 85 / 0.3)',
+          color: 'oklch(0.97 0 0)',
+        }}
       >
         <DialogHeader>
-          <DialogTitle className="font-serif text-xl text-gold">{record.title}</DialogTitle>
-          <DialogDescription className="text-gray-400 text-sm leading-relaxed mt-1">
-            {record.description}
-          </DialogDescription>
+          <div className="flex items-start justify-between gap-4">
+            <div className="flex-1">
+              <DialogTitle
+                className="text-xl font-bold leading-snug"
+                style={{ color: 'oklch(0.97 0 0)', fontFamily: 'Playfair Display, serif' }}
+              >
+                {record.title}
+              </DialogTitle>
+              <DialogDescription className="mt-1" style={{ color: 'oklch(0.55 0 0)' }}>
+                IP Record #{record.id.toString()}
+              </DialogDescription>
+            </div>
+            <span
+              className="text-xs font-semibold px-3 py-1 rounded-full shrink-0 mt-1"
+              style={{
+                backgroundColor: 'oklch(0.78 0.15 85 / 0.15)',
+                color: 'oklch(0.78 0.15 85)',
+                border: '1px solid oklch(0.78 0.15 85 / 0.4)',
+              }}
+            >
+              {categoryLabel(record.category)}
+            </span>
+          </div>
         </DialogHeader>
 
-        <div className="space-y-3 mt-2">
-          {fields.map((f) => (
-            <div key={f.label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
-              <span className="text-xs text-gray-500 sm:w-36 flex-shrink-0 pt-0.5">{f.label}</span>
-              <span className={`text-sm text-gray-200 break-all ${f.mono ? 'font-mono text-xs' : ''}`}>
-                {f.value}
-              </span>
+        <div className="space-y-5 mt-2">
+          {/* Description */}
+          <div>
+            <h4 className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'oklch(0.78 0.15 85)' }}>
+              Description
+            </h4>
+            <p className="text-sm leading-relaxed" style={{ color: 'oklch(0.72 0 0)' }}>
+              {record.description}
+            </p>
+          </div>
+
+          {/* Metadata grid */}
+          <div
+            className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 rounded-lg"
+            style={{ backgroundColor: 'oklch(0.13 0 0)', border: '1px solid oklch(0.22 0 0)' }}
+          >
+            <div className="flex items-center gap-3">
+              <Calendar className="w-4 h-4 shrink-0" style={{ color: 'oklch(0.78 0.15 85)' }} />
+              <div>
+                <p className="text-xs" style={{ color: 'oklch(0.50 0 0)' }}>Registration Date</p>
+                <p className="text-sm font-medium" style={{ color: 'oklch(0.90 0 0)' }}>{formatDate(record.registrationDate)}</p>
+              </div>
             </div>
-          ))}
+            <div className="flex items-center gap-3">
+              <Globe className="w-4 h-4 shrink-0" style={{ color: 'oklch(0.78 0.15 85)' }} />
+              <div>
+                <p className="text-xs" style={{ color: 'oklch(0.50 0 0)' }}>Jurisdiction</p>
+                <p className="text-sm font-medium" style={{ color: 'oklch(0.90 0 0)' }}>{record.jurisdiction}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 sm:col-span-2">
+              <User className="w-4 h-4 shrink-0" style={{ color: 'oklch(0.78 0.15 85)' }} />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs" style={{ color: 'oklch(0.50 0 0)' }}>Owner Principal</p>
+                <p className="text-xs font-mono truncate" style={{ color: 'oklch(0.72 0 0)' }}>
+                  {record.owner.toString()}
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Document Hash */}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500">Document Hash (SHA-256)</span>
+          <div>
+            <h4 className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'oklch(0.78 0.15 85)' }}>
+              Document Hash
+            </h4>
             <div
-              className="flex items-center gap-2 p-3 rounded-sm border border-gold/15"
-              style={{ background: 'oklch(0.10 0.025 240)' }}
+              className="flex items-center gap-2 p-3 rounded-lg"
+              style={{ backgroundColor: 'oklch(0.13 0 0)', border: '1px solid oklch(0.22 0 0)' }}
             >
-              <span className="font-mono text-xs text-gray-300 break-all flex-1">{hashHex}</span>
+              <FileText className="w-4 h-4 shrink-0" style={{ color: 'oklch(0.78 0.15 85)' }} />
+              <code className="text-xs font-mono flex-1 break-all" style={{ color: 'oklch(0.72 0 0)' }}>
+                {docHashHex}
+              </code>
               <button
-                onClick={handleCopy}
-                className="flex-shrink-0 p-1.5 rounded-sm hover:bg-gold/10 text-gray-400 hover:text-gold transition-colors"
+                onClick={() => copyToClipboard(docHashHex, setCopiedDocHash)}
+                className="shrink-0 p-1 rounded transition-colors"
+                style={{ color: copiedDocHash ? 'oklch(0.78 0.15 85)' : 'oklch(0.50 0 0)' }}
               >
-                {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                {copiedDocHash ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
               </button>
             </div>
           </div>
 
-          {/* SHA-256 Hash (record-level hash assigned at registration) */}
+          {/* SHA-256 Hash */}
           {record.hash && (
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-gray-500">SHA-256 Hash</span>
+            <div>
+              <h4 className="text-xs font-semibold tracking-widest uppercase mb-2" style={{ color: 'oklch(0.78 0.15 85)' }}>
+                SHA-256 Hash
+              </h4>
               <div
-                className="flex items-center gap-2 p-3 rounded-sm border border-gold/20"
-                style={{ background: 'oklch(0.10 0.025 240)' }}
+                className="flex items-center gap-2 p-3 rounded-lg"
+                style={{ backgroundColor: 'oklch(0.13 0 0)', border: '1px solid oklch(0.78 0.15 85 / 0.2)' }}
               >
-                <span className="font-mono text-xs text-gold/80 break-all flex-1">{record.hash}</span>
+                <Hash className="w-4 h-4 shrink-0" style={{ color: 'oklch(0.78 0.15 85)' }} />
+                <code className="text-xs font-mono flex-1 break-all" style={{ color: 'oklch(0.78 0.15 85)' }}>
+                  {record.hash}
+                </code>
                 <button
-                  onClick={handleCopySha}
-                  className="flex-shrink-0 p-1.5 rounded-sm hover:bg-gold/10 text-gray-400 hover:text-gold transition-colors"
-                  title="Copy SHA-256 hash"
+                  onClick={() => copyToClipboard(record.hash, setCopiedSha)}
+                  className="shrink-0 p-1 rounded transition-colors"
+                  style={{ color: copiedSha ? 'oklch(0.78 0.15 85)' : 'oklch(0.50 0 0)' }}
                 >
-                  {copiedSha ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                  {copiedSha ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                 </button>
               </div>
             </div>
           )}
 
-          {/* ICP Blockchain Metadata */}
+          {/* On-chain confirmation */}
           <div
-            className="flex items-center justify-between p-3 rounded-sm border border-green-500/20"
-            style={{ background: 'oklch(0.10 0.025 240)' }}
+            className="p-4 rounded-lg"
+            style={{ backgroundColor: 'oklch(0.78 0.15 85 / 0.08)', border: '1px solid oklch(0.78 0.15 85 / 0.25)' }}
           >
-            <span className="text-gray-400 text-sm">ICP Canister</span>
-            <span className="text-green-400 font-semibold text-sm">On-Chain ✓</span>
-          </div>
-
-          {/* Simulated Cross-Chain Section */}
-          <div
-            className="rounded-sm border border-gold/20 overflow-hidden"
-            style={{ background: 'oklch(0.10 0.025 240)' }}
-          >
-            <div
-              className="flex items-center gap-2 px-3 py-2 border-b border-gold/15"
-              style={{ background: 'oklch(0.11 0.028 240)' }}
-            >
-              <FlaskConical className="w-3.5 h-3.5 text-gold/70" />
-              <span className="text-gold/80 text-xs font-semibold uppercase tracking-wider">
-                Also Recorded On
-              </span>
-              <span className="ml-auto text-xs text-gray-600 italic">
-                Future Integration — Simulated Reference
+            <div className="flex items-center gap-2 mb-1">
+              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: 'oklch(0.78 0.15 85)' }} />
+              <span className="text-xs font-semibold" style={{ color: 'oklch(0.78 0.15 85)' }}>
+                Recorded On-Chain — Internet Computer
               </span>
             </div>
-
-            {/* Ethereum */}
-            <div className="p-3 border-b border-white/5">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-blue-400 text-[8px] font-bold">Ξ</span>
-                </div>
-                <span className="text-gray-300 text-xs font-semibold">Ethereum</span>
-              </div>
-              <div className="space-y-1 pl-6">
-                <div className="flex items-start gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Tx ID</span>
-                  <span className="font-mono text-xs text-gray-400 break-all leading-relaxed">
-                    {mockEthTxId}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Block</span>
-                  <span className="font-mono text-xs text-gray-400">
-                    {mockEthBlock.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
-
-            {/* Solana */}
-            <div className="p-3">
-              <div className="flex items-center gap-2 mb-2">
-                <div className="w-4 h-4 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center flex-shrink-0">
-                  <span className="text-purple-400 text-[8px] font-bold">◎</span>
-                </div>
-                <span className="text-gray-300 text-xs font-semibold">Solana</span>
-              </div>
-              <div className="space-y-1 pl-6">
-                <div className="flex items-start gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Sig</span>
-                  <span className="font-mono text-xs text-gray-400 break-all leading-relaxed">
-                    {mockSolanaSig}
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Slot</span>
-                  <span className="font-mono text-xs text-gray-400">
-                    {mockSolanaSlot.toLocaleString()}
-                  </span>
-                </div>
-              </div>
-            </div>
+            <p className="text-xs" style={{ color: 'oklch(0.55 0 0)' }}>
+              This IP record is permanently stored on the Internet Computer blockchain and cannot be altered or deleted.
+            </p>
           </div>
-
-          {/* File download */}
-          {record.fileBlob && (
-            <div className="pt-2">
-              <a
-                href={record.fileBlob.getDirectURL()}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-sm border border-gold/30 text-gold text-sm hover:bg-gold/10 transition-colors"
-              >
-                <Download className="w-4 h-4" />
-                Download Document
-              </a>
-            </div>
-          )}
         </div>
       </DialogContent>
     </Dialog>

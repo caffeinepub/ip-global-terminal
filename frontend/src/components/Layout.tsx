@@ -1,16 +1,15 @@
-import { ReactNode } from 'react';
+import React from 'react';
+import { Outlet } from '@tanstack/react-router';
 import Header from './Header';
 import Footer from './Footer';
 
-interface LayoutProps {
-  children: ReactNode;
-}
-
-export default function Layout({ children }: LayoutProps) {
+export default function Layout() {
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: 'oklch(0.12 0.025 240)' }}>
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: 'oklch(0.08 0 0)' }}>
       <Header />
-      <main className="flex-1">{children}</main>
+      <main className="flex-1">
+        <Outlet />
+      </main>
       <Footer />
     </div>
   );
