@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Shield, Globe, Lock, Zap, ArrowRight, Database, Coins } from 'lucide-react';
+import { Shield, Globe, Lock, Zap, ArrowRight, Database, Coins, FileText } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const features = [
@@ -126,7 +126,7 @@ export default function Home() {
               { label: 'Total Supply', value: '100B', unit: 'IPGT' },
               { label: 'Blockchain', value: 'ICP', unit: 'Internet Computer' },
               { label: 'IP Categories', value: '3', unit: 'Types' },
-              { label: 'Registration Fee', value: '100', unit: 'IPGT Burned' },
+              { label: 'Registration Fee', value: '0.02', unit: 'IPGT Burned' },
             ].map((stat) => (
               <div key={stat.label}>
                 <div className="font-serif font-bold text-2xl" style={{ color: 'oklch(0.78 0.14 85)' }}>
@@ -178,6 +178,47 @@ export default function Home() {
                 <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Whitepaper CTA */}
+      <section
+        className="py-14 border-t border-border"
+        style={{ backgroundColor: 'oklch(0.13 0.025 240)' }}
+      >
+        <div className="container mx-auto px-4">
+          <div
+            className="rounded-xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10"
+            style={{
+              background: 'linear-gradient(135deg, oklch(0.16 0.025 240) 0%, oklch(0.18 0.04 85 / 0.3) 100%)',
+              border: '1px solid oklch(0.78 0.14 85 / 0.25)',
+            }}
+          >
+            <div
+              className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0"
+              style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.15)', border: '1px solid oklch(0.78 0.14 85 / 0.3)' }}
+            >
+              <FileText className="w-8 h-8" style={{ color: 'oklch(0.78 0.14 85)' }} />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h3 className="font-serif text-2xl font-bold text-foreground mb-2">
+                Read the IPGT Whitepaper
+              </h3>
+              <p className="text-muted-foreground leading-relaxed max-w-xl">
+                Explore the full technical architecture, tokenomics, SHA-256 hashing methodology, duplicate IP protection, 48-month vesting schedule, and long-term vision behind the IP Global Terminal protocol.
+              </p>
+            </div>
+            <Link to="/whitepaper" className="shrink-0">
+              <Button
+                size="lg"
+                className="font-semibold gap-2 whitespace-nowrap"
+                style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
+              >
+                <FileText className="w-4 h-4" />
+                Read Whitepaper
+              </Button>
+            </Link>
           </div>
         </div>
       </section>

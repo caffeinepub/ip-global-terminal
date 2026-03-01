@@ -1,83 +1,121 @@
 {
   "kind": "build_request",
-  "title": "Reduce IP registration burn fee to 0.02 IPGT and persist Internet Identity login sessions",
+  "title": "Restore pre-whitepaper styling on all non-whitepaper pages and add Whitepaper CTA to homepage",
   "projectName": "IP Global Terminal",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-11",
-      "text": "In the backend (backend/main.mo), reduce the IP registration burn fee constant from 100 IPGT to 0.02 IPGT. Given that IPGT uses 2 decimal places of precision (base units), this means the burn amount must be set to 2 base units (i.e., 1/50th of 1 IPGT coin). Update all relevant constants, minimum balance checks, and burn logic accordingly.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-7",
-          "msg-9"
-        ],
-        "quotes": [
-          "the MIN burn fee for an IP is 1/50 of a IPGT Coin please adjust",
-          "Burn fee reduced to 0.02 IPGT (1/50th of 1 IPGT coin)"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The backend burn constant is set to 2 base units (0.02 IPGT at 2 decimal precision)",
-        "Registering an IP deducts exactly 0.02 IPGT from the caller's balance",
-        "The minimum balance check for registration is updated to require at least 0.02 IPGT",
-        "Total burned supply is incremented by 0.02 IPGT per successful registration"
-      ]
-    },
-    {
-      "id": "REQ-12",
-      "text": "Update the IP Registration page (frontend/src/pages/RegisterIP.tsx) and the RegistrationSuccessModal (frontend/src/components/RegistrationSuccessModal.tsx) to display the correct burn fee of 0.02 IPGT instead of 100 IPGT. Any UI text, tooltips, or helper copy referencing the burn amount must reflect the new fee.",
+      "id": "REQ-18",
+      "text": "Restore frontend/src/pages/Home.tsx to its pre-whitepaper visual state (hero banner, feature grid, navigation buttons, color scheme, typography, spacing, and layout) exactly as it appeared before the whitepaper feature was added, while retaining the 'Read the Whitepaper' call-to-action button or card that links to /whitepaper using the existing gold accent button style.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-7",
-          "msg-9"
+          "msg-4",
+          "msg-5",
+          "msg-6"
         ],
         "quotes": [
-          "Registration burns 100 IPGT from your balance permanently",
-          "update the frontend registration UI text so it accurately reflects the new fee"
+          "revert all non-whitepaper pages back to their original look",
+          "just add the whitepaper somewhere on the homepage"
         ]
       },
       "acceptanceCriteria": [
-        "The registration form displays '0.02 IPGT' as the burn fee",
-        "The success modal shows '0.02 IPGT burned' after a successful registration",
-        "No UI text anywhere in the app references 100 IPGT as the registration cost"
+        "Home page hero banner, feature grid, and CTA section look identical to the version before the whitepaper feature was introduced.",
+        "A 'Read the Whitepaper' button or card is present on the homepage and navigates to /whitepaper.",
+        "The Whitepaper CTA uses the existing gold accent button style consistent with other CTAs on the page.",
+        "No whitepaper-specific layout or style overrides bleed into the homepage."
       ]
     },
     {
-      "id": "REQ-13",
-      "text": "Ensure the Internet Identity authentication hook (frontend/src/hooks/useInternetIdentity.ts) persists the authenticated session across page reloads using AuthClient's local storage persistence. On app startup, the app must automatically restore an existing authenticated session without requiring the user to log in again. The session should remain valid until the user explicitly logs out or the session naturally expires.",
+      "id": "REQ-19",
+      "text": "Restore frontend/src/components/Header.tsx to its pre-whitepaper visual state (logo placement, nav link styling, authenticated balance display, mobile menu) while keeping the existing 'Whitepaper' navigation link that was already added.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8",
-          "msg-10"
+          "msg-4",
+          "msg-5"
         ],
         "quotes": [
-          "save any log in created so they can log in in the future and keep their data",
-          "Persistent login sessions — the Internet Identity session is saved in the browser so users don't have to log in every time they revisit the app",
-          "Session restoration — on page load, the app will automatically check for an existing Internet Identity session and restore the logged-in state without requiring re-authentication"
+          "revert all non-whitepaper pages back to their original look"
         ]
       },
       "acceptanceCriteria": [
-        "After logging in with Internet Identity, refreshing the page restores the authenticated state automatically without showing the login prompt",
-        "The user's principal ID and IPGT balance are displayed immediately on page load if a valid session exists",
-        "Clicking logout clears the session and the user is returned to the unauthenticated state",
-        "If no valid session exists on load, the app shows the unauthenticated state without errors"
+        "Header appearance (colors, font sizes, spacing, logo) matches the original dark navy/gold design from before the whitepaper feature.",
+        "The 'Whitepaper' nav link remains present and functional.",
+        "Authenticated user balance and login/logout button render correctly."
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "text": "Restore frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and frontend/src/pages/CoinDashboard.tsx to their pre-whitepaper visual state — reverting any layout, typography, color, or spacing changes that were introduced as a side effect of the whitepaper feature implementation.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-5"
+        ],
+        "quotes": [
+          "revert all non-whitepaper pages (Home, IP Database, Registration, Coin Dashboard) back to their original look"
+        ]
+      },
+      "acceptanceCriteria": [
+        "IP Database page card layout, filter controls, pagination, and dark navy/gold styling are identical to before the whitepaper was added.",
+        "Register IP page form fields, file upload, error/success states, and gold-accented button styling are identical to before the whitepaper was added.",
+        "Coin Dashboard stats cards and transfer form appearance are identical to before the whitepaper was added.",
+        "No whitepaper-specific global CSS or Tailwind overrides affect these pages."
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "text": "Restore frontend/src/components/Layout.tsx and frontend/src/components/Footer.tsx to their pre-whitepaper visual state, reverting any structural or styling changes introduced by the whitepaper feature while preserving the whitepaper route in App.tsx.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-5"
+        ],
+        "quotes": [
+          "revert all non-whitepaper pages back to their original look"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Layout wrapper (Header + Footer + content area) renders identically to before the whitepaper was added on all non-whitepaper pages.",
+        "Footer branding, copyright, and links are unchanged.",
+        "The /whitepaper route remains registered in App.tsx and Whitepaper.tsx is untouched."
+      ]
+    },
+    {
+      "id": "REQ-22",
+      "text": "Audit frontend/src/index.css and frontend/tailwind.config.js for any global style changes introduced by the whitepaper feature implementation that affect non-whitepaper pages, and revert only those changes while preserving whitepaper-specific print styles and prose utilities.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-5"
+        ],
+        "quotes": [
+          "the app does not look the same please revert the app to what it looked like before but keep the whitepaper in"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Global CSS variables and Tailwind config are restored to their pre-whitepaper values for all shared tokens.",
+        "Whitepaper-specific styles (e.g., print media queries, prose classes scoped to the whitepaper page) remain intact.",
+        "No visual regressions appear on Home, IP Database, Register IP, or Coin Dashboard pages due to global style changes."
       ]
     }
   ],
   "constraints": [
-    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts directly if they are immutable — implement session persistence using only patterns supported by the existing AuthClient setup in those hooks",
-    "Do not change the IPGT token supply or any other token parameters beyond the burn fee constant",
-    "All on-chain data (IP records, balances) must remain linked to user principals and must not be reset"
+    "Do not modify frontend/src/pages/Whitepaper.tsx — its content, layout, and styling must remain exactly as implemented.",
+    "Keep the /whitepaper route registered in frontend/src/App.tsx.",
+    "Keep the 'Whitepaper' navigation link in frontend/src/components/Header.tsx.",
+    "Do not touch any files listed in frontend.immutablePaths.",
+    "Do not modify any backend files."
   ],
   "nonGoals": [
-    "Adding new authentication providers beyond Internet Identity",
-    "Changing any other backend token parameters (supply, transfer logic, etc.)",
-    "Redesigning any UI pages beyond updating the burn fee display text",
-    "Implementing a coin faucet or airdrop mechanism"
+    "Redesigning or improving any page beyond restoring the pre-whitepaper state.",
+    "Adding new features to any page other than the Whitepaper CTA on the homepage.",
+    "Changing the Whitepaper page content, layout, or styling.",
+    "Any backend changes."
   ],
   "imageRequirements": {
     "required": [],

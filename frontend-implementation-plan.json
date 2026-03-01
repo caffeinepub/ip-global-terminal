@@ -1,48 +1,107 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Reduce IP registration burn fee to 0.02 IPGT and persist Internet Identity login sessions",
+  "title": "Restore pre-whitepaper styling on all non-whitepaper pages and add Whitepaper CTA to homepage",
   "requirements": [
     {
-      "id": "REQ-12",
-      "summary": "Update registration UI to display 0.02 IPGT burn fee instead of 100 IPGT",
+      "id": "REQ-18",
+      "summary": "Restore Home.tsx to its pre-whitepaper visual state (hero banner, feature grid, navigation buttons, color scheme, typography, spacing, layout) while retaining a 'Read the Whitepaper' CTA button that links to /whitepaper using the existing gold accent button style",
       "acceptanceCriteria": [
-        "The registration form displays '0.02 IPGT' as the burn fee",
-        "The success modal shows '0.02 IPGT burned' after a successful registration",
-        "No UI text anywhere in the app references 100 IPGT as the registration cost"
+        "Home page hero banner, feature grid, and CTA section look identical to the version before the whitepaper feature was introduced.",
+        "A 'Read the Whitepaper' button or card is present on the homepage and navigates to /whitepaper.",
+        "The Whitepaper CTA uses the existing gold accent button style consistent with other CTAs on the page.",
+        "No whitepaper-specific layout or style overrides bleed into the homepage."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/RegisterIP.tsx",
+          "path": "frontend/src/pages/Home.tsx",
           "operation": "modify",
-          "description": "Update all UI text and tooltips referencing the burn fee from 100 IPGT to 0.02 IPGT. Verify the component's usage instructions before implementing. Search for hardcoded '100' values in fee-related copy and replace with '0.02'."
-        },
-        {
-          "path": "frontend/src/components/RegistrationSuccessModal.tsx",
-          "operation": "modify",
-          "description": "Update the success confirmation message to display '0.02 IPGT burned' instead of '100 IPGT'. Ensure the burned amount shown after registration accurately reflects the new fee."
+          "description": "Restore the original hero banner with the generated hero image at frontend/public/assets/generated/ipgt-hero-banner.dim_1400x500.png, feature grid layout, and navigation buttons to their pre-whitepaper styling. Add a 'Read the Whitepaper' CTA button using the existing gold accent button style that navigates to /whitepaper, positioned within the existing CTA section or feature grid without altering the overall page structure."
         }
       ]
     },
     {
-      "id": "REQ-13",
-      "summary": "Implement persistent Internet Identity sessions across page reloads",
+      "id": "REQ-19",
+      "summary": "Restore Header.tsx to its pre-whitepaper visual state (logo placement, nav link styling, authenticated balance display, mobile menu) while keeping the existing 'Whitepaper' navigation link",
       "acceptanceCriteria": [
-        "After logging in with Internet Identity, refreshing the page restores the authenticated state automatically without showing the login prompt",
-        "The user's principal ID and IPGT balance are displayed immediately on page load if a valid session exists",
-        "Clicking logout clears the session and the user is returned to the unauthenticated state",
-        "If no valid session exists on load, the app shows the unauthenticated state without errors"
+        "Header appearance (colors, font sizes, spacing, logo) matches the original dark navy/gold design from before the whitepaper feature.",
+        "The 'Whitepaper' nav link remains present and functional.",
+        "Authenticated user balance and login/logout button render correctly."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/hooks/useInternetIdentity.ts",
+          "path": "frontend/src/components/Header.tsx",
           "operation": "modify",
-          "description": "Ensure the AuthClient is configured with persistent storage and that the hook checks for an existing authenticated session on initialization. Verify the component's usage instructions before implementing. The session must be automatically restored from AuthClient's local storage on app startup without requiring re-authentication. Ensure the identity state is set immediately when a valid session is found."
+          "description": "Restore the original header styling including logo placement using the generated logo at frontend/public/assets/generated/ipgt-logo.dim_128x128.png, nav link font sizes, colors, spacing, and mobile menu appearance to match the dark navy/gold design from before the whitepaper feature. Preserve the 'Whitepaper' navigation link and ensure authenticated balance display and login/logout functionality remain intact."
+        }
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "summary": "Restore IPDatabase.tsx, RegisterIP.tsx, and CoinDashboard.tsx to their pre-whitepaper visual state, reverting any layout, typography, color, or spacing changes introduced by the whitepaper feature",
+      "acceptanceCriteria": [
+        "IP Database page card layout, filter controls, pagination, and dark navy/gold styling are identical to before the whitepaper was added.",
+        "Register IP page form fields, file upload, error/success states, and gold-accented button styling are identical to before the whitepaper was added.",
+        "Coin Dashboard stats cards and transfer form appearance are identical to before the whitepaper was added.",
+        "No whitepaper-specific global CSS or Tailwind overrides affect these pages."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/IPDatabase.tsx",
+          "operation": "modify",
+          "description": "Restore the original card layout, filter controls (search, category, jurisdiction), pagination UI, and dark navy/gold color scheme to match the pre-whitepaper state. Remove any typography, spacing, or layout changes introduced as side effects of the whitepaper feature implementation."
         },
         {
-          "path": "frontend/src/hooks/useActor.ts",
+          "path": "frontend/src/pages/RegisterIP.tsx",
           "operation": "modify",
-          "description": "Verify that the actor hook properly handles restored identity from persistent sessions. Ensure that when the identity is restored on page load, the actor is recreated with the authenticated identity and dependent queries are not prematurely invalidated during the restoration phase."
+          "description": "Restore the original form field styling, file upload component appearance, error/success message display, and gold-accented submit button to match the pre-whitepaper state. Ensure all spacing, typography, and color values revert to their original dark navy/gold theme."
+        },
+        {
+          "path": "frontend/src/pages/CoinDashboard.tsx",
+          "operation": "modify",
+          "description": "Restore the original stats card layout, transfer form styling, button appearance, and dark navy/gold color scheme to match the pre-whitepaper state. Remove any typography or spacing changes introduced by the whitepaper feature."
+        }
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "summary": "Restore Layout.tsx and Footer.tsx to their pre-whitepaper visual state, reverting any structural or styling changes introduced by the whitepaper feature while preserving the whitepaper route in App.tsx",
+      "acceptanceCriteria": [
+        "Layout wrapper (Header + Footer + content area) renders identically to before the whitepaper was added on all non-whitepaper pages.",
+        "Footer branding, copyright, and links are unchanged.",
+        "The /whitepaper route remains registered in App.tsx and Whitepaper.tsx is untouched."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Restore the original Layout wrapper structure, flex container styling, spacing, and any background or structural properties to match the pre-whitepaper state. Ensure the Header, Footer, and content area composition renders identically on all non-whitepaper pages."
+        },
+        {
+          "path": "frontend/src/components/Footer.tsx",
+          "operation": "modify",
+          "description": "Restore the original footer branding, copyright text, link styling, spacing, and color scheme to match the pre-whitepaper state. Revert any typography or layout changes introduced by the whitepaper feature implementation."
+        }
+      ]
+    },
+    {
+      "id": "REQ-22",
+      "summary": "Audit index.css and tailwind.config.js for global style changes introduced by the whitepaper feature that affect non-whitepaper pages, and revert only those changes while preserving whitepaper-specific print styles and prose utilities",
+      "acceptanceCriteria": [
+        "Global CSS variables and Tailwind config are restored to their pre-whitepaper values for all shared tokens.",
+        "Whitepaper-specific styles (e.g., print media queries, prose classes scoped to the whitepaper page) remain intact.",
+        "No visual regressions appear on Home, IP Database, Register IP, or Coin Dashboard pages due to global style changes."
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/index.css",
+          "operation": "modify",
+          "description": "Audit and revert any global CSS variable changes, base layer modifications, or utility class additions introduced by the whitepaper feature that affect non-whitepaper pages. Preserve whitepaper-specific print media queries and prose utility classes that are scoped to the Whitepaper page. Restore original dark navy/gold theme tokens and ensure no global overrides bleed into Home, IP Database, Register IP, or Coin Dashboard pages."
+        },
+        {
+          "path": "frontend/tailwind.config.js",
+          "operation": "modify",
+          "description": "Audit and revert any Tailwind theme extensions, color token modifications, typography settings, or plugin configurations introduced by the whitepaper feature that affect non-whitepaper pages. Preserve whitepaper-specific typography plugin settings if they are scoped correctly. Restore original oklch-based color tokens (gold, navy, charcoal) and ensure all shared theme values match the pre-whitepaper state."
         }
       ]
     }

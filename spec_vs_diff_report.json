@@ -1,26 +1,66 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T03:14:03.534Z",
-  "summary": "The diff implements REQ-11 (backend burn fee reduced to 2 base units) and REQ-12 (frontend UI updated to show 0.02 IPGT). REQ-13 (session persistence across page reloads) is not addressed anywhere in the diff — no changes were made to useInternetIdentity.ts or any session-restoration logic.",
+  "generatedAt": "2026-03-01T04:13:27.536Z",
+  "summary": "The diff shows only 3 files modified: frontend/src/pages/CoinDashboard.tsx, frontend-file-summaries.txt (a metadata/documentation file), and project_state.json. The build request requires restoring pre-whitepaper styling across Home.tsx, Header.tsx, IPDatabase.tsx, RegisterIP.tsx, CoinDashboard.tsx, Layout.tsx, Footer.tsx, index.css, and tailwind.config.js. Only CoinDashboard.tsx appears to have been touched among the actual source files, and its changes appear functional rather than styling restorations.",
   "missing_requirements": [
     {
-      "id": "REQ-13",
-      "requirement": "Persist Internet Identity authenticated session across page reloads using AuthClient's local storage persistence, automatically restoring an existing session on app startup without requiring the user to log in again.",
-      "reason": "No changes to frontend/src/hooks/useInternetIdentity.ts or any related session persistence logic appear anywhere in the diff. The frontend-file-summaries.txt does not mention any session persistence update for the auth hook, and no new files related to session restoration were added.",
+      "id": "REQ-18",
+      "requirement": "Restore frontend/src/pages/Home.tsx to its pre-whitepaper visual state while retaining the 'Read the Whitepaper' CTA button linking to /whitepaper using gold accent button style.",
+      "reason": "frontend/src/pages/Home.tsx is not present in the modified files list. No changes were made to this file in the diff.",
       "evidence": [
-        "frontend-file-summaries.txt",
-        "frontend/src/hooks/useInternetIdentity.ts"
+        "frontend/src/pages/Home.tsx"
+      ]
+    },
+    {
+      "id": "REQ-19",
+      "requirement": "Restore frontend/src/components/Header.tsx to its pre-whitepaper visual state while keeping the 'Whitepaper' navigation link.",
+      "reason": "frontend/src/components/Header.tsx is not present in the modified files list. No changes were made to this file in the diff.",
+      "evidence": [
+        "frontend/src/components/Header.tsx"
+      ]
+    },
+    {
+      "id": "REQ-20",
+      "requirement": "Restore frontend/src/pages/IPDatabase.tsx and frontend/src/pages/RegisterIP.tsx to their pre-whitepaper visual state.",
+      "reason": "frontend/src/pages/IPDatabase.tsx and frontend/src/pages/RegisterIP.tsx are not present in the modified files list. Only CoinDashboard.tsx was modified, and its modification appears to be functional rather than restoring pre-whitepaper styling.",
+      "evidence": [
+        "frontend/src/pages/IPDatabase.tsx",
+        "frontend/src/pages/RegisterIP.tsx"
+      ]
+    },
+    {
+      "id": "REQ-21",
+      "requirement": "Restore frontend/src/components/Layout.tsx and frontend/src/components/Footer.tsx to their pre-whitepaper visual state.",
+      "reason": "Neither frontend/src/components/Layout.tsx nor frontend/src/components/Footer.tsx appear in the modified files list. No changes were made to these files.",
+      "evidence": [
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/components/Footer.tsx"
+      ]
+    },
+    {
+      "id": "REQ-22",
+      "requirement": "Audit frontend/src/index.css and frontend/tailwind.config.js for global style changes introduced by the whitepaper feature and revert only those changes while preserving whitepaper-specific styles.",
+      "reason": "Neither frontend/src/index.css nor frontend/tailwind.config.js appear in the modified files list. No audit or reversion was performed on these files.",
+      "evidence": [
+        "frontend/src/index.css",
+        "frontend/tailwind.config.js"
       ]
     }
   ],
-  "hallucinated_features": [],
-  "confidence": 0.92,
+  "hallucinated_features": [
+    {
+      "description": "CoinDashboard.tsx was modified to update burn amount display logic and coin info text to reflect 0.02 IPGT, which is a functional/content change not requested by any REQ.",
+      "reason": "The build request only asks to restore pre-whitepaper styling on CoinDashboard.tsx. The diff shows content changes to burn fee amounts and coin info text, which are outside the scope of styling restoration and were not requested.",
+      "evidence": [
+        "frontend/src/pages/CoinDashboard.tsx"
+      ]
+    }
+  ],
+  "confidence": 0.82,
   "changed_files": [
-    "backend/main.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/RegistrationSuccessModal.tsx",
-    "frontend/src/pages/RegisterIP.tsx",
+    "frontend/src/pages/CoinDashboard.tsx",
     "project_state.json"
   ]
 }

@@ -127,7 +127,7 @@ export default function CoinDashboard() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
             {[
               { label: 'Total Supply', value: '100,000,000,000 IPGT' },
-              { label: 'Registration Burn', value: '100 IPGT per IP' },
+              { label: 'Registration Burn', value: '0.02 IPGT per IP' },
               { label: 'Blockchain', value: 'Internet Computer (ICP)' },
               { label: 'Token Model', value: 'Deflationary (burn-on-use)' },
             ].map((item) => (
@@ -143,7 +143,7 @@ export default function CoinDashboard() {
           >
             <Info className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'oklch(0.78 0.14 85)' }} />
             <p className="text-muted-foreground">
-              IPGT coins are required to register intellectual property. Each registration permanently burns 100 IPGT, creating a deflationary pressure that preserves long-term coin value.
+              IPGT coins are required to register intellectual property. Each registration permanently burns 0.02 IPGT, creating a deflationary pressure that preserves long-term coin value.
             </p>
           </div>
         </div>

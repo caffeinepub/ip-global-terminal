@@ -1,13 +1,15 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 5,
-  "summary": "IP Global Terminal (IPGT) — a blockchain-secured global intellectual property database running on ICP. Features an IPGT coin (100B supply, burn-on-registration), open IP registration for coin holders, document uploads, on-chain file hashing, and a publicly searchable global IP database.",
+  "projectStateVersion": 9,
+  "summary": "IP Global Terminal (IPGT) — a blockchain-secured global intellectual property database running on ICP. Features an IPGT coin (100B supply, 25B immediate release, 75B vesting linearly over 48 months at ~1.5625B IPGT/month, burn-on-registration), open IP registration for coin holders, document uploads, on-chain file hashing, a publicly searchable global IP database, a standalone ICRC-1 token canister for ICPSwap compatibility, and an in-app whitepaper page accessible from the homepage.",
   "architectural_notes": [
     "Platform runs on ICP (Internet Computer Protocol) using canisters as smart contracts",
     "IPGT coin is a fungible token on ICP; coins are permanently burned on each IP registration",
     "IP records include: title, description, category (patent/trademark/copyright), owner identity, registration date, document hash, jurisdiction",
     "Document uploads (PDFs, images) supported; file hash recorded on-chain regardless of upload",
-    "IP registration burn fee is 0.02 IPGT (1/50th of 1 IPGT coin) — not 100 IPGT"
+    "IP registration burn fee is 0.02 IPGT (1/50th of 1 IPGT coin) — not 100 IPGT",
+    "IPGT token will be deployed as a standalone ICRC-1 canister separate from the main app canister, enabling ICPSwap listing and cross-wallet transfers",
+    "Treasury holds 100% of 100B IPGT supply at launch; 25B released immediately, 75B vests linearly over 48 months (~1.5625B IPGT/month)"
   ],
   "known_issues": [],
   "isFixRequest": true,
@@ -73,6 +75,46 @@
       "title": "Update the IP Registration page (frontend/src/pages/RegisterIP.tsx) and the RegistrationSuccessModal (frontend/src/components/RegistrationSuccessModal.tsx) to display the correct burn fee of 0.02 IPGT instead of 100 IPGT. Any UI text, tooltips, or helper copy referencing the burn amount must reflect the new fee.",
       "reqIds": [
         "REQ-12"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-create-a-new-whitepaper-page-at-frontend-src-pages-whitepaper-tsx-the-page-must-be-a-long-detailed-professionally-written-whitepaper-rendered-as-a-styled-in-app-page-it-must-include-all-of-the-following-sections-with-extensive-prose-under-each-1-executive-summary-ipgt-s-mission-to-decentralize-and-democratize-ip-protection-globally-on-the-internet-computer-2-the-problem-fragmented-expensive-jurisdiction-locked-and-inaccessible-traditional-ip-registration-systems-worldwide-3-the-solution-ipgt-s-on-chain-tamper-proof-ip-registry-with-open-access-via-internet-identity-4-technology-architecture-icp-canisters-on-chain-state-internet-identity-immutable-records-canister-upgrades-and-stable-memory-5-encryption-hashing-methodology-sha-256-document-fingerprinting-computed-client-side-how-it-proves-prior-art-and-establishes-ownership-without-storing-the-document-itself-and-how-hashes-are-stored-immutably-on-chain-6-duplicate-ip-protection-the-system-enforces-uniqueness-by-rejecting-any-registration-attempt-where-the-document-hash-already-exists-on-chain-making-double-registration-of-the-same-ip-impossible-7-ipgt-tokenomics-100b-total-supply-25b-released-immediately-at-launch-75b-vesting-linearly-over-48-months-1-5625b-ipgt-month-burn-on-registration-mechanism-with-0-02-ipgt-burned-per-registration-deflationary-supply-dynamics-8-token-release-schedule-month-by-month-breakdown-table-and-rationale-covering-ecosystem-growth-anti-inflation-design-long-term-sustainability-and-icpswap-liquidity-strategy-9-use-cases-patents-trademarks-copyrights-creative-works-software-trade-secrets-media-and-domain-innovations-10-roadmap-phase-1-platform-launch-and-initial-ip-registrations-phase-2-icpswap-listing-and-token-liquidity-phase-3-global-adoption-api-access-institutional-partnerships-11-legal-disclaimer-the-platform-does-not-constitute-legal-ip-protection-in-any-jurisdiction-and-users-should-consult-qualified-legal-counsel-the-page-must-include-a-sticky-left-sidebar-table-of-contents-with-anchor-links-to-each-section-smooth-scroll-behavior-and-a-print-to-pdf-button-at-the-top-of-the-page-style-must-fully-match-the-existing-dark-navy-gold-theme-playfair-display-headings-inter-body-gold-accents-charcoal-navy-backgrounds",
+      "title": "Create a new Whitepaper page at frontend/src/pages/Whitepaper.tsx. The page must be a long, detailed, professionally written whitepaper rendered as a styled in-app page. It must include all of the following sections with extensive prose under each: (1) Executive Summary — IPGT's mission to decentralize and democratize IP protection globally on the Internet Computer; (2) The Problem — fragmented, expensive, jurisdiction-locked, and inaccessible traditional IP registration systems worldwide; (3) The Solution — IPGT's on-chain, tamper-proof IP registry with open access via Internet Identity; (4) Technology Architecture — ICP canisters, on-chain state, Internet Identity, immutable records, canister upgrades and stable memory; (5) Encryption & Hashing Methodology — SHA-256 document fingerprinting computed client-side, how it proves prior art and establishes ownership without storing the document itself, and how hashes are stored immutably on-chain; (6) Duplicate IP Protection — the system enforces uniqueness by rejecting any registration attempt where the document hash already exists on-chain, making double-registration of the same IP impossible; (7) IPGT Tokenomics — 100B total supply, 25B released immediately at launch, 75B vesting linearly over 48 months (~1.5625B IPGT/month), burn-on-registration mechanism with 0.02 IPGT burned per registration, deflationary supply dynamics; (8) Token Release Schedule — month-by-month breakdown table and rationale covering ecosystem growth, anti-inflation design, long-term sustainability, and ICPSwap liquidity strategy; (9) Use Cases — Patents, Trademarks, Copyrights, creative works, software, trade secrets, media, and domain innovations; (10) Roadmap — Phase 1 (platform launch and initial IP registrations), Phase 2 (ICPSwap listing and token liquidity), Phase 3 (global adoption, API access, institutional partnerships); (11) Legal Disclaimer — the platform does not constitute legal IP protection in any jurisdiction and users should consult qualified legal counsel. The page must include a sticky left-sidebar table of contents with anchor links to each section, smooth scroll behavior, and a print-to-PDF button at the top of the page. Style must fully match the existing dark navy/gold theme (Playfair Display headings, Inter body, gold accents, charcoal/navy backgrounds).",
+      "reqIds": [
+        "REQ-14"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-the-whitepaper-route-to-the-tanstack-router-tree-in-frontend-src-app-tsx-register-a-route-at-whitepaper-pointing-to-the-new-whitepaper-page-component",
+      "title": "Add the Whitepaper route to the TanStack Router tree in frontend/src/App.tsx. Register a route at /whitepaper pointing to the new Whitepaper page component.",
+      "reqIds": [
+        "REQ-15"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-components-header-tsx-to-add-a-whitepaper-navigation-link-pointing-to-whitepaper-alongside-the-existing-nav-links-maintaining-the-current-dark-navy-gold-header-styling",
+      "title": "Update frontend/src/components/Header.tsx to add a 'Whitepaper' navigation link pointing to /whitepaper alongside the existing nav links, maintaining the current dark navy/gold header styling.",
+      "reqIds": [
+        "REQ-16"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-pages-home-tsx-to-add-a-prominent-read-the-whitepaper-call-to-action-button-or-card-in-the-feature-highlights-cta-section-the-button-should-link-to-whitepaper-and-use-the-existing-gold-accent-button-style",
+      "title": "Update frontend/src/pages/Home.tsx to add a prominent 'Read the Whitepaper' call-to-action button or card in the feature highlights / CTA section. The button should link to /whitepaper and use the existing gold accent button style.",
+      "reqIds": [
+        "REQ-17"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-restore-frontend-src-pages-ipdatabase-tsx-frontend-src-pages-registerip-tsx-and-frontend-src-pages-coindashboard-tsx-to-their-pre-whitepaper-visual-state-reverting-any-layout-typography-color-or-spacing-changes-that-were-introduced-as-a-side-effect-of-the-whitepaper-feature-implementation",
+      "title": "Restore frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and frontend/src/pages/CoinDashboard.tsx to their pre-whitepaper visual state — reverting any layout, typography, color, or spacing changes that were introduced as a side effect of the whitepaper feature implementation.",
+      "reqIds": [
+        "REQ-20"
       ],
       "version": 1
     }
@@ -151,6 +193,56 @@
       "summary": "Ensure the Internet Identity authentication hook (frontend/src/hooks/useInternetIdentity.ts) persists the authenticated session across page reloads using AuthClient's local storage persistence. On app startup, the app must automatically restore an existing authenticated session without requiring the user to log in again. The session should remain valid until the user explicitly logs out or the session naturally expires.",
       "reqIds": [
         "REQ-13"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-13",
+      "summary": "Deploy a standalone ICRC-1 token canister for IPGT with 100B total supply minted to treasury, 25B released immediately at launch, remaining 75B vesting linearly over 48 months (~1.5625B IPGT/month). Full ICRC-1 standard compliance for ICPSwap compatibility. Treasury is a distinct account from the personal wallet.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-14",
+      "summary": "Migrate the main app to use the new standalone ICRC-1 token canister for balances, transfers, and IP registration burn fee. Update IPGT Terminal Wallet to support receiving transfers from an ICPSwap-connected wallet.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-15",
+      "summary": "Add a long, detailed, professionally styled in-app whitepaper page accessible from the homepage. Sections include: executive summary, the problem, the solution, technology architecture, encryption/hashing methodology, duplicate IP protection, IPGT tokenomics, token release schedule with rationale, use cases, roadmap, and legal disclaimer. Match dark navy/gold theme with sticky TOC sidebar, section anchors, and print-to-PDF button.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-16",
+      "summary": "Restore frontend/src/pages/Home.tsx to its pre-whitepaper visual state (hero banner, feature grid, navigation buttons, color scheme, typography, spacing, and layout) exactly as it appeared before the whitepaper feature was added, while retaining the 'Read the Whitepaper' call-to-action button or card that links to /whitepaper using the existing gold accent button style.",
+      "reqIds": [
+        "REQ-18"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-17",
+      "summary": "Restore frontend/src/components/Header.tsx to its pre-whitepaper visual state (logo placement, nav link styling, authenticated balance display, mobile menu) while keeping the existing 'Whitepaper' navigation link that was already added.",
+      "reqIds": [
+        "REQ-19"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-19",
+      "summary": "Restore frontend/src/components/Layout.tsx and frontend/src/components/Footer.tsx to their pre-whitepaper visual state, reverting any structural or styling changes introduced by the whitepaper feature while preserving the whitepaper route in App.tsx.",
+      "reqIds": [
+        "REQ-21"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-20",
+      "summary": "Audit frontend/src/index.css and frontend/tailwind.config.js for any global style changes introduced by the whitepaper feature implementation that affect non-whitepaper pages, and revert only those changes while preserving whitepaper-specific print styles and prose utilities.",
+      "reqIds": [
+        "REQ-22"
       ],
       "status": "pending"
     }

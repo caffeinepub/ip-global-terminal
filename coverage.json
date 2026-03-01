@@ -1,56 +1,74 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T03:14:03.538Z",
+  "generatedAt": "2026-03-01T04:13:27.540Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
+    "total": 5,
     "implemented": 1,
     "items": [
       {
-        "id": "REQ-11",
-        "summary": "In the backend (backend/main.mo), reduce the IP registration burn fee constant from 100 IPGT to 0.02 IPGT. Given that IPGT uses 2 decimal places of precision (base units), this means the burn amount must be set to 2 base units (i.e., 1/50th of 1 IPGT coin). Update all relevant constants, minimum balance checks, and burn logic accordingly.",
-        "status": "unknown",
-        "plannedFiles": [],
+        "id": "REQ-18",
+        "summary": "Restore frontend/src/pages/Home.tsx to its pre-whitepaper visual state (hero banner, feature grid, navigation buttons, color scheme, typography, spacing, and layout) exactly as it appeared before the whitepaper feature was added, while retaining the 'Read the Whitepaper' call-to-action button or card that links to /whitepaper using the existing gold accent button style.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/pages/Home.tsx"
+        ],
         "matchedFiles": []
       },
       {
-        "id": "REQ-12",
-        "summary": "Update the IP Registration page (frontend/src/pages/RegisterIP.tsx) and the RegistrationSuccessModal (frontend/src/components/RegistrationSuccessModal.tsx) to display the correct burn fee of 0.02 IPGT instead of 100 IPGT. Any UI text, tooltips, or helper copy referencing the burn amount must reflect the new fee.",
+        "id": "REQ-19",
+        "summary": "Restore frontend/src/components/Header.tsx to its pre-whitepaper visual state (logo placement, nav link styling, authenticated balance display, mobile menu) while keeping the existing 'Whitepaper' navigation link that was already added.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/components/Header.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-20",
+        "summary": "Restore frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and frontend/src/pages/CoinDashboard.tsx to their pre-whitepaper visual state — reverting any layout, typography, color, or spacing changes that were introduced as a side effect of the whitepaper feature implementation.",
         "status": "implemented",
         "plannedFiles": [
+          "frontend/src/pages/IPDatabase.tsx",
           "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/components/RegistrationSuccessModal.tsx"
+          "frontend/src/pages/CoinDashboard.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/components/RegistrationSuccessModal.tsx"
+          "frontend/src/pages/CoinDashboard.tsx"
         ]
       },
       {
-        "id": "REQ-13",
-        "summary": "Ensure the Internet Identity authentication hook (frontend/src/hooks/useInternetIdentity.ts) persists the authenticated session across page reloads using AuthClient's local storage persistence. On app startup, the app must automatically restore an existing authenticated session without requiring the user to log in again. The session should remain valid until the user explicitly logs out or the session naturally expires.",
+        "id": "REQ-21",
+        "summary": "Restore frontend/src/components/Layout.tsx and frontend/src/components/Footer.tsx to their pre-whitepaper visual state, reverting any structural or styling changes introduced by the whitepaper feature while preserving the whitepaper route in App.tsx.",
         "status": "missing",
         "plannedFiles": [
-          "frontend/src/hooks/useInternetIdentity.ts",
-          "frontend/src/hooks/useActor.ts"
+          "frontend/src/components/Layout.tsx",
+          "frontend/src/components/Footer.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-22",
+        "summary": "Audit frontend/src/index.css and frontend/tailwind.config.js for any global style changes introduced by the whitepaper feature implementation that affect non-whitepaper pages, and revert only those changes while preserving whitepaper-specific print styles and prose utilities.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/index.css",
+          "frontend/tailwind.config.js"
         ],
         "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
     "build-request.json",
-    "build-template/README.md",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/RegistrationSuccessModal.tsx",
-    "frontend/src/pages/RegisterIP.tsx",
+    "frontend/src/pages/CoinDashboard.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

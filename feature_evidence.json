@@ -2,11 +2,10 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-update-the-ip-registration-page-frontend-src-pages-registerip-tsx-and-the-registrationsuccessmodal-frontend-src-components-registrationsuccessmodal-tsx-to-display-the-correct-burn-fee-of-0-02-ipgt-instead-of-100-ipgt-any-ui-text-tooltips-or-helper-copy-referencing-the-burn-amount-must-reflect-the-new-fee",
-      "featureTitle": "Update the IP Registration page (frontend/src/pages/RegisterIP.tsx) and the RegistrationSuccessModal (frontend/src/components/RegistrationSuccessModal.tsx) to display the correct burn fee of 0.02 IPGT instead of 100 IPGT. Any UI text, tooltips, or helper copy referencing the burn amount must reflect the new fee.",
+      "featureId": "feature-restore-frontend-src-pages-ipdatabase-tsx-frontend-src-pages-registerip-tsx-and-frontend-src-pages-coindashboard-tsx-to-their-pre-whitepaper-visual-state-reverting-any-layout-typography-color-or-spacing-changes-that-were-introduced-as-a-side-effect-of-the-whitepaper-feature-implementation",
+      "featureTitle": "Restore frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and frontend/src/pages/CoinDashboard.tsx to their pre-whitepaper visual state — reverting any layout, typography, color, or spacing changes that were introduced as a side effect of the whitepaper feature implementation.",
       "files": [
-        "frontend/src/components/RegistrationSuccessModal.tsx",
-        "frontend/src/pages/RegisterIP.tsx"
+        "frontend/src/pages/CoinDashboard.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -18,7 +17,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-12"
+        "REQ-20"
       ],
       "confidence": "high"
     }

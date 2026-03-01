@@ -1,4 +1,4 @@
-import { createRootRoute, createRoute, createRouter, RouterProvider, Outlet, Link } from '@tanstack/react-router';
+import { createRootRoute, createRoute, createRouter, RouterProvider, Outlet } from '@tanstack/react-router';
 import { useInternetIdentity } from './hooks/useInternetIdentity';
 import { useGetCallerUserProfile } from './hooks/useQueries';
 import Layout from './components/Layout';
@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import RegisterIP from './pages/RegisterIP';
 import IPDatabase from './pages/IPDatabase';
 import CoinDashboard from './pages/CoinDashboard';
+import Whitepaper from './pages/Whitepaper';
 
 function RootComponent() {
   const { identity } = useInternetIdentity();
@@ -51,7 +52,19 @@ const dashboardRoute = createRoute({
   component: CoinDashboard,
 });
 
-const routeTree = rootRoute.addChildren([indexRoute, registerRoute, databaseRoute, dashboardRoute]);
+const whitepaperRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/whitepaper',
+  component: Whitepaper,
+});
+
+const routeTree = rootRoute.addChildren([
+  indexRoute,
+  registerRoute,
+  databaseRoute,
+  dashboardRoute,
+  whitepaperRoute,
+]);
 
 const router = createRouter({ routeTree });
 

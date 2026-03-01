@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Link, useNavigate } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
 import { useQueryClient } from '@tanstack/react-query';
 import { useGetCallerUserProfile, useGetBalance } from '../hooks/useQueries';
 import { Principal } from '@dfinity/principal';
-import { Coins, Menu, X, Globe, ChevronDown } from 'lucide-react';
+import { Coins, Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export default function Header() {
@@ -46,6 +46,7 @@ export default function Header() {
     { to: '/database', label: 'IP Database' },
     { to: '/register', label: 'Register IP' },
     { to: '/dashboard', label: 'Coin Dashboard' },
+    { to: '/whitepaper', label: 'Whitepaper' },
   ];
 
   return (
