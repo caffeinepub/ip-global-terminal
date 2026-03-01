@@ -1,13 +1,14 @@
 # Specification
 
 ## Summary
-**Goal:** Remove all WIPO references, Sovereign IP integration mentions, and hypothetical/unverified statistics from every page and component of the IP Global Terminal frontend.
+**Goal:** Gate IP registration behind authentication and profile setup, add simulated cross-chain badges to IP records, and fully remove all IPGT Coin/token references from the application.
 
 **Planned changes:**
-- In `Home.tsx`, remove any section titled "Integration with WIPO & Sovereign IP" or similar, remove hero/subtitle copy mentioning WIPO or Sovereign IP, and remove hypothetical statistics such as "180+ jurisdictions served".
-- In `Whitepaper.tsx`, remove the "WIPO & Sovereign IP Integration" section (section 7) and all inline WIPO/Sovereign IP mentions and unverified statistics; replace with a neutral "Global IP Ecosystem Interoperability" section framed as blockchain-as-infrastructure; update the sticky TOC sidebar anchor links to reflect the section title change.
-- In `Footer.tsx`, remove any copy, taglines, or links referencing WIPO, Sovereign IP integration, or hypothetical statistics.
-- Audit `Header.tsx`, `IPDatabase.tsx`, `RegisterIP.tsx`, and any other frontend files for remaining WIPO, Sovereign IP, or hypothetical statistic references and remove them all.
-- Preserve all Mock IP records, all other content sections, visual theme, layout, spacing, and functionality throughout.
+- Gate `/register-ip` so unauthenticated users see a login prompt and authenticated users without a completed profile are shown a `ProfileSetupModal` before accessing the form; `/database` remains publicly accessible.
+- Add an "Organisation" field (optional) to `ProfileSetupModal` alongside display name and email; persist all three fields on submission.
+- Update the backend to store and retrieve user profiles with display name, organisation, and optional email fields associated with the caller's principal.
+- Add a simulated "Also Recorded On" section to `RegistrationSuccessModal` showing mock Ethereum (transaction ID + block number) and Solana (signature + slot number) references, clearly labelled as a future/simulated integration.
+- Add the same simulated "Also Recorded On" section to `IPDetailModal`, displayed below existing ICP blockchain metadata, with the same disclaimer.
+- Remove all IPGT Coin, burn fee, token balance, token transfer, and payment references from every page, modal, component, and route — including disabling the `/coin-dashboard` route, removing `TokenStats`, removing coin balance from the `Header`, and clearing coin/token language from `Footer` and `RegistrationSuccessModal`.
 
-**User-visible outcome:** The application contains no references to WIPO, Sovereign IP integration, or unverified statistics on any page or in any component, while all other content, mock data, and the dark navy/gold theme remain unchanged.
+**User-visible outcome:** Users must log in and complete a profile (display name, organisation, optional email) before registering IP. Registered IP records and success modals show simulated Ethereum and Solana cross-chain badges labelled as future integrations. No IPGT Coin or token-related UI appears anywhere in the application.

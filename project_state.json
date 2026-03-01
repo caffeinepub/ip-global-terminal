@@ -1,12 +1,14 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 15,
-  "summary": "IP Global Terminal (IPGT) — a cryptographic timestamping, certification, and dispute facilitation layer. The platform builds interoperable infrastructure that strengthens IP systems, speeds up IP registration, and offers automated filing strategy optimization, SME-first infrastructure, and open cryptographic auditing layers. WIPO/Sovereign IP integration references have been removed. The app features an ONDO Finance-inspired dark navy/gold landing page with sections for How It Works, Automated Filing Strategy, SME Infrastructure, and Open Cryptographic Auditing. A separate Global IP Database tab provides a searchable interface with blockchain metadata and mock IP records. The updated whitepaper covers cryptographic timestamping focus. All cryptocurrency/coin language and all WIPO references have been removed; blockchain is framed as infrastructure. Hypothetical statistics (e.g. '180+ jurisdictions served') are also removed.",
+  "projectStateVersion": 17,
+  "summary": "IP Global Terminal (IPGT) — a cryptographic timestamping, certification, and dispute facilitation layer. The platform builds interoperable infrastructure that strengthens IP systems, speeds up IP registration, and offers automated filing strategy optimization, SME-first infrastructure, and open cryptographic auditing layers. WIPO/Sovereign IP integration references and hypothetical statistics have been removed. The app features an ONDO Finance-inspired dark navy/gold landing page. IP registration is gated behind Internet Identity login plus a profile setup step (display name, organisation, optional email). After registration, IP is stored on ICP canisters and the confirmation screen and IP record detail display a simulated 'Also Recorded On' badge showing mock Solana/ETH transaction IDs as a future integration layer. All IPGT Coin, burn fee, token balance, and payment references have been removed from the entire platform.",
   "architectural_notes": [
     "Platform runs on ICP (Internet Computer Protocol) using canisters as smart contracts",
     "IP records include: title, description, category (patent/trademark/copyright), owner identity, registration date, document hash, jurisdiction",
     "Document uploads (PDFs, images) supported; file hash recorded on-chain regardless of upload",
-    "Global IP Database pre-seeded with mock IP records for demo/search purposes; blockchain metadata displayed per record"
+    "Global IP Database pre-seeded with mock IP records for demo/search purposes; blockchain metadata displayed per record",
+    "IP registration is gated: user must be authenticated via Internet Identity and have completed profile setup (display name, organisation, optional email) before registering IP",
+    "Simulated cross-chain layer: after ICP registration, UI displays mock Solana/ETH transaction ID and block reference as a 'Also Recorded On' badge — this is a future/simulated layer, not a live cross-chain call"
   ],
   "known_issues": [],
   "isFixRequest": false,
@@ -210,6 +212,46 @@
         "REQ-34"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-gate-the-ip-registration-form-in-frontend-src-pages-registerip-tsx-behind-internet-identity-login-and-a-completed-profile-setup-step-if-the-user-is-not-logged-in-display-a-prompt-to-log-in-via-internet-identity-if-the-user-is-logged-in-but-has-not-completed-profile-setup-display-name-organisation-optional-email-redirect-or-prompt-them-to-complete-the-profile-via-profilesetupmodal-before-they-can-access-the-registration-form-unauthenticated-users-may-still-browse-the-ip-database-at-database",
+      "title": "Gate the IP registration form in frontend/src/pages/RegisterIP.tsx behind Internet Identity login AND a completed profile setup step. If the user is not logged in, display a prompt to log in via Internet Identity. If the user is logged in but has not completed profile setup (display name, organisation, optional email), redirect or prompt them to complete the profile via ProfileSetupModal before they can access the registration form. Unauthenticated users may still browse the IP database at /database.",
+      "reqIds": [
+        "REQ-36"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-components-profilesetupmodal-tsx-to-include-an-organisation-text-input-field-optional-in-the-profile-setup-form-alongside-the-existing-display-name-and-optional-email-fields-persist-all-three-fields-on-submission-style-the-new-field-consistently-with-the-existing-dark-navy-gold-theme",
+      "title": "Update frontend/src/components/ProfileSetupModal.tsx to include an 'Organisation' text input field (optional) in the profile setup form, alongside the existing display name and optional email fields. Persist all three fields on submission. Style the new field consistently with the existing dark navy/gold theme.",
+      "reqIds": [
+        "REQ-38"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-after-a-successful-ip-registration-on-icp-canisters-update-frontend-src-components-registrationsuccessmodal-tsx-to-display-a-simulated-also-recorded-on-section-showing-mock-cross-chain-references-this-section-must-show-a-a-mock-ethereum-transaction-id-e-g-0x-followed-by-a-hex-string-and-block-number-and-b-a-mock-solana-transaction-signature-and-slot-number-label-this-section-clearly-as-future-integration-simulated-reference-or-equivalent-disclaimer-text-so-users-understand-this-is-a-planned-feature-and-not-a-live-cross-chain-transaction",
+      "title": "After a successful IP registration on ICP canisters, update frontend/src/components/RegistrationSuccessModal.tsx to display a simulated 'Also Recorded On' section showing mock cross-chain references. This section must show: (a) a mock Ethereum transaction ID (e.g. '0x' followed by a hex string) and block number, and (b) a mock Solana transaction signature and slot number. Label this section clearly as 'Future Integration — Simulated Reference' or equivalent disclaimer text so users understand this is a planned feature and not a live cross-chain transaction.",
+      "reqIds": [
+        "REQ-39"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-frontend-src-components-ipdetailmodal-tsx-to-display-a-simulated-also-recorded-on-section-for-each-ip-record-showing-mock-ethereum-and-solana-cross-chain-references-transaction-id-signature-block-slot-number-with-a-clear-disclaimer-that-these-are-simulated-future-integration-references-this-section-should-appear-below-the-existing-blockchain-metadata-icp-canister-details-block-height-timestamp",
+      "title": "Update frontend/src/components/IPDetailModal.tsx to display a simulated 'Also Recorded On' section for each IP record, showing mock Ethereum and Solana cross-chain references (transaction ID/signature, block/slot number) with a clear disclaimer that these are simulated future integration references. This section should appear below the existing blockchain metadata (ICP canister details, block height, timestamp).",
+      "reqIds": [
+        "REQ-40"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-remove-all-ipgt-coin-burn-fee-token-balance-token-transfer-and-payment-references-from-every-frontend-page-form-modal-component-and-route-specifically-a-delete-or-disable-the-coin-dashboard-route-in-frontend-src-app-tsx-b-remove-tokenstats-from-any-page-that-still-renders-it-c-remove-all-burn-fee-and-ipgt-token-mentions-from-frontend-src-pages-registerip-tsx-d-remove-all-token-balance-transfer-form-and-coin-related-ui-from-frontend-src-pages-coindashboard-tsx-or-remove-the-page-entirely-e-remove-any-remaining-ipgt-coin-token-balance-display-from-frontend-src-components-header-tsx-f-ensure-frontend-src-components-registrationsuccessmodal-tsx-contains-no-burn-fee-or-ipgt-token-text-g-remove-any-remaining-coin-token-references-from-frontend-src-components-footer-tsx",
+      "title": "Remove all IPGT Coin, burn fee, token balance, token transfer, and payment references from every frontend page, form, modal, component, and route. Specifically: (a) delete or disable the /coin-dashboard route in frontend/src/App.tsx; (b) remove TokenStats from any page that still renders it; (c) remove all burn fee and IPGT token mentions from frontend/src/pages/RegisterIP.tsx; (d) remove all token balance, transfer form, and coin-related UI from frontend/src/pages/CoinDashboard.tsx or remove the page entirely; (e) remove any remaining IPGT coin/token balance display from frontend/src/components/Header.tsx; (f) ensure frontend/src/components/RegistrationSuccessModal.tsx contains no burn fee or IPGT token text; (g) remove any remaining coin/token references from frontend/src/components/Footer.tsx.",
+      "reqIds": [
+        "REQ-41"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -300,6 +342,32 @@
       "summary": "Audit frontend/src/components/Header.tsx, frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and any other frontend files not already covered above for any remaining references to WIPO, Sovereign IP integration, or hypothetical statistics (e.g. '180+ jurisdictions served'). Remove all such references. Do not modify Mock IP record data, functionality, or visual styling of any component.",
       "reqIds": [
         "REQ-35"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-30",
+      "summary": "Gate IP registration behind Internet Identity login + profile setup step (display name, organisation, optional email). Unauthenticated users can still browse the public IP database but cannot register IP.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-31",
+      "summary": "After successful IP registration on ICP canisters, display a simulated 'Also Recorded On' badge/reference on the confirmation screen and IP record detail showing a mock Solana or Ethereum transaction ID and block reference, presented clearly as a future integration layer.",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-32",
+      "summary": "Remove all IPGT Coin, burn fee, token balance, token transfer, and payment references from every page, form, modal, and route across the platform (including CoinDashboard, RegisterIP success modal, Header, Footer, and any remaining references).",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-34",
+      "summary": "Update the backend in backend/main.mo to support user profile storage with display name, organisation, and optional email fields. Ensure the profile setup step called from ProfileSetupModal (useSaveCallerUserProfile) persists these fields. The profile must be associated with the caller's principal. If the profile data structures already exist, verify they include an organisation field and add it if missing.",
+      "reqIds": [
+        "REQ-37"
       ],
       "status": "pending"
     }

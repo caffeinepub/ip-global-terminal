@@ -56,14 +56,14 @@ export default function Home() {
               {
                 step: '01',
                 icon: <FileText className="w-6 h-6" />,
-                title: 'Submit Your IP',
-                desc: 'Upload your document or file. Our system generates a cryptographic SHA-256 hash that uniquely identifies your intellectual property.',
+                title: 'Create an Account',
+                desc: 'Sign up using your secure digital identity. Your account establishes your on-chain presence and ownership credentials.',
               },
               {
                 step: '02',
                 icon: <Lock className="w-6 h-6" />,
-                title: 'On-Chain Registration',
-                desc: 'Your IP record is written to the Internet Computer blockchain — immutable, timestamped, and permanently verifiable.',
+                title: 'Register Your IP',
+                desc: 'Upload your document and fill in the details. Our system generates a cryptographic SHA-256 hash and writes your IP record to the blockchain.',
               },
               {
                 step: '03',
@@ -174,7 +174,7 @@ export default function Home() {
                 Traditional IP registration is expensive, slow, and inaccessible to small and medium enterprises. IPGT democratizes IP protection by bringing enterprise-grade security to every creator and innovator.
               </p>
               <p className="text-white/60 leading-relaxed">
-                With a minimal token burn fee and a straightforward registration flow, protecting your intellectual property has never been more accessible.
+                With a straightforward registration flow and no complex barriers, protecting your intellectual property has never been more accessible.
               </p>
             </div>
           </div>

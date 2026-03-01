@@ -12,21 +12,22 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Upload, FileText, AlertCircle, Info } from 'lucide-react';
-import { useRegisterIP } from '../hooks/useQueries';
-import { useGetBalance } from '../hooks/useQueries';
+import { Loader2, Upload, FileText, AlertCircle, LogIn, Shield } from 'lucide-react';
+import { useRegisterIP, useGetCallerUserProfile } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { useQueryClient } from '@tanstack/react-query';
 import { IPCategory, ExternalBlob } from '../backend';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 
 const JURISDICTIONS = ['US', 'EU', 'UK', 'CN', 'JP', 'CA', 'AU', 'IN', 'BR', 'Global'];
-const BURN_AMOUNT = 2; // 2 base units = 0.02 IPGT
 
 export default function RegisterIP() {
   const navigate = useNavigate();
-  const { identity } = useInternetIdentity();
-  const { data: balance } = useGetBalance(identity?.getPrincipal());
+  const { login, loginStatus, identity, clear } = useInternetIdentity();
+  const queryClient = useQueryClient();
   const { mutateAsync: registerIP, isPending } = useRegisterIP();
+
+  const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -42,7 +43,19 @@ export default function RegisterIP() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const isAuthenticated = !!identity;
-  const hasEnoughBalance = balance !== undefined && balance >= BigInt(BURN_AMOUNT);
+  const isLoggingIn = loginStatus === 'logging-in';
+  const isProfileComplete = isAuthenticated && profileFetched && userProfile !== null;
+
+  const handleLogin = async () => {
+    try {
+      await login();
+    } catch (error: any) {
+      if (error.message === 'User is already authenticated') {
+        await clear();
+        setTimeout(() => login(), 300);
+      }
+    }
+  };
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
@@ -66,10 +79,6 @@ export default function RegisterIP() {
 
     if (!isAuthenticated) {
       setError('Please log in to register IP.');
-      return;
-    }
-    if (!hasEnoughBalance) {
-      setError('Insufficient IPGT balance. You need at least 0.02 IPGT to register.');
       return;
     }
     if (!title.trim() || !description.trim() || !category || !jurisdiction) {
@@ -115,6 +124,74 @@ export default function RegisterIP() {
   const inputStyle = { background: 'oklch(0.10 0.025 240)' };
   const inputClass = 'border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50';
 
+  // ── Not authenticated: show login prompt ──────────────────────────────────
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-16" style={{ background: 'oklch(0.12 0.025 240)' }}>
+        <div
+          className="text-center p-10 rounded-sm border border-gold/20 max-w-md w-full"
+          style={{ background: 'oklch(0.13 0.03 240)' }}
+        >
+          <div className="w-16 h-16 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center mx-auto mb-6">
+            <Shield className="w-8 h-8 text-gold" />
+          </div>
+          <h2 className="font-serif text-2xl font-bold text-gold mb-3">Login Required</h2>
+          <p className="text-gray-400 text-sm leading-relaxed mb-8">
+            You must be logged in to register intellectual property. Your identity is used to establish on-chain ownership of your IP record.
+          </p>
+          <Button
+            onClick={handleLogin}
+            disabled={isLoggingIn}
+            className="w-full bg-gold text-navy font-semibold hover:bg-gold/90 disabled:opacity-50"
+          >
+            {isLoggingIn ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Logging in…
+              </>
+            ) : (
+              <>
+                <LogIn className="w-4 h-4 mr-2" />
+                Login to Register IP
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Authenticated but profile not yet loaded ──────────────────────────────
+  if (isAuthenticated && profileLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
+        <Loader2 className="w-8 h-8 text-gold animate-spin" />
+      </div>
+    );
+  }
+
+  // ── Authenticated but profile incomplete: ProfileSetupModal handles this via App.tsx ──
+  // We show a waiting state here while the modal is open
+  if (isAuthenticated && profileFetched && userProfile === null) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-4 py-16" style={{ background: 'oklch(0.12 0.025 240)' }}>
+        <div
+          className="text-center p-10 rounded-sm border border-gold/20 max-w-md w-full"
+          style={{ background: 'oklch(0.13 0.03 240)' }}
+        >
+          <div className="w-16 h-16 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center mx-auto mb-6">
+            <Loader2 className="w-8 h-8 text-gold animate-spin" />
+          </div>
+          <h2 className="font-serif text-2xl font-bold text-gold mb-3">Complete Your Profile</h2>
+          <p className="text-gray-400 text-sm leading-relaxed">
+            Please complete your profile setup to access IP registration.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Authenticated and profile complete: show the registration form ────────
   return (
     <div className="min-h-screen py-10 px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
       <div className="max-w-2xl mx-auto">
@@ -122,39 +199,7 @@ export default function RegisterIP() {
         <div className="mb-8">
           <h1 className="font-serif text-4xl font-bold text-gold mb-2">Register IP</h1>
           <p className="text-gray-400">
-            Protect your intellectual property on the blockchain. Registration burns 0.02 IPGT.
-          </p>
-        </div>
-
-        {/* Auth warning */}
-        {!isAuthenticated && (
-          <Alert className="mb-6 border-yellow-500/30 bg-yellow-500/10">
-            <AlertCircle className="w-4 h-4 text-yellow-400" />
-            <AlertDescription className="text-yellow-300">
-              You must be logged in to register IP.
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Balance warning */}
-        {isAuthenticated && !hasEnoughBalance && (
-          <Alert className="mb-6 border-red-500/30 bg-red-500/10">
-            <AlertCircle className="w-4 h-4 text-red-400" />
-            <AlertDescription className="text-red-300">
-              Insufficient balance. You need at least 0.02 IPGT to register. Current balance:{' '}
-              {balance !== undefined ? `${(Number(balance) / 100).toFixed(2)} IPGT` : '…'}
-            </AlertDescription>
-          </Alert>
-        )}
-
-        {/* Info banner */}
-        <div
-          className="flex items-start gap-3 p-4 rounded-sm border border-gold/20 mb-6"
-          style={{ background: 'oklch(0.13 0.03 240)' }}
-        >
-          <Info className="w-4 h-4 text-gold mt-0.5 flex-shrink-0" />
-          <p className="text-gray-300 text-sm leading-relaxed">
-            Registering an IP record will burn <span className="text-gold font-semibold">0.02 IPGT</span> from your balance. This is a permanent, irreversible action that creates an immutable on-chain record.
+            Protect your intellectual property on the blockchain with an immutable on-chain record.
           </p>
         </div>
 
@@ -166,7 +211,9 @@ export default function RegisterIP() {
         >
           {/* Title */}
           <div className="space-y-1.5">
-            <Label htmlFor="title" className="text-gray-300">Title <span className="text-gold">*</span></Label>
+            <Label htmlFor="title" className="text-gray-300">
+              Title <span className="text-gold">*</span>
+            </Label>
             <Input
               id="title"
               value={title}
@@ -180,7 +227,9 @@ export default function RegisterIP() {
 
           {/* Description */}
           <div className="space-y-1.5">
-            <Label htmlFor="description" className="text-gray-300">Description <span className="text-gold">*</span></Label>
+            <Label htmlFor="description" className="text-gray-300">
+              Description <span className="text-gold">*</span>
+            </Label>
             <Textarea
               id="description"
               value={description}
@@ -196,9 +245,11 @@ export default function RegisterIP() {
           {/* Category & Jurisdiction */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="space-y-1.5">
-              <Label className="text-gray-300">Category <span className="text-gold">*</span></Label>
+              <Label className="text-gray-300">
+                Category <span className="text-gold">*</span>
+              </Label>
               <Select value={category} onValueChange={(v) => setCategory(v as IPCategory)}>
-                <SelectTrigger className={`${inputClass}`} style={inputStyle}>
+                <SelectTrigger className={inputClass} style={inputStyle}>
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
                 <SelectContent style={{ background: 'oklch(0.13 0.03 240)' }} className="border-gold/25">
@@ -210,9 +261,11 @@ export default function RegisterIP() {
             </div>
 
             <div className="space-y-1.5">
-              <Label className="text-gray-300">Jurisdiction <span className="text-gold">*</span></Label>
+              <Label className="text-gray-300">
+                Jurisdiction <span className="text-gold">*</span>
+              </Label>
               <Select value={jurisdiction} onValueChange={setJurisdiction}>
-                <SelectTrigger className={`${inputClass}`} style={inputStyle}>
+                <SelectTrigger className={inputClass} style={inputStyle}>
                   <SelectValue placeholder="Select jurisdiction" />
                 </SelectTrigger>
                 <SelectContent style={{ background: 'oklch(0.13 0.03 240)' }} className="border-gold/25">
@@ -226,7 +279,9 @@ export default function RegisterIP() {
 
           {/* File Upload */}
           <div className="space-y-1.5">
-            <Label className="text-gray-300">Document <span className="text-gold">*</span></Label>
+            <Label className="text-gray-300">
+              Document <span className="text-gold">*</span>
+            </Label>
             <div
               onClick={() => fileInputRef.current?.click()}
               className="cursor-pointer flex flex-col items-center justify-center gap-2 p-6 rounded-sm border border-dashed border-gold/25 hover:border-gold/50 transition-colors"
@@ -289,7 +344,7 @@ export default function RegisterIP() {
           {/* Submit */}
           <Button
             type="submit"
-            disabled={isPending || isHashing || !isAuthenticated || !hasEnoughBalance}
+            disabled={isPending || isHashing || !isProfileComplete}
             className="w-full bg-gold text-navy font-semibold hover:bg-gold/90 disabled:opacity-50 py-3"
           >
             {isPending ? (
@@ -298,7 +353,7 @@ export default function RegisterIP() {
                 Registering…
               </>
             ) : (
-              'Register IP — Burn 0.02 IPGT'
+              'Register IP'
             )}
           </Button>
         </form>
@@ -308,7 +363,6 @@ export default function RegisterIP() {
         open={showSuccess}
         onClose={handleSuccessClose}
         ipId={successIpId}
-        burnAmount={BURN_AMOUNT}
       />
     </div>
   );

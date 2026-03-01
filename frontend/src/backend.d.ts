@@ -29,6 +29,7 @@ export type TokenBalance = bigint;
 export interface UserProfile {
     name: string;
     email?: string;
+    organisation: string;
 }
 export enum IPCategory {
     trademark = "trademark",

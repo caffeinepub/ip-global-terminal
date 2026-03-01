@@ -1,103 +1,141 @@
 {
   "kind": "build_request",
-  "title": "Remove all WIPO references and hypothetical statistics from every page",
+  "title": "Authenticated IP Registration, Simulated Blockchain Badges, and Full IPGT Coin Removal",
   "projectName": "IP Global Terminal",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-32",
-      "text": "In frontend/src/pages/Home.tsx, remove every reference to WIPO (e.g. any section titled 'Integration with WIPO & Sovereign IP', any subtitle copy mentioning WIPO or Sovereign IP integration) and remove all hypothetical or unverified statistics (e.g. '180+ jurisdictions served', any fabricated numeric claims). Do not remove or alter the Mock IP records, the How It Works section, Automated Filing Strategy, SME-First Infrastructure, Open Cryptographic Auditing, or any other content. Preserve the dark navy/gold theme, layout, and all remaining section content exactly as-is.",
+      "id": "REQ-36",
+      "text": "Gate the IP registration form in frontend/src/pages/RegisterIP.tsx behind Internet Identity login AND a completed profile setup step. If the user is not logged in, display a prompt to log in via Internet Identity. If the user is logged in but has not completed profile setup (display name, organisation, optional email), redirect or prompt them to complete the profile via ProfileSetupModal before they can access the registration form. Unauthenticated users may still browse the IP database at /database.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-8"
         ],
         "quotes": [
-          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
+          "Once you are a user you should be able to add IP.",
+          "Internet Identity login remains the auth mechanism. After logging in, users will be directed through a brief profile setup step (display name, organisation, optional email) before they can access IP registration."
         ]
       },
       "acceptanceCriteria": [
-        "The Home page contains no text mentioning 'WIPO' in any form.",
-        "The Home page contains no section titled 'Integration with WIPO & Sovereign IP' or similar.",
-        "Any subtitle or hero copy referencing WIPO or Sovereign IP integration has been removed.",
-        "Hypothetical statistics such as '180+ jurisdictions served' or any other unverified numeric claims do not appear on the Home page.",
-        "All other homepage sections (How It Works, Automated Filing Strategy, SME-First Infrastructure, Open Cryptographic Auditing, Hero, CTA) remain intact.",
-        "Visual theme, layout, and spacing are unchanged."
+        "Visiting /register-ip while unauthenticated shows a login prompt instead of the form.",
+        "Visiting /register-ip while authenticated but profile-incomplete triggers the ProfileSetupModal before showing the form.",
+        "Visiting /register-ip while authenticated and profile-complete shows the registration form immediately.",
+        "The IP database at /database remains publicly accessible without login."
       ]
     },
     {
-      "id": "REQ-33",
-      "text": "In frontend/src/pages/Whitepaper.tsx, remove every reference to WIPO, Sovereign IP integration, and any hypothetical or unverified statistics. This includes removing or rewriting the 'WIPO & Sovereign IP Integration' section (section 7 in the current whitepaper) and any inline mentions of WIPO, sovereign IP registries, or fabricated metrics throughout the document. Replace removed WIPO/Sovereign IP content with a neutral section on 'Global IP Ecosystem Interoperability' framed purely as blockchain-as-infrastructure without naming WIPO or any sovereign body. Retain all other sections, the sticky left-sidebar table of contents (updating anchor links to reflect any section title changes), smooth scroll, print-to-PDF button, and the existing dark navy/gold theme.",
-      "target": "frontend",
+      "id": "REQ-37",
+      "text": "Update the backend in backend/main.mo to support user profile storage with display name, organisation, and optional email fields. Ensure the profile setup step called from ProfileSetupModal (useSaveCallerUserProfile) persists these fields. The profile must be associated with the caller's principal. If the profile data structures already exist, verify they include an organisation field and add it if missing.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-8"
         ],
         "quotes": [
-          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
+          "users will be directed through a brief profile setup step (display name, organisation, optional email) before they can access IP registration"
         ]
       },
       "acceptanceCriteria": [
-        "The Whitepaper page contains no text mentioning 'WIPO' in any form.",
-        "The Whitepaper page contains no text mentioning 'Sovereign IP' integration or sovereign registries.",
-        "No hypothetical or unverified statistics appear anywhere in the whitepaper prose.",
-        "The table of contents sidebar accurately reflects any section title changes.",
-        "All other whitepaper sections remain intact with their full prose content.",
-        "Sticky TOC, smooth scroll, and print-to-PDF button continue to function correctly.",
-        "Dark navy/gold theme with Playfair Display headings and Inter body text is unchanged."
+        "The backend actor exposes a saveCallerUserProfile function accepting display name, organisation (text), and optional email.",
+        "The profile is stored stably and retrievable by the caller's principal.",
+        "Existing profile fields (display name, email) are preserved and organisation is added without breaking existing calls."
       ]
     },
     {
-      "id": "REQ-34",
-      "text": "In frontend/src/components/Footer.tsx, remove every reference to WIPO and Sovereign IP integration (including any footer copy, taglines, or navigation links mentioning WIPO). Also remove any hypothetical statistics if present. Do not change the footer's dark navy/gold theme, copyright line, or remaining navigation links (Home, IP Database, Whitepaper).",
+      "id": "REQ-38",
+      "text": "Update frontend/src/components/ProfileSetupModal.tsx to include an 'Organisation' text input field (optional) in the profile setup form, alongside the existing display name and optional email fields. Persist all three fields on submission. Style the new field consistently with the existing dark navy/gold theme.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-8"
         ],
         "quotes": [
-          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
+          "profile setup step (display name, organisation, optional email)"
         ]
       },
       "acceptanceCriteria": [
-        "The Footer contains no text mentioning 'WIPO' in any form.",
-        "The Footer contains no text mentioning 'Sovereign IP' integration.",
-        "No hypothetical or unverified statistics appear in the Footer.",
-        "The Footer's dark navy/gold theme, copyright line, and remaining navigation links are unchanged."
+        "The ProfileSetupModal form contains fields for display name (required), organisation (optional), and email (optional).",
+        "On submission, all three values are sent to the backend.",
+        "The modal cannot be dismissed without completing at least the display name field.",
+        "Styling matches the existing dark navy/gold theme."
       ]
     },
     {
-      "id": "REQ-35",
-      "text": "Audit frontend/src/components/Header.tsx, frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and any other frontend files not already covered above for any remaining references to WIPO, Sovereign IP integration, or hypothetical statistics (e.g. '180+ jurisdictions served'). Remove all such references. Do not modify Mock IP record data, functionality, or visual styling of any component.",
+      "id": "REQ-39",
+      "text": "After a successful IP registration on ICP canisters, update frontend/src/components/RegistrationSuccessModal.tsx to display a simulated 'Also Recorded On' section showing mock cross-chain references. This section must show: (a) a mock Ethereum transaction ID (e.g. '0x' followed by a hex string) and block number, and (b) a mock Solana transaction signature and slot number. Label this section clearly as 'Future Integration — Simulated Reference' or equivalent disclaimer text so users understand this is a planned feature and not a live cross-chain transaction.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4"
+          "msg-8"
         ],
         "quotes": [
-          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
+          "the confirmation screen and IP record detail will display a simulated 'Also Recorded On' badge/reference showing a mock Solana or Ethereum transaction ID and block reference — presented clearly as a future integration layer"
         ]
       },
       "acceptanceCriteria": [
-        "No frontend file outside of Whitepaper.tsx and Home.tsx contains any reference to 'WIPO' or 'Sovereign IP'.",
-        "No frontend file contains hypothetical or unverified statistics.",
-        "Mock IP records in IPDatabase.tsx remain completely intact.",
-        "No visual styling or functionality changes are introduced."
+        "The RegistrationSuccessModal displays an 'Also Recorded On' section with mock Ethereum and Solana references.",
+        "Each reference shows a transaction ID/signature and a block/slot number.",
+        "A disclaimer label clearly indicates this is a simulated future integration layer.",
+        "All IPGT coin, burn fee, and token language is absent from the modal.",
+        "Styling matches the dark navy/gold theme."
+      ]
+    },
+    {
+      "id": "REQ-40",
+      "text": "Update frontend/src/components/IPDetailModal.tsx to display a simulated 'Also Recorded On' section for each IP record, showing mock Ethereum and Solana cross-chain references (transaction ID/signature, block/slot number) with a clear disclaimer that these are simulated future integration references. This section should appear below the existing blockchain metadata (ICP canister details, block height, timestamp).",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-8"
+        ],
+        "quotes": [
+          "IP record detail will display a simulated 'Also Recorded On' badge/reference showing a mock Solana or Ethereum transaction ID and block reference"
+        ]
+      },
+      "acceptanceCriteria": [
+        "IPDetailModal shows an 'Also Recorded On' section with mock ETH and Solana references.",
+        "The section is clearly labelled as a future/simulated integration.",
+        "ICP canister metadata and other existing fields remain intact.",
+        "Styling is consistent with the dark navy/gold theme."
+      ]
+    },
+    {
+      "id": "REQ-41",
+      "text": "Remove all IPGT Coin, burn fee, token balance, token transfer, and payment references from every frontend page, form, modal, component, and route. Specifically: (a) delete or disable the /coin-dashboard route in frontend/src/App.tsx; (b) remove TokenStats from any page that still renders it; (c) remove all burn fee and IPGT token mentions from frontend/src/pages/RegisterIP.tsx; (d) remove all token balance, transfer form, and coin-related UI from frontend/src/pages/CoinDashboard.tsx or remove the page entirely; (e) remove any remaining IPGT coin/token balance display from frontend/src/components/Header.tsx; (f) ensure frontend/src/components/RegistrationSuccessModal.tsx contains no burn fee or IPGT token text; (g) remove any remaining coin/token references from frontend/src/components/Footer.tsx.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-8"
+        ],
+        "quotes": [
+          "remove anything to IPGT Coin",
+          "Remove all IPGT Coin / payment references — Every mention of IPGT coin, burn fees, token balances, and transfer forms will be removed from all pages, forms, modals, and the coin dashboard route."
+        ]
+      },
+      "acceptanceCriteria": [
+        "No page, modal, form, or component in the app displays IPGT coin balance, burn fee, token transfer, or any coin/token language.",
+        "The /coin-dashboard route is removed or redirects away.",
+        "The Coin Dashboard page is either deleted or emptied of all token-related UI.",
+        "TokenStats component is not rendered on any page.",
+        "Header does not show a coin balance for authenticated users.",
+        "RegistrationSuccessModal shows no burn fee or token amount.",
+        "Footer contains no coin/token language."
       ]
     }
   ],
   "constraints": [
-    "Do not remove or modify Mock IP records in IPDatabase.tsx.",
-    "Do not alter the visual theme, layout, or spacing of any page.",
-    "Do not remove any sections other than those containing WIPO references or hypothetical statistics.",
-    "Whitepaper.tsx TOC must remain accurate if any section titles change."
+    "Do not modify any file listed in frontend.immutablePaths.",
+    "The IP database at /database must remain publicly accessible without authentication.",
+    "Simulated Solana/ETH references must be clearly labelled as future/simulated — never presented as live cross-chain transactions.",
+    "The dark navy/gold visual theme (Playfair Display headings, Inter body, gold accents) must be preserved across all modified components.",
+    "Whitepaper.tsx must not be modified."
   ],
   "nonGoals": [
-    "Adding new content sections to any page.",
-    "Changing the dark navy/gold visual theme.",
-    "Modifying backend logic.",
-    "Altering authentication or Internet Identity flows.",
-    "Changing any functionality of the IP registration form or coin dashboard."
+    "Live Solana or Ethereum smart contract integration — simulated references only.",
+    "Any payment, subscription, or token-gating mechanism to replace IPGT coins.",
+    "Changes to the Whitepaper page content or styling.",
+    "Changes to the IP database mock records or search/filter functionality."
   ],
   "imageRequirements": {
     "required": [],

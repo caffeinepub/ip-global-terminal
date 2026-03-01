@@ -13,7 +13,9 @@ import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -24,6 +26,7 @@ actor {
 
   public type UserProfile = {
     name : Text;
+    organisation : Text;
     email : ?Text;
   };
 

@@ -26,7 +26,11 @@ export interface IPRecord {
   'registrationDate' : bigint,
 }
 export type TokenBalance = bigint;
-export interface UserProfile { 'name' : string, 'email' : [] | [string] }
+export interface UserProfile {
+  'name' : string,
+  'email' : [] | [string],
+  'organisation' : string,
+}
 export type UserRole = { 'admin' : null } |
   { 'user' : null } |
   { 'guest' : null };

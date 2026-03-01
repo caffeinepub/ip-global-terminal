@@ -45,6 +45,7 @@ export const IPRecord = IDL.Record({
 export const UserProfile = IDL.Record({
   'name' : IDL.Text,
   'email' : IDL.Opt(IDL.Text),
+  'organisation' : IDL.Text,
 });
 
 export const idlService = IDL.Service({
@@ -151,6 +152,7 @@ export const idlFactory = ({ IDL }) => {
   const UserProfile = IDL.Record({
     'name' : IDL.Text,
     'email' : IDL.Opt(IDL.Text),
+    'organisation' : IDL.Text,
   });
   
   return IDL.Service({

@@ -111,6 +111,7 @@ export type TokenBalance = bigint;
 export interface UserProfile {
     name: string;
     email?: string;
+    organisation: string;
 }
 export interface _CaffeineStorageRefillResult {
     success?: boolean;
@@ -635,13 +636,16 @@ async function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promi
 function from_candid_record_n21(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     name: string;
     email: [] | [string];
+    organisation: string;
 }): {
     name: string;
     email?: string;
+    organisation: string;
 } {
     return {
         name: value.name,
-        email: record_opt_to_undefined(from_candid_opt_n22(_uploadFile, _downloadFile, value.email))
+        email: record_opt_to_undefined(from_candid_opt_n22(_uploadFile, _downloadFile, value.email)),
+        organisation: value.organisation
     };
 }
 function from_candid_record_n5(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
@@ -701,13 +705,16 @@ async function to_candid_opt_n26(_uploadFile: (file: ExternalBlob) => Promise<Ui
 function to_candid_record_n29(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {
     name: string;
     email?: string;
+    organisation: string;
 }): {
     name: string;
     email: [] | [string];
+    organisation: string;
 } {
     return {
         name: value.name,
-        email: value.email ? candid_some(value.email) : candid_none()
+        email: value.email ? candid_some(value.email) : candid_none(),
+        organisation: value.organisation
     };
 }
 function to_candid_record_n3(_uploadFile: (file: ExternalBlob) => Promise<Uint8Array>, _downloadFile: (file: Uint8Array) => Promise<ExternalBlob>, value: {

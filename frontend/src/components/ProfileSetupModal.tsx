@@ -18,14 +18,22 @@ interface ProfileSetupModalProps {
 
 export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
   const [name, setName] = useState('');
+  const [organisation, setOrganisation] = useState('');
   const [email, setEmail] = useState('');
   const { mutateAsync: saveProfile, isPending } = useSaveCallerUserProfile();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    await saveProfile({ name: name.trim(), email: email.trim() || undefined });
+    await saveProfile({
+      name: name.trim(),
+      organisation: organisation.trim(),
+      email: email.trim() || undefined,
+    });
   };
+
+  const inputStyle = { background: 'oklch(0.10 0.025 240)' };
+  const inputClass = 'border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50';
 
   return (
     <Dialog open={open}>
@@ -56,8 +64,22 @@ export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
               onChange={(e) => setName(e.target.value)}
               placeholder="Your name"
               required
-              className="border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
-              style={{ background: 'oklch(0.10 0.025 240)' }}
+              className={inputClass}
+              style={inputStyle}
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="organisation" className="text-gray-300 text-sm">
+              Organisation <span className="text-gray-600 text-xs">(optional)</span>
+            </Label>
+            <Input
+              id="organisation"
+              value={organisation}
+              onChange={(e) => setOrganisation(e.target.value)}
+              placeholder="Your company or organisation"
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
 
@@ -71,8 +93,8 @@ export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
-              style={{ background: 'oklch(0.10 0.025 240)' }}
+              className={inputClass}
+              style={inputStyle}
             />
           </div>
 

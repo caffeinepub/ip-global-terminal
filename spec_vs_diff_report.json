@@ -1,16 +1,39 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T04:57:46.560Z",
-  "summary": "The diff addresses all four requirements (REQ-32 through REQ-35). Home.tsx has WIPO references and hypothetical statistics removed, Whitepaper.tsx has the WIPO/Sovereign IP section replaced with 'Global IP Ecosystem Interoperability' and the TOC updated, Footer.tsx no longer contains WIPO references, and the file summaries confirm audits of Header.tsx, IPDatabase.tsx, and RegisterIP.tsx. All changes appear to be in scope and correctly implemented based on the available evidence.",
-  "missing_requirements": [],
-  "hallucinated_features": [],
-  "confidence": 0.88,
+  "generatedAt": "2026-03-01T05:22:56.982Z",
+  "summary": "The diff implements most requirements: REQ-37 (backend organisation field), REQ-38 (ProfileSetupModal with organisation), REQ-39 (RegistrationSuccessModal simulated cross-chain), REQ-40 (IPDetailModal simulated cross-chain), and REQ-41 (IPGT coin removal). REQ-36 is partially implemented — the RegisterIP page checks authentication and profile completion, but the evidence for ProfileSetupModal being triggered when profile is incomplete is ambiguous from the truncated diff.",
+  "missing_requirements": [
+    {
+      "id": "REQ-36",
+      "requirement": "Visiting /register-ip while authenticated but profile-incomplete triggers the ProfileSetupModal before showing the form.",
+      "reason": "The frontend-file-summaries.txt describes RegisterIP as showing a 'waiting state' for profile-incomplete users rather than explicitly triggering ProfileSetupModal. The truncated RegisterIP.tsx does not clearly show ProfileSetupModal being rendered or triggered from within RegisterIP when profile is incomplete.",
+      "evidence": [
+        "frontend/src/pages/RegisterIP.tsx",
+        "frontend-file-summaries.txt"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "A backend migration module (backend/migration.mo) was added to migrate old user profiles without organisation to new profiles with organisation defaulting to empty string.",
+      "reason": "The build request did not request a migration module. REQ-37 only asked to add the organisation field and verify or add it if missing. The migration.mo file is an additional implementation not mentioned in any requirement.",
+      "evidence": [
+        "backend/migration.mo"
+      ]
+    }
+  ],
+  "confidence": 0.78,
   "changed_files": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/Footer.tsx",
+    "frontend/src/components/IPDetailModal.tsx",
+    "frontend/src/components/ProfileSetupModal.tsx",
+    "frontend/src/components/RegistrationSuccessModal.tsx",
+    "frontend/src/pages/CoinDashboard.tsx",
     "frontend/src/pages/Home.tsx",
-    "frontend/src/pages/Whitepaper.tsx",
+    "frontend/src/pages/RegisterIP.tsx",
     "project_state.json"
   ]
 }

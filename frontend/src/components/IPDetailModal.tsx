@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { IPRecord, IPCategory } from '../backend';
 import {
   Dialog,
@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Copy, Check, Download } from 'lucide-react';
+import { Copy, Check, Download, FlaskConical } from 'lucide-react';
 
 interface IPDetailModalProps {
   record: IPRecord | null;
@@ -21,14 +21,71 @@ const categoryLabels: Record<string, string> = {
   [IPCategory.copyright]: 'Copyright',
 };
 
+function seededHex(seed: string, length: number): string {
+  const chars = '0123456789abcdef';
+  let result = '';
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  for (let i = 0; i < length; i++) {
+    hash = (hash * 1664525 + 1013904223) >>> 0;
+    result += chars[hash % 16];
+  }
+  return result;
+}
+
+function seededBase58(seed: string, length: number): string {
+  const chars = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+  let result = '';
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  for (let i = 0; i < length; i++) {
+    hash = (hash * 1664525 + 1013904223) >>> 0;
+    result += chars[hash % chars.length];
+  }
+  return result;
+}
+
 export default function IPDetailModal({ record, open, onClose }: IPDetailModalProps) {
   const [copied, setCopied] = useState(false);
 
-  if (!record) return null;
+  const hashHex = useMemo(() => {
+    if (!record) return '';
+    return Array.from(record.documentHash)
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('');
+  }, [record]);
 
-  const hashHex = Array.from(record.documentHash)
-    .map((b) => b.toString(16).padStart(2, '0'))
-    .join('');
+  const mockEthTxId = useMemo(() => {
+    if (!record) return '';
+    return '0x' + seededHex(String(record.id) + record.title, 64);
+  }, [record]);
+
+  const mockEthBlock = useMemo(() => {
+    if (!record) return 0;
+    let hash = 0;
+    const s = String(record.id) + record.title;
+    for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+    return 19_000_000 + (hash % 2_000_000);
+  }, [record]);
+
+  const mockSolanaSig = useMemo(() => {
+    if (!record) return '';
+    return seededBase58(record.title + String(record.id), 88);
+  }, [record]);
+
+  const mockSolanaSlot = useMemo(() => {
+    if (!record) return 0;
+    let hash = 0;
+    const s = record.title + String(record.id);
+    for (let i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) >>> 0;
+    return 250_000_000 + (hash % 10_000_000);
+  }, [record]);
+
+  if (!record) return null;
 
   const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -55,7 +112,7 @@ export default function IPDetailModal({ record, open, onClose }: IPDetailModalPr
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
-        className="max-w-2xl border border-gold/30 text-gray-100"
+        className="max-w-2xl border border-gold/30 text-gray-100 max-h-[90vh] overflow-y-auto"
         style={{ background: 'oklch(0.13 0.03 240)' }}
       >
         <DialogHeader>
@@ -89,6 +146,82 @@ export default function IPDetailModal({ record, open, onClose }: IPDetailModalPr
               >
                 {copied ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
               </button>
+            </div>
+          </div>
+
+          {/* ICP Blockchain Metadata */}
+          <div
+            className="flex items-center justify-between p-3 rounded-sm border border-green-500/20"
+            style={{ background: 'oklch(0.10 0.025 240)' }}
+          >
+            <span className="text-gray-400 text-sm">ICP Canister</span>
+            <span className="text-green-400 font-semibold text-sm">On-Chain ✓</span>
+          </div>
+
+          {/* Simulated Cross-Chain Section */}
+          <div
+            className="rounded-sm border border-gold/20 overflow-hidden"
+            style={{ background: 'oklch(0.10 0.025 240)' }}
+          >
+            <div
+              className="flex items-center gap-2 px-3 py-2 border-b border-gold/15"
+              style={{ background: 'oklch(0.11 0.028 240)' }}
+            >
+              <FlaskConical className="w-3.5 h-3.5 text-gold/70" />
+              <span className="text-gold/80 text-xs font-semibold uppercase tracking-wider">
+                Also Recorded On
+              </span>
+              <span className="ml-auto text-xs text-gray-600 italic">
+                Future Integration — Simulated Reference
+              </span>
+            </div>
+
+            {/* Ethereum */}
+            <div className="p-3 border-b border-white/5">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-4 h-4 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center flex-shrink-0">
+                  <span className="text-blue-400 text-[8px] font-bold">Ξ</span>
+                </div>
+                <span className="text-gray-300 text-xs font-semibold">Ethereum</span>
+              </div>
+              <div className="space-y-1 pl-6">
+                <div className="flex items-start gap-2">
+                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Tx ID</span>
+                  <span className="font-mono text-xs text-gray-400 break-all leading-relaxed">
+                    {mockEthTxId}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Block</span>
+                  <span className="font-mono text-xs text-gray-400">
+                    {mockEthBlock.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Solana */}
+            <div className="p-3">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-4 h-4 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center flex-shrink-0">
+                  <span className="text-purple-400 text-[8px] font-bold">◎</span>
+                </div>
+                <span className="text-gray-300 text-xs font-semibold">Solana</span>
+              </div>
+              <div className="space-y-1 pl-6">
+                <div className="flex items-start gap-2">
+                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Sig</span>
+                  <span className="font-mono text-xs text-gray-400 break-all leading-relaxed">
+                    {mockSolanaSig}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-gray-600 text-xs w-16 flex-shrink-0">Slot</span>
+                  <span className="font-mono text-xs text-gray-400">
+                    {mockSolanaSlot.toLocaleString()}
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
