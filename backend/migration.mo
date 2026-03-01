@@ -1,36 +1,83 @@
 import Map "mo:core/Map";
 import Principal "mo:core/Principal";
+import Blob "mo:core/Blob";
+import Storage "blob-storage/Storage";
 
 module {
-  // The old user profile type.
   type OldUserProfile = {
     name : Text;
+    organisation : Text;
     email : ?Text;
   };
 
-  // The old actor state.
-  type OldActor = {
-    userProfiles : Map.Map<Principal, OldUserProfile>;
+  type OldIPCategory = {
+    #patent;
+    #trademark;
+    #copyright;
   };
 
-  // The new user profile type with organisation.
+  type OldIPRecord = {
+    id : Nat;
+    title : Text;
+    description : Text;
+    category : OldIPCategory;
+    owner : Principal;
+    registrationDate : Int;
+    documentHash : Blob;
+    fileBlob : ?Storage.ExternalBlob;
+    jurisdiction : Text;
+  };
+
+  // Old actor's full persistent state
+  type OldActor = {
+    ipRecords : Map.Map<Nat, OldIPRecord>;
+    nextIpId : Nat;
+    userProfiles : Map.Map<Principal, OldUserProfile>;
+
+    // Deleted fields (okay to ignore in migration)
+    ledger : Map.Map<Principal, Nat64>;
+    treasury : Principal;
+    totalBurnedTokens : Nat;
+    REGISTRATION_BURN_AMOUNT : Nat64;
+    MINIMUM_BALANCE_TO_REGISTER : Nat64;
+    INITIAL_SUPPLY : Nat64;
+  };
+
   type NewUserProfile = {
     name : Text;
     organisation : Text;
     email : ?Text;
   };
 
-  // The new actor state.
+  type NewIPCategory = {
+    #patent;
+    #trademark;
+    #copyright;
+  };
+
+  type NewIPRecord = {
+    id : Nat;
+    title : Text;
+    description : Text;
+    category : NewIPCategory;
+    owner : Principal;
+    registrationDate : Int;
+    documentHash : Blob;
+    fileBlob : ?Storage.ExternalBlob;
+    jurisdiction : Text;
+  };
+
   type NewActor = {
+    ipRecords : Map.Map<Nat, NewIPRecord>;
+    nextIpId : Nat;
     userProfiles : Map.Map<Principal, NewUserProfile>;
   };
 
   public func run(old : OldActor) : NewActor {
-    let newUserProfiles = old.userProfiles.map<Principal, OldUserProfile, NewUserProfile>(
-      func(_p, oldUserProfile) {
-        { oldUserProfile with organisation = "" };
-      }
-    );
-    { userProfiles = newUserProfiles };
+    {
+      ipRecords = old.ipRecords;
+      nextIpId = old.nextIpId;
+      userProfiles = old.userProfiles;
+    };
   };
 };

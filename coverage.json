@@ -1,18 +1,18 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T05:22:56.991Z",
+  "generatedAt": "2026-03-01T05:53:00.972Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 6,
-    "implemented": 5,
+    "total": 3,
+    "implemented": 2,
     "items": [
       {
-        "id": "REQ-36",
-        "summary": "Gate the IP registration form in frontend/src/pages/RegisterIP.tsx behind Internet Identity login AND a completed profile setup step. If the user is not logged in, display a prompt to log in via Internet Identity. If the user is logged in but has not completed profile setup (display name, organisation, optional email), redirect or prompt them to complete the profile via ProfileSetupModal before they can access the registration form. Unauthenticated users may still browse the IP database at /database.",
+        "id": "REQ-42",
+        "summary": "In frontend/src/pages/RegisterIP.tsx, remove all remaining token balance checks, 'Insufficient IPGT tokens' error messages, and any related conditional logic that blocks or warns the user about token balance. The registration form must submit without any token-related validation or error states.",
         "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/RegisterIP.tsx"
@@ -22,64 +22,21 @@
         ]
       },
       {
-        "id": "REQ-37",
-        "summary": "Update the backend in backend/main.mo to support user profile storage with display name, organisation, and optional email fields. Ensure the profile setup step called from ProfileSetupModal (useSaveCallerUserProfile) persists these fields. The profile must be associated with the caller's principal. If the profile data structures already exist, verify they include an organisation field and add it if missing.",
+        "id": "REQ-43",
+        "summary": "In backend/main.mo, remove any token balance validation from the IP registration function (e.g. any check that the caller has sufficient IPGT balance before registering an IP). The registerIP function must accept valid registration requests without checking token balances.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
       },
       {
-        "id": "REQ-38",
-        "summary": "Update frontend/src/components/ProfileSetupModal.tsx to include an 'Organisation' text input field (optional) in the profile setup form, alongside the existing display name and optional email fields. Persist all three fields on submission. Style the new field consistently with the existing dark navy/gold theme.",
+        "id": "REQ-44",
+        "summary": "In frontend/src/pages/RegisterIP.tsx, make the file upload input optional. Remove any 'required' constraint, validation error, or submission guard that prevents the form from being submitted without an attached document. Users may optionally upload a PDF or image to auto-populate the document hash field, but it must not be required.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/components/ProfileSetupModal.tsx",
-          "frontend/src/hooks/useQueries.ts"
+          "frontend/src/pages/RegisterIP.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/components/ProfileSetupModal.tsx"
-        ]
-      },
-      {
-        "id": "REQ-39",
-        "summary": "After a successful IP registration on ICP canisters, update frontend/src/components/RegistrationSuccessModal.tsx to display a simulated 'Also Recorded On' section showing mock cross-chain references. This section must show: (a) a mock Ethereum transaction ID (e.g. '0x' followed by a hex string) and block number, and (b) a mock Solana transaction signature and slot number. Label this section clearly as 'Future Integration — Simulated Reference' or equivalent disclaimer text so users understand this is a planned feature and not a live cross-chain transaction.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/RegistrationSuccessModal.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/RegistrationSuccessModal.tsx"
-        ]
-      },
-      {
-        "id": "REQ-40",
-        "summary": "Update frontend/src/components/IPDetailModal.tsx to display a simulated 'Also Recorded On' section for each IP record, showing mock Ethereum and Solana cross-chain references (transaction ID/signature, block/slot number) with a clear disclaimer that these are simulated future integration references. This section should appear below the existing blockchain metadata (ICP canister details, block height, timestamp).",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/IPDetailModal.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/IPDetailModal.tsx"
-        ]
-      },
-      {
-        "id": "REQ-41",
-        "summary": "Remove all IPGT Coin, burn fee, token balance, token transfer, and payment references from every frontend page, form, modal, component, and route. Specifically: (a) delete or disable the /coin-dashboard route in frontend/src/App.tsx; (b) remove TokenStats from any page that still renders it; (c) remove all burn fee and IPGT token mentions from frontend/src/pages/RegisterIP.tsx; (d) remove all token balance, transfer form, and coin-related UI from frontend/src/pages/CoinDashboard.tsx or remove the page entirely; (e) remove any remaining IPGT coin/token balance display from frontend/src/components/Header.tsx; (f) ensure frontend/src/components/RegistrationSuccessModal.tsx contains no burn fee or IPGT token text; (g) remove any remaining coin/token references from frontend/src/components/Footer.tsx.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/App.tsx",
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/pages/CoinDashboard.tsx",
-          "frontend/src/components/Header.tsx",
-          "frontend/src/components/Footer.tsx",
-          "frontend/src/pages/Home.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/pages/CoinDashboard.tsx",
-          "frontend/src/pages/Home.tsx"
+          "frontend/src/pages/RegisterIP.tsx"
         ]
       }
     ]
@@ -93,13 +50,10 @@
     "frontend-implementation-plan.json",
     "frontend/src/backend.d.ts",
     "frontend/src/backend.ts",
-    "frontend/src/components/IPDetailModal.tsx",
-    "frontend/src/components/ProfileSetupModal.tsx",
-    "frontend/src/components/RegistrationSuccessModal.tsx",
+    "frontend/src/components/TokenStats.tsx",
     "frontend/src/declarations/backend.did.d.ts",
     "frontend/src/declarations/backend.did.js",
-    "frontend/src/pages/CoinDashboard.tsx",
-    "frontend/src/pages/Home.tsx",
+    "frontend/src/hooks/useQueries.ts",
     "frontend/src/pages/RegisterIP.tsx",
     "project_state.json",
     "scratch/component-selection.json",

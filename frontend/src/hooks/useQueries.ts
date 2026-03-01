@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useActor } from './useActor';
 import { useInternetIdentity } from './useInternetIdentity';
-import { IPCategory, type IPRecord, type UserProfile, type TokenBalance } from '../backend';
+import { IPCategory, type IPRecord, type UserProfile } from '../backend';
 import { Principal } from '@dfinity/principal';
 import { ExternalBlob } from '../backend';
 
@@ -38,83 +38,6 @@ export function useSaveCallerUserProfile() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['currentUserProfile'] });
-    },
-  });
-}
-
-// ── Token Balance ─────────────────────────────────────────────────────────────
-
-export function useGetBalance(principal?: Principal) {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<TokenBalance>({
-    queryKey: ['balance', principal?.toString()],
-    queryFn: async () => {
-      if (!actor || !principal) return BigInt(0);
-      return actor.getBalance(principal);
-    },
-    enabled: !!actor && !actorFetching && !!principal,
-    refetchInterval: 30000,
-  });
-}
-
-export function useGetCirculatingSupply() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<bigint>({
-    queryKey: ['circulatingSupply'],
-    queryFn: async () => {
-      if (!actor) return BigInt(0);
-      return actor.getCirculatingSupply();
-    },
-    enabled: !!actor && !actorFetching,
-    refetchInterval: 30000,
-  });
-}
-
-export function useGetTotalBurnedTokens() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<bigint>({
-    queryKey: ['totalBurned'],
-    queryFn: async () => {
-      if (!actor) return BigInt(0);
-      return actor.getTotalBurnedTokens();
-    },
-    enabled: !!actor && !actorFetching,
-    refetchInterval: 30000,
-  });
-}
-
-/** Convenience hook that fetches circulating supply and total burned together. */
-export function useGetTokenStats() {
-  const { data: circulatingSupply, isLoading: csLoading } = useGetCirculatingSupply();
-  const { data: totalBurned, isLoading: tbLoading } = useGetTotalBurnedTokens();
-
-  return {
-    data:
-      circulatingSupply !== undefined && totalBurned !== undefined
-        ? { circulatingSupply, totalBurned }
-        : undefined,
-    isLoading: csLoading || tbLoading,
-  };
-}
-
-export function useTransferTokens() {
-  const { actor } = useActor();
-  const { identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({ to, amount }: { to: Principal; amount: TokenBalance }) => {
-      if (!actor) throw new Error('Actor not available');
-      return actor.transferTokens(to, amount);
-    },
-    onSuccess: () => {
-      if (identity) {
-        queryClient.invalidateQueries({ queryKey: ['balance', identity.getPrincipal().toString()] });
-      }
-      queryClient.invalidateQueries({ queryKey: ['circulatingSupply'] });
     },
   });
 }
@@ -212,11 +135,19 @@ export function useRegisterIP() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['allIPs'] });
-      queryClient.invalidateQueries({ queryKey: ['totalBurned'] });
-      queryClient.invalidateQueries({ queryKey: ['circulatingSupply'] });
-      if (identity) {
-        queryClient.invalidateQueries({ queryKey: ['balance', identity.getPrincipal().toString()] });
-      }
     },
+  });
+}
+
+export function useFilterByOwner(owner: Principal | null) {
+  const { actor, isFetching: actorFetching } = useActor();
+
+  return useQuery<IPRecord[]>({
+    queryKey: ['filterByOwner', owner?.toString()],
+    queryFn: async () => {
+      if (!actor || !owner) return [];
+      return actor.filterByOwner(owner);
+    },
+    enabled: !!actor && !actorFetching && !!owner,
   });
 }

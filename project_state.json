@@ -1,6 +1,6 @@
 {
   "schemaVersion": "1.0.0",
-  "projectStateVersion": 17,
+  "projectStateVersion": 19,
   "summary": "IP Global Terminal (IPGT) — a cryptographic timestamping, certification, and dispute facilitation layer. The platform builds interoperable infrastructure that strengthens IP systems, speeds up IP registration, and offers automated filing strategy optimization, SME-first infrastructure, and open cryptographic auditing layers. WIPO/Sovereign IP integration references and hypothetical statistics have been removed. The app features an ONDO Finance-inspired dark navy/gold landing page. IP registration is gated behind Internet Identity login plus a profile setup step (display name, organisation, optional email). After registration, IP is stored on ICP canisters and the confirmation screen and IP record detail display a simulated 'Also Recorded On' badge showing mock Solana/ETH transaction IDs as a future integration layer. All IPGT Coin, burn fee, token balance, and payment references have been removed from the entire platform.",
   "architectural_notes": [
     "Platform runs on ICP (Internet Computer Protocol) using canisters as smart contracts",
@@ -8,10 +8,11 @@
     "Document uploads (PDFs, images) supported; file hash recorded on-chain regardless of upload",
     "Global IP Database pre-seeded with mock IP records for demo/search purposes; blockchain metadata displayed per record",
     "IP registration is gated: user must be authenticated via Internet Identity and have completed profile setup (display name, organisation, optional email) before registering IP",
-    "Simulated cross-chain layer: after ICP registration, UI displays mock Solana/ETH transaction ID and block reference as a 'Also Recorded On' badge — this is a future/simulated layer, not a live cross-chain call"
+    "Simulated cross-chain layer: after ICP registration, UI displays mock Solana/ETH transaction ID and block reference as a 'Also Recorded On' badge — this is a future/simulated layer, not a live cross-chain call",
+    "IP records stored in stable memory on ICP canister to persist across canister upgrades"
   ],
   "known_issues": [],
-  "isFixRequest": false,
+  "isFixRequest": true,
   "existing_features": [
     {
       "id": "feature-integrate-internet-identity-authentication-into-the-frontend-display-a-login-logout-button-when-logged-in-show-the-user-s-principal-id-and-their-ipgt-coin-balance-fetched-from-the-backend-unauthenticated-users-can-browse-and-search-the-ip-database-but-cannot-register-an-ip",
@@ -252,6 +253,22 @@
         "REQ-41"
       ],
       "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-registerip-tsx-remove-all-remaining-token-balance-checks-insufficient-ipgt-tokens-error-messages-and-any-related-conditional-logic-that-blocks-or-warns-the-user-about-token-balance-the-registration-form-must-submit-without-any-token-related-validation-or-error-states",
+      "title": "In frontend/src/pages/RegisterIP.tsx, remove all remaining token balance checks, 'Insufficient IPGT tokens' error messages, and any related conditional logic that blocks or warns the user about token balance. The registration form must submit without any token-related validation or error states.",
+      "reqIds": [
+        "REQ-42"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-in-frontend-src-pages-registerip-tsx-make-the-file-upload-input-optional-remove-any-required-constraint-validation-error-or-submission-guard-that-prevents-the-form-from-being-submitted-without-an-attached-document-users-may-optionally-upload-a-pdf-or-image-to-auto-populate-the-document-hash-field-but-it-must-not-be-required",
+      "title": "In frontend/src/pages/RegisterIP.tsx, make the file upload input optional. Remove any 'required' constraint, validation error, or submission guard that prevents the form from being submitted without an attached document. Users may optionally upload a PDF or image to auto-populate the document hash field, but it must not be required.",
+      "reqIds": [
+        "REQ-44"
+      ],
+      "version": 1
     }
   ],
   "new_feature_requests": [
@@ -368,6 +385,26 @@
       "summary": "Update the backend in backend/main.mo to support user profile storage with display name, organisation, and optional email fields. Ensure the profile setup step called from ProfileSetupModal (useSaveCallerUserProfile) persists these fields. The profile must be associated with the caller's principal. If the profile data structures already exist, verify they include an organisation field and add it if missing.",
       "reqIds": [
         "REQ-37"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-35",
+      "summary": "Remove 'Insufficient IPGT tokens' error — strip all remaining token balance checks and related error messages from the registration form and any backend calls",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-36",
+      "summary": "Make document upload optional on the IP registration form — remove the required constraint so users can submit without attaching a document",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-38",
+      "summary": "In backend/main.mo, remove any token balance validation from the IP registration function (e.g. any check that the caller has sufficient IPGT balance before registering an IP). The registerIP function must accept valid registration requests without checking token balances.",
+      "reqIds": [
+        "REQ-43"
       ],
       "status": "pending"
     }

@@ -2,8 +2,8 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-gate-the-ip-registration-form-in-frontend-src-pages-registerip-tsx-behind-internet-identity-login-and-a-completed-profile-setup-step-if-the-user-is-not-logged-in-display-a-prompt-to-log-in-via-internet-identity-if-the-user-is-logged-in-but-has-not-completed-profile-setup-display-name-organisation-optional-email-redirect-or-prompt-them-to-complete-the-profile-via-profilesetupmodal-before-they-can-access-the-registration-form-unauthenticated-users-may-still-browse-the-ip-database-at-database",
-      "featureTitle": "Gate the IP registration form in frontend/src/pages/RegisterIP.tsx behind Internet Identity login AND a completed profile setup step. If the user is not logged in, display a prompt to log in via Internet Identity. If the user is logged in but has not completed profile setup (display name, organisation, optional email), redirect or prompt them to complete the profile via ProfileSetupModal before they can access the registration form. Unauthenticated users may still browse the IP database at /database.",
+      "featureId": "feature-in-frontend-src-pages-registerip-tsx-remove-all-remaining-token-balance-checks-insufficient-ipgt-tokens-error-messages-and-any-related-conditional-logic-that-blocks-or-warns-the-user-about-token-balance-the-registration-form-must-submit-without-any-token-related-validation-or-error-states",
+      "featureTitle": "In frontend/src/pages/RegisterIP.tsx, remove all remaining token balance checks, 'Insufficient IPGT tokens' error messages, and any related conditional logic that blocks or warns the user about token balance. The registration form must submit without any token-related validation or error states.",
       "files": [
         "frontend/src/pages/RegisterIP.tsx"
       ],
@@ -17,15 +17,14 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-36"
+        "REQ-42"
       ],
       "confidence": "high"
     },
     {
-      "featureId": "feature-update-frontend-src-components-profilesetupmodal-tsx-to-include-an-organisation-text-input-field-optional-in-the-profile-setup-form-alongside-the-existing-display-name-and-optional-email-fields-persist-all-three-fields-on-submission-style-the-new-field-consistently-with-the-existing-dark-navy-gold-theme",
-      "featureTitle": "Update frontend/src/components/ProfileSetupModal.tsx to include an 'Organisation' text input field (optional) in the profile setup form, alongside the existing display name and optional email fields. Persist all three fields on submission. Style the new field consistently with the existing dark navy/gold theme.",
+      "featureId": "feature-in-frontend-src-pages-registerip-tsx-make-the-file-upload-input-optional-remove-any-required-constraint-validation-error-or-submission-guard-that-prevents-the-form-from-being-submitted-without-an-attached-document-users-may-optionally-upload-a-pdf-or-image-to-auto-populate-the-document-hash-field-but-it-must-not-be-required",
+      "featureTitle": "In frontend/src/pages/RegisterIP.tsx, make the file upload input optional. Remove any 'required' constraint, validation error, or submission guard that prevents the form from being submitted without an attached document. Users may optionally upload a PDF or image to auto-populate the document hash field, but it must not be required.",
       "files": [
-        "frontend/src/components/ProfileSetupModal.tsx",
         "frontend/src/pages/RegisterIP.tsx"
       ],
       "components": [
@@ -38,69 +37,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-38"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-after-a-successful-ip-registration-on-icp-canisters-update-frontend-src-components-registrationsuccessmodal-tsx-to-display-a-simulated-also-recorded-on-section-showing-mock-cross-chain-references-this-section-must-show-a-a-mock-ethereum-transaction-id-e-g-0x-followed-by-a-hex-string-and-block-number-and-b-a-mock-solana-transaction-signature-and-slot-number-label-this-section-clearly-as-future-integration-simulated-reference-or-equivalent-disclaimer-text-so-users-understand-this-is-a-planned-feature-and-not-a-live-cross-chain-transaction",
-      "featureTitle": "After a successful IP registration on ICP canisters, update frontend/src/components/RegistrationSuccessModal.tsx to display a simulated 'Also Recorded On' section showing mock cross-chain references. This section must show: (a) a mock Ethereum transaction ID (e.g. '0x' followed by a hex string) and block number, and (b) a mock Solana transaction signature and slot number. Label this section clearly as 'Future Integration — Simulated Reference' or equivalent disclaimer text so users understand this is a planned feature and not a live cross-chain transaction.",
-      "files": [
-        "frontend/src/components/RegistrationSuccessModal.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-39"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-update-frontend-src-components-ipdetailmodal-tsx-to-display-a-simulated-also-recorded-on-section-for-each-ip-record-showing-mock-ethereum-and-solana-cross-chain-references-transaction-id-signature-block-slot-number-with-a-clear-disclaimer-that-these-are-simulated-future-integration-references-this-section-should-appear-below-the-existing-blockchain-metadata-icp-canister-details-block-height-timestamp",
-      "featureTitle": "Update frontend/src/components/IPDetailModal.tsx to display a simulated 'Also Recorded On' section for each IP record, showing mock Ethereum and Solana cross-chain references (transaction ID/signature, block/slot number) with a clear disclaimer that these are simulated future integration references. This section should appear below the existing blockchain metadata (ICP canister details, block height, timestamp).",
-      "files": [
-        "frontend/src/components/IPDetailModal.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-40"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-remove-all-ipgt-coin-burn-fee-token-balance-token-transfer-and-payment-references-from-every-frontend-page-form-modal-component-and-route-specifically-a-delete-or-disable-the-coin-dashboard-route-in-frontend-src-app-tsx-b-remove-tokenstats-from-any-page-that-still-renders-it-c-remove-all-burn-fee-and-ipgt-token-mentions-from-frontend-src-pages-registerip-tsx-d-remove-all-token-balance-transfer-form-and-coin-related-ui-from-frontend-src-pages-coindashboard-tsx-or-remove-the-page-entirely-e-remove-any-remaining-ipgt-coin-token-balance-display-from-frontend-src-components-header-tsx-f-ensure-frontend-src-components-registrationsuccessmodal-tsx-contains-no-burn-fee-or-ipgt-token-text-g-remove-any-remaining-coin-token-references-from-frontend-src-components-footer-tsx",
-      "featureTitle": "Remove all IPGT Coin, burn fee, token balance, token transfer, and payment references from every frontend page, form, modal, component, and route. Specifically: (a) delete or disable the /coin-dashboard route in frontend/src/App.tsx; (b) remove TokenStats from any page that still renders it; (c) remove all burn fee and IPGT token mentions from frontend/src/pages/RegisterIP.tsx; (d) remove all token balance, transfer form, and coin-related UI from frontend/src/pages/CoinDashboard.tsx or remove the page entirely; (e) remove any remaining IPGT coin/token balance display from frontend/src/components/Header.tsx; (f) ensure frontend/src/components/RegistrationSuccessModal.tsx contains no burn fee or IPGT token text; (g) remove any remaining coin/token references from frontend/src/components/Footer.tsx.",
-      "files": [
-        "frontend/src/pages/CoinDashboard.tsx",
-        "frontend/src/pages/Home.tsx",
-        "frontend/src/pages/RegisterIP.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-41"
+        "REQ-44"
       ],
       "confidence": "high"
     }

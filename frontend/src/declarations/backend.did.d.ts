@@ -25,7 +25,6 @@ export interface IPRecord {
   'category' : IPCategory,
   'registrationDate' : bigint,
 }
-export type TokenBalance = bigint;
 export interface UserProfile {
   'name' : string,
   'email' : [] | [string],
@@ -64,11 +63,6 @@ export interface _SERVICE {
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
   /**
-   * / Burn IPGT tokens from the caller's balance permanently.
-   * / Requires the caller to have at least the #user role.
-   */
-  'burnTokens' : ActorMethod<[TokenBalance], undefined>,
-  /**
    * / Filter IPs by category.
    */
   'filterByCategory' : ActorMethod<[IPCategory], Array<IPRecord>>,
@@ -85,32 +79,14 @@ export interface _SERVICE {
    * / first page.
    */
   'getAllIPs' : ActorMethod<[bigint, bigint], Array<IPRecord>>,
-  /**
-   * / Query any principal's IPGT balance. Callable without authentication.
-   */
-  'getBalance' : ActorMethod<[Principal], TokenBalance>,
   'getCallerUserProfile' : ActorMethod<[], [] | [UserProfile]>,
   'getCallerUserRole' : ActorMethod<[], UserRole>,
-  /**
-   * / Returns the current circulating supply (initial supply minus burned).
-   */
-  'getCirculatingSupply' : ActorMethod<[], bigint>,
   /**
    * / Retrieve a single IP record by its unique ID.
    */
   'getIP' : ActorMethod<[bigint], [] | [IPRecord]>,
-  /**
-   * / Returns the total number of IPGT tokens burned so far.
-   */
-  'getTotalBurnedTokens' : ActorMethod<[], bigint>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
-  'initializeTreasury' : ActorMethod<[Principal], undefined>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
-  /**
-   * / Register a new IP record. Burns REGISTRATION_BURN_AMOUNT IPGT from the
-   * / caller's balance. Requires the caller to have at least the #user role
-   * / and hold at least MINIMUM_BALANCE_TO_REGISTER tokens.
-   */
   'registerIP' : ActorMethod<
     [string, string, IPCategory, Uint8Array, [] | [ExternalBlob], string],
     bigint
@@ -120,11 +96,6 @@ export interface _SERVICE {
    * / Search IPs whose title contains the given keyword (case-sensitive).
    */
   'searchByTitle' : ActorMethod<[string], Array<IPRecord>>,
-  /**
-   * / Transfer IPGT tokens from the caller to another principal.
-   * / Requires the caller to have at least the #user role.
-   */
-  'transferTokens' : ActorMethod<[Principal, TokenBalance], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

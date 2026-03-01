@@ -107,7 +107,6 @@ export interface IPRecord {
     category: IPCategory;
     registrationDate: bigint;
 }
-export type TokenBalance = bigint;
 export interface UserProfile {
     name: string;
     email?: string;
@@ -137,11 +136,6 @@ export interface backendInterface {
     _initializeAccessControlWithSecret(userSecret: string): Promise<void>;
     assignCallerUserRole(user: Principal, role: UserRole): Promise<void>;
     /**
-     * / Burn IPGT tokens from the caller's balance permanently.
-     * / Requires the caller to have at least the #user role.
-     */
-    burnTokens(amount: TokenBalance): Promise<void>;
-    /**
      * / Filter IPs by category.
      */
     filterByCategory(category: IPCategory): Promise<Array<IPRecord>>;
@@ -158,43 +152,20 @@ export interface backendInterface {
      * / first page.
      */
     getAllIPs(offset: bigint, limit: bigint): Promise<Array<IPRecord>>;
-    /**
-     * / Query any principal's IPGT balance. Callable without authentication.
-     */
-    getBalance(user: Principal): Promise<TokenBalance>;
     getCallerUserProfile(): Promise<UserProfile | null>;
     getCallerUserRole(): Promise<UserRole>;
-    /**
-     * / Returns the current circulating supply (initial supply minus burned).
-     */
-    getCirculatingSupply(): Promise<bigint>;
     /**
      * / Retrieve a single IP record by its unique ID.
      */
     getIP(id: bigint): Promise<IPRecord | null>;
-    /**
-     * / Returns the total number of IPGT tokens burned so far.
-     */
-    getTotalBurnedTokens(): Promise<bigint>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
-    initializeTreasury(adminPrincipal: Principal): Promise<void>;
     isCallerAdmin(): Promise<boolean>;
-    /**
-     * / Register a new IP record. Burns REGISTRATION_BURN_AMOUNT IPGT from the
-     * / caller's balance. Requires the caller to have at least the #user role
-     * / and hold at least MINIMUM_BALANCE_TO_REGISTER tokens.
-     */
     registerIP(title: string, description: string, category: IPCategory, documentHash: Uint8Array, fileBlob: ExternalBlob | null, jurisdiction: string): Promise<bigint>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     /**
      * / Search IPs whose title contains the given keyword (case-sensitive).
      */
     searchByTitle(keyword: string): Promise<Array<IPRecord>>;
-    /**
-     * / Transfer IPGT tokens from the caller to another principal.
-     * / Requires the caller to have at least the #user role.
-     */
-    transferTokens(to: Principal, amount: TokenBalance): Promise<void>;
 }
 import type { ExternalBlob as _ExternalBlob, IPCategory as _IPCategory, IPRecord as _IPRecord, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -311,20 +282,6 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async burnTokens(arg0: TokenBalance): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.burnTokens(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.burnTokens(arg0);
-            return result;
-        }
-    }
     async filterByCategory(arg0: IPCategory): Promise<Array<IPRecord>> {
         if (this.processError) {
             try {
@@ -381,20 +338,6 @@ export class Backend implements backendInterface {
             return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getBalance(arg0: Principal): Promise<TokenBalance> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getBalance(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getBalance(arg0);
-            return result;
-        }
-    }
     async getCallerUserProfile(): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -423,20 +366,6 @@ export class Backend implements backendInterface {
             return from_candid_UserRole_n23(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getCirculatingSupply(): Promise<bigint> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getCirculatingSupply();
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getCirculatingSupply();
-            return result;
-        }
-    }
     async getIP(arg0: bigint): Promise<IPRecord | null> {
         if (this.processError) {
             try {
@@ -451,20 +380,6 @@ export class Backend implements backendInterface {
             return from_candid_opt_n25(this._uploadFile, this._downloadFile, result);
         }
     }
-    async getTotalBurnedTokens(): Promise<bigint> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.getTotalBurnedTokens();
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.getTotalBurnedTokens();
-            return result;
-        }
-    }
     async getUserProfile(arg0: Principal): Promise<UserProfile | null> {
         if (this.processError) {
             try {
@@ -477,20 +392,6 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.getUserProfile(arg0);
             return from_candid_opt_n19(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async initializeTreasury(arg0: Principal): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.initializeTreasury(arg0);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.initializeTreasury(arg0);
-            return result;
         }
     }
     async isCallerAdmin(): Promise<boolean> {
@@ -547,20 +448,6 @@ export class Backend implements backendInterface {
         } else {
             const result = await this.actor.searchByTitle(arg0);
             return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
-        }
-    }
-    async transferTokens(arg0: Principal, arg1: TokenBalance): Promise<void> {
-        if (this.processError) {
-            try {
-                const result = await this.actor.transferTokens(arg0, arg1);
-                return result;
-            } catch (e) {
-                this.processError(e);
-                throw new Error("unreachable");
-            }
-        } else {
-            const result = await this.actor.transferTokens(arg0, arg1);
-            return result;
         }
     }
 }

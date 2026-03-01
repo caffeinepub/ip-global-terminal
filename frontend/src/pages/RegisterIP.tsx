@@ -15,7 +15,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Loader2, Upload, FileText, AlertCircle, LogIn, Shield } from 'lucide-react';
 import { useRegisterIP, useGetCallerUserProfile } from '../hooks/useQueries';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useQueryClient } from '@tanstack/react-query';
 import { IPCategory, ExternalBlob } from '../backend';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 
@@ -24,7 +23,6 @@ const JURISDICTIONS = ['US', 'EU', 'UK', 'CN', 'JP', 'CA', 'AU', 'IN', 'BR', 'Gl
 export default function RegisterIP() {
   const navigate = useNavigate();
   const { login, loginStatus, identity, clear } = useInternetIdentity();
-  const queryClient = useQueryClient();
   const { mutateAsync: registerIP, isPending } = useRegisterIP();
 
   const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
@@ -85,10 +83,6 @@ export default function RegisterIP() {
       setError('Please fill in all required fields.');
       return;
     }
-    if (!fileHash) {
-      setError('Please upload a document to generate its hash.');
-      return;
-    }
 
     try {
       let externalBlob: ExternalBlob | null = null;
@@ -100,11 +94,14 @@ export default function RegisterIP() {
         );
       }
 
+      // Use the computed file hash if available, otherwise use an empty hash
+      const documentHash = fileHash ?? new Uint8Array(0);
+
       const ipId = await registerIP({
         title: title.trim(),
         description: description.trim(),
         category: category as IPCategory,
-        documentHash: fileHash,
+        documentHash,
         fileBlob: externalBlob,
         jurisdiction,
       });
@@ -171,7 +168,6 @@ export default function RegisterIP() {
   }
 
   // ── Authenticated but profile incomplete: ProfileSetupModal handles this via App.tsx ──
-  // We show a waiting state here while the modal is open
   if (isAuthenticated && profileFetched && userProfile === null) {
     return (
       <div className="min-h-screen flex items-center justify-center px-4 py-16" style={{ background: 'oklch(0.12 0.025 240)' }}>
@@ -277,10 +273,10 @@ export default function RegisterIP() {
             </div>
           </div>
 
-          {/* File Upload */}
+          {/* File Upload (optional) */}
           <div className="space-y-1.5">
             <Label className="text-gray-300">
-              Document <span className="text-gold">*</span>
+              Document <span className="text-gray-500 text-xs font-normal">(optional)</span>
             </Label>
             <div
               onClick={() => fileInputRef.current?.click()}

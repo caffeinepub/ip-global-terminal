@@ -24,7 +24,6 @@ export const UserRole = IDL.Variant({
   'user' : IDL.Null,
   'guest' : IDL.Null,
 });
-export const TokenBalance = IDL.Nat64;
 export const IPCategory = IDL.Variant({
   'trademark' : IDL.Null,
   'copyright' : IDL.Null,
@@ -77,23 +76,18 @@ export const idlService = IDL.Service({
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'burnTokens' : IDL.Func([TokenBalance], [], []),
   'filterByCategory' : IDL.Func([IPCategory], [IDL.Vec(IPRecord)], ['query']),
   'filterByJurisdiction' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
   'filterByOwner' : IDL.Func([IDL.Principal], [IDL.Vec(IPRecord)], ['query']),
   'getAllIPs' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Vec(IPRecord)], ['query']),
-  'getBalance' : IDL.Func([IDL.Principal], [TokenBalance], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-  'getCirculatingSupply' : IDL.Func([], [IDL.Nat], ['query']),
   'getIP' : IDL.Func([IDL.Nat], [IDL.Opt(IPRecord)], ['query']),
-  'getTotalBurnedTokens' : IDL.Func([], [IDL.Nat], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
       ['query'],
     ),
-  'initializeTreasury' : IDL.Func([IDL.Principal], [], []),
   'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
   'registerIP' : IDL.Func(
       [
@@ -109,7 +103,6 @@ export const idlService = IDL.Service({
     ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'searchByTitle' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
-  'transferTokens' : IDL.Func([IDL.Principal, TokenBalance], [], []),
 });
 
 export const idlInitArgs = [];
@@ -131,7 +124,6 @@ export const idlFactory = ({ IDL }) => {
     'user' : IDL.Null,
     'guest' : IDL.Null,
   });
-  const TokenBalance = IDL.Nat64;
   const IPCategory = IDL.Variant({
     'trademark' : IDL.Null,
     'copyright' : IDL.Null,
@@ -184,7 +176,6 @@ export const idlFactory = ({ IDL }) => {
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'burnTokens' : IDL.Func([TokenBalance], [], []),
     'filterByCategory' : IDL.Func([IPCategory], [IDL.Vec(IPRecord)], ['query']),
     'filterByJurisdiction' : IDL.Func(
         [IDL.Text],
@@ -193,18 +184,14 @@ export const idlFactory = ({ IDL }) => {
       ),
     'filterByOwner' : IDL.Func([IDL.Principal], [IDL.Vec(IPRecord)], ['query']),
     'getAllIPs' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Vec(IPRecord)], ['query']),
-    'getBalance' : IDL.Func([IDL.Principal], [TokenBalance], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
-    'getCirculatingSupply' : IDL.Func([], [IDL.Nat], ['query']),
     'getIP' : IDL.Func([IDL.Nat], [IDL.Opt(IPRecord)], ['query']),
-    'getTotalBurnedTokens' : IDL.Func([], [IDL.Nat], ['query']),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
         ['query'],
       ),
-    'initializeTreasury' : IDL.Func([IDL.Principal], [], []),
     'isCallerAdmin' : IDL.Func([], [IDL.Bool], ['query']),
     'registerIP' : IDL.Func(
         [
@@ -220,7 +207,6 @@ export const idlFactory = ({ IDL }) => {
       ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'searchByTitle' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
-    'transferTokens' : IDL.Func([IDL.Principal, TokenBalance], [], []),
   });
 };
 

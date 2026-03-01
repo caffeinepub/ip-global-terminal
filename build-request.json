@@ -1,141 +1,75 @@
 {
   "kind": "build_request",
-  "title": "Authenticated IP Registration, Simulated Blockchain Badges, and Full IPGT Coin Removal",
+  "title": "Remove IPGT token error, make document upload optional on IP registration",
   "projectName": "IP Global Terminal",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-36",
-      "text": "Gate the IP registration form in frontend/src/pages/RegisterIP.tsx behind Internet Identity login AND a completed profile setup step. If the user is not logged in, display a prompt to log in via Internet Identity. If the user is logged in but has not completed profile setup (display name, organisation, optional email), redirect or prompt them to complete the profile via ProfileSetupModal before they can access the registration form. Unauthenticated users may still browse the IP database at /database.",
+      "id": "REQ-42",
+      "text": "In frontend/src/pages/RegisterIP.tsx, remove all remaining token balance checks, 'Insufficient IPGT tokens' error messages, and any related conditional logic that blocks or warns the user about token balance. The registration form must submit without any token-related validation or error states.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8"
+          "msg-recent"
         ],
         "quotes": [
-          "Once you are a user you should be able to add IP.",
-          "Internet Identity login remains the auth mechanism. After logging in, users will be directed through a brief profile setup step (display name, organisation, optional email) before they can access IP registration."
+          "Remove the 'Insufficient IPGT tokens' error — strip any remaining token balance check or error message from the registration form and backend call"
         ]
       },
       "acceptanceCriteria": [
-        "Visiting /register-ip while unauthenticated shows a login prompt instead of the form.",
-        "Visiting /register-ip while authenticated but profile-incomplete triggers the ProfileSetupModal before showing the form.",
-        "Visiting /register-ip while authenticated and profile-complete shows the registration form immediately.",
-        "The IP database at /database remains publicly accessible without login."
+        "No 'Insufficient IPGT tokens' or equivalent token balance error message appears anywhere on the registration form or after submission",
+        "The form does not perform any token balance check before or during submission",
+        "All other form validation (title, category, jurisdiction) remains intact"
       ]
     },
     {
-      "id": "REQ-37",
-      "text": "Update the backend in backend/main.mo to support user profile storage with display name, organisation, and optional email fields. Ensure the profile setup step called from ProfileSetupModal (useSaveCallerUserProfile) persists these fields. The profile must be associated with the caller's principal. If the profile data structures already exist, verify they include an organisation field and add it if missing.",
+      "id": "REQ-43",
+      "text": "In backend/main.mo, remove any token balance validation from the IP registration function (e.g. any check that the caller has sufficient IPGT balance before registering an IP). The registerIP function must accept valid registration requests without checking token balances.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-8"
+          "msg-recent"
         ],
         "quotes": [
-          "users will be directed through a brief profile setup step (display name, organisation, optional email) before they can access IP registration"
+          "Remove the 'Insufficient IPGT tokens' error — strip any remaining token balance check or error message from the registration form and backend call"
         ]
       },
       "acceptanceCriteria": [
-        "The backend actor exposes a saveCallerUserProfile function accepting display name, organisation (text), and optional email.",
-        "The profile is stored stably and retrievable by the caller's principal.",
-        "Existing profile fields (display name, email) are preserved and organisation is added without breaking existing calls."
+        "The registerIP backend function does not return an error variant related to insufficient token balance",
+        "IP registration succeeds regardless of the caller's token balance",
+        "All other registration validations (duplicate hash check, required fields) remain intact"
       ]
     },
     {
-      "id": "REQ-38",
-      "text": "Update frontend/src/components/ProfileSetupModal.tsx to include an 'Organisation' text input field (optional) in the profile setup form, alongside the existing display name and optional email fields. Persist all three fields on submission. Style the new field consistently with the existing dark navy/gold theme.",
+      "id": "REQ-44",
+      "text": "In frontend/src/pages/RegisterIP.tsx, make the file upload input optional. Remove any 'required' constraint, validation error, or submission guard that prevents the form from being submitted without an attached document. Users may optionally upload a PDF or image to auto-populate the document hash field, but it must not be required.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-8"
+          "msg-recent"
         ],
         "quotes": [
-          "profile setup step (display name, organisation, optional email)"
+          "Optional document upload — file upload will no longer be required; users can submit the form without attaching a document"
         ]
       },
       "acceptanceCriteria": [
-        "The ProfileSetupModal form contains fields for display name (required), organisation (optional), and email (optional).",
-        "On submission, all three values are sent to the backend.",
-        "The modal cannot be dismissed without completing at least the display name field.",
-        "Styling matches the existing dark navy/gold theme."
-      ]
-    },
-    {
-      "id": "REQ-39",
-      "text": "After a successful IP registration on ICP canisters, update frontend/src/components/RegistrationSuccessModal.tsx to display a simulated 'Also Recorded On' section showing mock cross-chain references. This section must show: (a) a mock Ethereum transaction ID (e.g. '0x' followed by a hex string) and block number, and (b) a mock Solana transaction signature and slot number. Label this section clearly as 'Future Integration — Simulated Reference' or equivalent disclaimer text so users understand this is a planned feature and not a live cross-chain transaction.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-8"
-        ],
-        "quotes": [
-          "the confirmation screen and IP record detail will display a simulated 'Also Recorded On' badge/reference showing a mock Solana or Ethereum transaction ID and block reference — presented clearly as a future integration layer"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The RegistrationSuccessModal displays an 'Also Recorded On' section with mock Ethereum and Solana references.",
-        "Each reference shows a transaction ID/signature and a block/slot number.",
-        "A disclaimer label clearly indicates this is a simulated future integration layer.",
-        "All IPGT coin, burn fee, and token language is absent from the modal.",
-        "Styling matches the dark navy/gold theme."
-      ]
-    },
-    {
-      "id": "REQ-40",
-      "text": "Update frontend/src/components/IPDetailModal.tsx to display a simulated 'Also Recorded On' section for each IP record, showing mock Ethereum and Solana cross-chain references (transaction ID/signature, block/slot number) with a clear disclaimer that these are simulated future integration references. This section should appear below the existing blockchain metadata (ICP canister details, block height, timestamp).",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-8"
-        ],
-        "quotes": [
-          "IP record detail will display a simulated 'Also Recorded On' badge/reference showing a mock Solana or Ethereum transaction ID and block reference"
-        ]
-      },
-      "acceptanceCriteria": [
-        "IPDetailModal shows an 'Also Recorded On' section with mock ETH and Solana references.",
-        "The section is clearly labelled as a future/simulated integration.",
-        "ICP canister metadata and other existing fields remain intact.",
-        "Styling is consistent with the dark navy/gold theme."
-      ]
-    },
-    {
-      "id": "REQ-41",
-      "text": "Remove all IPGT Coin, burn fee, token balance, token transfer, and payment references from every frontend page, form, modal, component, and route. Specifically: (a) delete or disable the /coin-dashboard route in frontend/src/App.tsx; (b) remove TokenStats from any page that still renders it; (c) remove all burn fee and IPGT token mentions from frontend/src/pages/RegisterIP.tsx; (d) remove all token balance, transfer form, and coin-related UI from frontend/src/pages/CoinDashboard.tsx or remove the page entirely; (e) remove any remaining IPGT coin/token balance display from frontend/src/components/Header.tsx; (f) ensure frontend/src/components/RegistrationSuccessModal.tsx contains no burn fee or IPGT token text; (g) remove any remaining coin/token references from frontend/src/components/Footer.tsx.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-8"
-        ],
-        "quotes": [
-          "remove anything to IPGT Coin",
-          "Remove all IPGT Coin / payment references — Every mention of IPGT coin, burn fees, token balances, and transfer forms will be removed from all pages, forms, modals, and the coin dashboard route."
-        ]
-      },
-      "acceptanceCriteria": [
-        "No page, modal, form, or component in the app displays IPGT coin balance, burn fee, token transfer, or any coin/token language.",
-        "The /coin-dashboard route is removed or redirects away.",
-        "The Coin Dashboard page is either deleted or emptied of all token-related UI.",
-        "TokenStats component is not rendered on any page.",
-        "Header does not show a coin balance for authenticated users.",
-        "RegistrationSuccessModal shows no burn fee or token amount.",
-        "Footer contains no coin/token language."
+        "The file upload input does not have a 'required' attribute or equivalent validation constraint",
+        "Submitting the registration form without uploading a file does not produce a validation error",
+        "If a file is uploaded, the SHA-256 hash is still computed and populates the document hash field as before",
+        "If no file is uploaded and no manual hash is provided, the document hash field may remain empty and the form still submits successfully"
       ]
     }
   ],
   "constraints": [
-    "Do not modify any file listed in frontend.immutablePaths.",
-    "The IP database at /database must remain publicly accessible without authentication.",
-    "Simulated Solana/ETH references must be clearly labelled as future/simulated — never presented as live cross-chain transactions.",
-    "The dark navy/gold visual theme (Playfair Display headings, Inter body, gold accents) must be preserved across all modified components.",
-    "Whitepaper.tsx must not be modified."
+    "Do not modify frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any file under frontend/src/components/ui",
+    "Do not alter any other page, component, or backend logic beyond what is specified in these requirements",
+    "The duplicate document hash uniqueness check in the backend must remain intact"
   ],
   "nonGoals": [
-    "Live Solana or Ethereum smart contract integration — simulated references only.",
-    "Any payment, subscription, or token-gating mechanism to replace IPGT coins.",
-    "Changes to the Whitepaper page content or styling.",
-    "Changes to the IP database mock records or search/filter functionality."
+    "Adding a random hash generator button (explicitly deferred from this build)",
+    "Persistent IP storage changes (not included in this scoped build)",
+    "Any visual or styling changes to RegisterIP.tsx beyond removing token-related UI",
+    "Changes to any other page, route, or component"
   ],
   "imageRequirements": {
     "required": [],
