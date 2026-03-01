@@ -1,0 +1,162 @@
+{
+  "schemaVersion": "1.0.0",
+  "projectStateVersion": 5,
+  "summary": "IP Global Terminal (IPGT) — a blockchain-secured global intellectual property database running on ICP. Features an IPGT coin (100B supply, burn-on-registration), open IP registration for coin holders, document uploads, on-chain file hashing, and a publicly searchable global IP database.",
+  "architectural_notes": [
+    "Platform runs on ICP (Internet Computer Protocol) using canisters as smart contracts",
+    "IPGT coin is a fungible token on ICP; coins are permanently burned on each IP registration",
+    "IP records include: title, description, category (patent/trademark/copyright), owner identity, registration date, document hash, jurisdiction",
+    "Document uploads (PDFs, images) supported; file hash recorded on-chain regardless of upload",
+    "IP registration burn fee is 0.02 IPGT (1/50th of 1 IPGT coin) — not 100 IPGT"
+  ],
+  "known_issues": [],
+  "isFixRequest": true,
+  "existing_features": [
+    {
+      "id": "feature-integrate-internet-identity-authentication-into-the-frontend-display-a-login-logout-button-when-logged-in-show-the-user-s-principal-id-and-their-ipgt-coin-balance-fetched-from-the-backend-unauthenticated-users-can-browse-and-search-the-ip-database-but-cannot-register-an-ip",
+      "title": "Integrate Internet Identity authentication into the frontend. Display a login/logout button. When logged in, show the user's principal ID and their IPGT coin balance fetched from the backend. Unauthenticated users can browse and search the IP database but cannot register an IP.",
+      "reqIds": [
+        "REQ-4"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-an-ip-registration-page-in-the-frontend-the-form-must-include-fields-for-title-text-description-textarea-category-select-patent-trademark-copyright-jurisdiction-text-document-hash-text-optional-if-file-is-uploaded-and-a-file-upload-input-accepting-pdfs-and-images-on-submission-compute-and-display-the-sha-256-hash-of-any-uploaded-file-client-side-call-the-backend-registration-function-and-show-a-success-confirmation-with-the-assigned-ip-id-and-the-amount-of-ipgt-coins-burned-display-a-clear-error-if-the-user-has-insufficient-ipgt-balance",
+      "title": "Build an IP Registration page in the frontend. The form must include fields for: title (text), description (textarea), category (select: Patent, Trademark, Copyright), jurisdiction (text), document hash (text, optional if file is uploaded), and a file upload input accepting PDFs and images. On submission, compute and display the SHA-256 hash of any uploaded file client-side, call the backend registration function, and show a success confirmation with the assigned IP ID and the amount of IPGT coins burned. Display a clear error if the user has insufficient IPGT balance.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-a-global-ip-database-page-in-the-frontend-display-a-searchable-paginated-table-card-list-of-all-registered-ips-provide-filter-search-controls-for-keyword-searches-title-category-dropdown-and-jurisdiction-text-each-ip-entry-should-display-ip-id-title-category-jurisdiction-owner-truncated-principal-registration-date-and-document-hash-include-a-detail-view-or-modal-for-each-ip-showing-all-fields-including-the-full-document-hash",
+      "title": "Build a Global IP Database page in the frontend. Display a searchable, paginated table/card list of all registered IPs. Provide filter/search controls for: keyword (searches title), category (dropdown), and jurisdiction (text). Each IP entry should display: IP ID, title, category, jurisdiction, owner (truncated principal), registration date, and document hash. Include a detail view or modal for each IP showing all fields including the full document hash.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-build-an-ipgt-coin-dashboard-section-in-the-frontend-accessible-after-login-display-the-user-s-current-ipgt-balance-the-current-total-circulating-supply-and-the-total-ipgt-burned-to-date-include-a-simple-transfer-form-allowing-the-user-to-send-ipgt-coins-to-another-principal",
+      "title": "Build an IPGT Coin dashboard section in the frontend (accessible after login). Display: the user's current IPGT balance, the current total circulating supply, and the total IPGT burned to date. Include a simple transfer form allowing the user to send IPGT coins to another principal.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-apply-a-cohesive-professional-visual-theme-across-the-entire-frontend-the-design-should-evoke-a-global-authoritative-and-high-tech-intellectual-property-registry-think-dark-navy-charcoal-backgrounds-with-gold-and-white-accents-bold-serif-or-semi-serif-headings-clean-data-dense-layouts-and-subtle-blockchain-document-motifs-enforce-this-theme-consistently-across-all-pages-navigation-forms-database-views-and-the-coin-dashboard",
+      "title": "Apply a cohesive, professional visual theme across the entire frontend. The design should evoke a global, authoritative, and high-tech intellectual property registry — think dark navy/charcoal backgrounds with gold and white accents, bold serif or semi-serif headings, clean data-dense layouts, and subtle blockchain/document motifs. Enforce this theme consistently across all pages: navigation, forms, database views, and the coin dashboard.",
+      "reqIds": [
+        "REQ-8"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-integrate-a-hero-banner-image-for-the-ipgt-landing-home-page-featuring-a-dark-futuristic-globe-with-glowing-gold-circuit-line-overlays-evoking-a-global-blockchain-network-and-the-branding-text-area-left-blank-for-overlay-use",
+      "title": "Generate and integrate a hero banner image for the IPGT landing/home page featuring a dark, futuristic globe with glowing gold circuit-line overlays evoking a global blockchain network, and the branding text area left blank for overlay use.",
+      "reqIds": [
+        "REQ-9"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-generate-and-integrate-an-ipgt-logo-mark-a-stylized-globe-or-shield-icon-with-a-golden-ip-monogram-used-in-the-navigation-bar-and-favicon",
+      "title": "Generate and integrate an IPGT logo mark — a stylized globe or shield icon with a golden 'IP' monogram — used in the navigation bar and favicon.",
+      "reqIds": [
+        "REQ-10"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-update-the-ip-registration-page-frontend-src-pages-registerip-tsx-and-the-registrationsuccessmodal-frontend-src-components-registrationsuccessmodal-tsx-to-display-the-correct-burn-fee-of-0-02-ipgt-instead-of-100-ipgt-any-ui-text-tooltips-or-helper-copy-referencing-the-burn-amount-must-reflect-the-new-fee",
+      "title": "Update the IP Registration page (frontend/src/pages/RegisterIP.tsx) and the RegistrationSuccessModal (frontend/src/components/RegistrationSuccessModal.tsx) to display the correct burn fee of 0.02 IPGT instead of 100 IPGT. Any UI text, tooltips, or helper copy referencing the burn amount must reflect the new fee.",
+      "reqIds": [
+        "REQ-12"
+      ],
+      "version": 1
+    }
+  ],
+  "new_feature_requests": [
+    {
+      "id": "AR-1",
+      "summary": "IPGT Coin launch with 100B supply and burn mechanism on IP registration",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-2",
+      "summary": "IP Registration open to IPGT coin holders with document upload and on-chain hash",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-3",
+      "summary": "Global IP Database — publicly searchable and browsable, connected to ICP canisters",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-4",
+      "summary": "Internet Identity authentication for wallet/identity login",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-5",
+      "summary": "Implement the IPGT token ledger in the backend with a fixed total supply of 100,000,000,000 (100 billion) IPGT coins. The initial supply should be minted to a designated treasury/admin principal. Provide functions to: query a user's IPGT balance, transfer IPGT coins between principals, and burn a configurable amount of IPGT coins (deducted permanently from circulation). Maintain a running total of burned coins and current circulating supply.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-6",
+      "summary": "Implement an IP registration system in the backend. Each IP record must store: title, description, category (Patent / Trademark / Copyright), owner principal (from Internet Identity), registration date (timestamp), document hash (SHA-256 or equivalent string), optional uploaded file blob, and jurisdiction. Registering an IP must require the caller to hold at least a minimum IPGT balance, burn a fixed number of IPGT coins from the caller's balance upon successful registration, and assign a unique IP ID to the record. Store all records in stable, on-chain state.",
+      "reqIds": [
+        "REQ-2"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-7",
+      "summary": "Implement a publicly accessible IP database query layer in the backend. Provide functions to: list all registered IPs (paginated), search IPs by title keyword, category, jurisdiction, and owner principal, and retrieve a single IP record by its unique ID. These query functions must be callable without authentication.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-8",
+      "summary": "Reduce IP registration burn fee from 100 IPGT to 0.02 IPGT (1/50th of 1 IPGT) in backend and frontend",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-9",
+      "summary": "Persist Internet Identity login sessions in the browser so users are automatically restored on page load without re-authentication",
+      "reqIds": [],
+      "status": "pending"
+    },
+    {
+      "id": "AR-10",
+      "summary": "In the backend (backend/main.mo), reduce the IP registration burn fee constant from 100 IPGT to 0.02 IPGT. Given that IPGT uses 2 decimal places of precision (base units), this means the burn amount must be set to 2 base units (i.e., 1/50th of 1 IPGT coin). Update all relevant constants, minimum balance checks, and burn logic accordingly.",
+      "reqIds": [
+        "REQ-11"
+      ],
+      "status": "pending"
+    },
+    {
+      "id": "AR-12",
+      "summary": "Ensure the Internet Identity authentication hook (frontend/src/hooks/useInternetIdentity.ts) persists the authenticated session across page reloads using AuthClient's local storage persistence. On app startup, the app must automatically restore an existing authenticated session without requiring the user to log in again. The session should remain valid until the user explicitly logs out or the session naturally expires.",
+      "reqIds": [
+        "REQ-13"
+      ],
+      "status": "pending"
+    }
+  ],
+  "gameProjectType": "none",
+  "projectName": "IP Global Terminal",
+  "clarification_mode": "instant",
+  "clarification_rounds": 0
+}

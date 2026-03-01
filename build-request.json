@@ -1,0 +1,86 @@
+{
+  "kind": "build_request",
+  "title": "Reduce IP registration burn fee to 0.02 IPGT and persist Internet Identity login sessions",
+  "projectName": "IP Global Terminal",
+  "priority": "normal",
+  "requirements": [
+    {
+      "id": "REQ-11",
+      "text": "In the backend (backend/main.mo), reduce the IP registration burn fee constant from 100 IPGT to 0.02 IPGT. Given that IPGT uses 2 decimal places of precision (base units), this means the burn amount must be set to 2 base units (i.e., 1/50th of 1 IPGT coin). Update all relevant constants, minimum balance checks, and burn logic accordingly.",
+      "target": "backend",
+      "source": {
+        "messageIds": [
+          "msg-7",
+          "msg-9"
+        ],
+        "quotes": [
+          "the MIN burn fee for an IP is 1/50 of a IPGT Coin please adjust",
+          "Burn fee reduced to 0.02 IPGT (1/50th of 1 IPGT coin)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The backend burn constant is set to 2 base units (0.02 IPGT at 2 decimal precision)",
+        "Registering an IP deducts exactly 0.02 IPGT from the caller's balance",
+        "The minimum balance check for registration is updated to require at least 0.02 IPGT",
+        "Total burned supply is incremented by 0.02 IPGT per successful registration"
+      ]
+    },
+    {
+      "id": "REQ-12",
+      "text": "Update the IP Registration page (frontend/src/pages/RegisterIP.tsx) and the RegistrationSuccessModal (frontend/src/components/RegistrationSuccessModal.tsx) to display the correct burn fee of 0.02 IPGT instead of 100 IPGT. Any UI text, tooltips, or helper copy referencing the burn amount must reflect the new fee.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-7",
+          "msg-9"
+        ],
+        "quotes": [
+          "Registration burns 100 IPGT from your balance permanently",
+          "update the frontend registration UI text so it accurately reflects the new fee"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The registration form displays '0.02 IPGT' as the burn fee",
+        "The success modal shows '0.02 IPGT burned' after a successful registration",
+        "No UI text anywhere in the app references 100 IPGT as the registration cost"
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "text": "Ensure the Internet Identity authentication hook (frontend/src/hooks/useInternetIdentity.ts) persists the authenticated session across page reloads using AuthClient's local storage persistence. On app startup, the app must automatically restore an existing authenticated session without requiring the user to log in again. The session should remain valid until the user explicitly logs out or the session naturally expires.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-8",
+          "msg-10"
+        ],
+        "quotes": [
+          "save any log in created so they can log in in the future and keep their data",
+          "Persistent login sessions — the Internet Identity session is saved in the browser so users don't have to log in every time they revisit the app",
+          "Session restoration — on page load, the app will automatically check for an existing Internet Identity session and restore the logged-in state without requiring re-authentication"
+        ]
+      },
+      "acceptanceCriteria": [
+        "After logging in with Internet Identity, refreshing the page restores the authenticated state automatically without showing the login prompt",
+        "The user's principal ID and IPGT balance are displayed immediately on page load if a valid session exists",
+        "Clicking logout clears the session and the user is returned to the unauthenticated state",
+        "If no valid session exists on load, the app shows the unauthenticated state without errors"
+      ]
+    }
+  ],
+  "constraints": [
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts or frontend/src/hooks/useActor.ts directly if they are immutable — implement session persistence using only patterns supported by the existing AuthClient setup in those hooks",
+    "Do not change the IPGT token supply or any other token parameters beyond the burn fee constant",
+    "All on-chain data (IP records, balances) must remain linked to user principals and must not be reset"
+  ],
+  "nonGoals": [
+    "Adding new authentication providers beyond Internet Identity",
+    "Changing any other backend token parameters (supply, transfer logic, etc.)",
+    "Redesigning any UI pages beyond updating the burn fee display text",
+    "Implementing a coin faucet or airdrop mechanism"
+  ],
+  "imageRequirements": {
+    "required": [],
+    "edits": []
+  }
+}

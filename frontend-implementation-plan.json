@@ -1,0 +1,50 @@
+{
+  "kind": "implementation_plan",
+  "version": "1.0",
+  "title": "Reduce IP registration burn fee to 0.02 IPGT and persist Internet Identity login sessions",
+  "requirements": [
+    {
+      "id": "REQ-12",
+      "summary": "Update registration UI to display 0.02 IPGT burn fee instead of 100 IPGT",
+      "acceptanceCriteria": [
+        "The registration form displays '0.02 IPGT' as the burn fee",
+        "The success modal shows '0.02 IPGT burned' after a successful registration",
+        "No UI text anywhere in the app references 100 IPGT as the registration cost"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/RegisterIP.tsx",
+          "operation": "modify",
+          "description": "Update all UI text and tooltips referencing the burn fee from 100 IPGT to 0.02 IPGT. Verify the component's usage instructions before implementing. Search for hardcoded '100' values in fee-related copy and replace with '0.02'."
+        },
+        {
+          "path": "frontend/src/components/RegistrationSuccessModal.tsx",
+          "operation": "modify",
+          "description": "Update the success confirmation message to display '0.02 IPGT burned' instead of '100 IPGT'. Ensure the burned amount shown after registration accurately reflects the new fee."
+        }
+      ]
+    },
+    {
+      "id": "REQ-13",
+      "summary": "Implement persistent Internet Identity sessions across page reloads",
+      "acceptanceCriteria": [
+        "After logging in with Internet Identity, refreshing the page restores the authenticated state automatically without showing the login prompt",
+        "The user's principal ID and IPGT balance are displayed immediately on page load if a valid session exists",
+        "Clicking logout clears the session and the user is returned to the unauthenticated state",
+        "If no valid session exists on load, the app shows the unauthenticated state without errors"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useInternetIdentity.ts",
+          "operation": "modify",
+          "description": "Ensure the AuthClient is configured with persistent storage and that the hook checks for an existing authenticated session on initialization. Verify the component's usage instructions before implementing. The session must be automatically restored from AuthClient's local storage on app startup without requiring re-authentication. Ensure the identity state is set immediately when a valid session is found."
+        },
+        {
+          "path": "frontend/src/hooks/useActor.ts",
+          "operation": "modify",
+          "description": "Verify that the actor hook properly handles restored identity from persistent sessions. Ensure that when the identity is restored on page load, the actor is recreated with the authenticated identity and dependent queries are not prematurely invalidated during the restoration phase."
+        }
+      ]
+    }
+  ]
+}

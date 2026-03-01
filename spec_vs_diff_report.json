@@ -1,0 +1,26 @@
+{
+  "kind": "spec_vs_diff_report",
+  "version": "1.0",
+  "generatedAt": "2026-03-01T03:14:03.534Z",
+  "summary": "The diff implements REQ-11 (backend burn fee reduced to 2 base units) and REQ-12 (frontend UI updated to show 0.02 IPGT). REQ-13 (session persistence across page reloads) is not addressed anywhere in the diff — no changes were made to useInternetIdentity.ts or any session-restoration logic.",
+  "missing_requirements": [
+    {
+      "id": "REQ-13",
+      "requirement": "Persist Internet Identity authenticated session across page reloads using AuthClient's local storage persistence, automatically restoring an existing session on app startup without requiring the user to log in again.",
+      "reason": "No changes to frontend/src/hooks/useInternetIdentity.ts or any related session persistence logic appear anywhere in the diff. The frontend-file-summaries.txt does not mention any session persistence update for the auth hook, and no new files related to session restoration were added.",
+      "evidence": [
+        "frontend-file-summaries.txt",
+        "frontend/src/hooks/useInternetIdentity.ts"
+      ]
+    }
+  ],
+  "hallucinated_features": [],
+  "confidence": 0.92,
+  "changed_files": [
+    "backend/main.mo",
+    "frontend-file-summaries.txt",
+    "frontend/src/components/RegistrationSuccessModal.tsx",
+    "frontend/src/pages/RegisterIP.tsx",
+    "project_state.json"
+  ]
+}

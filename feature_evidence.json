@@ -1,0 +1,26 @@
+{
+  "kind": "feature_evidence_report",
+  "features": [
+    {
+      "featureId": "feature-update-the-ip-registration-page-frontend-src-pages-registerip-tsx-and-the-registrationsuccessmodal-frontend-src-components-registrationsuccessmodal-tsx-to-display-the-correct-burn-fee-of-0-02-ipgt-instead-of-100-ipgt-any-ui-text-tooltips-or-helper-copy-referencing-the-burn-amount-must-reflect-the-new-fee",
+      "featureTitle": "Update the IP Registration page (frontend/src/pages/RegisterIP.tsx) and the RegistrationSuccessModal (frontend/src/components/RegistrationSuccessModal.tsx) to display the correct burn fee of 0.02 IPGT instead of 100 IPGT. Any UI text, tooltips, or helper copy referencing the burn amount must reflect the new fee.",
+      "files": [
+        "frontend/src/components/RegistrationSuccessModal.tsx",
+        "frontend/src/pages/RegisterIP.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-12"
+      ],
+      "confidence": "high"
+    }
+  ]
+}
