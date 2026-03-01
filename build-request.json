@@ -1,121 +1,103 @@
 {
   "kind": "build_request",
-  "title": "Restore pre-whitepaper styling on all non-whitepaper pages and add Whitepaper CTA to homepage",
+  "title": "Remove all WIPO references and hypothetical statistics from every page",
   "projectName": "IP Global Terminal",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-18",
-      "text": "Restore frontend/src/pages/Home.tsx to its pre-whitepaper visual state (hero banner, feature grid, navigation buttons, color scheme, typography, spacing, and layout) exactly as it appeared before the whitepaper feature was added, while retaining the 'Read the Whitepaper' call-to-action button or card that links to /whitepaper using the existing gold accent button style.",
+      "id": "REQ-32",
+      "text": "In frontend/src/pages/Home.tsx, remove every reference to WIPO (e.g. any section titled 'Integration with WIPO & Sovereign IP', any subtitle copy mentioning WIPO or Sovereign IP integration) and remove all hypothetical or unverified statistics (e.g. '180+ jurisdictions served', any fabricated numeric claims). Do not remove or alter the Mock IP records, the How It Works section, Automated Filing Strategy, SME-First Infrastructure, Open Cryptographic Auditing, or any other content. Preserve the dark navy/gold theme, layout, and all remaining section content exactly as-is.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5",
-          "msg-6"
+          "msg-4"
         ],
         "quotes": [
-          "revert all non-whitepaper pages back to their original look",
-          "just add the whitepaper somewhere on the homepage"
+          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
         ]
       },
       "acceptanceCriteria": [
-        "Home page hero banner, feature grid, and CTA section look identical to the version before the whitepaper feature was introduced.",
-        "A 'Read the Whitepaper' button or card is present on the homepage and navigates to /whitepaper.",
-        "The Whitepaper CTA uses the existing gold accent button style consistent with other CTAs on the page.",
-        "No whitepaper-specific layout or style overrides bleed into the homepage."
+        "The Home page contains no text mentioning 'WIPO' in any form.",
+        "The Home page contains no section titled 'Integration with WIPO & Sovereign IP' or similar.",
+        "Any subtitle or hero copy referencing WIPO or Sovereign IP integration has been removed.",
+        "Hypothetical statistics such as '180+ jurisdictions served' or any other unverified numeric claims do not appear on the Home page.",
+        "All other homepage sections (How It Works, Automated Filing Strategy, SME-First Infrastructure, Open Cryptographic Auditing, Hero, CTA) remain intact.",
+        "Visual theme, layout, and spacing are unchanged."
       ]
     },
     {
-      "id": "REQ-19",
-      "text": "Restore frontend/src/components/Header.tsx to its pre-whitepaper visual state (logo placement, nav link styling, authenticated balance display, mobile menu) while keeping the existing 'Whitepaper' navigation link that was already added.",
+      "id": "REQ-33",
+      "text": "In frontend/src/pages/Whitepaper.tsx, remove every reference to WIPO, Sovereign IP integration, and any hypothetical or unverified statistics. This includes removing or rewriting the 'WIPO & Sovereign IP Integration' section (section 7 in the current whitepaper) and any inline mentions of WIPO, sovereign IP registries, or fabricated metrics throughout the document. Replace removed WIPO/Sovereign IP content with a neutral section on 'Global IP Ecosystem Interoperability' framed purely as blockchain-as-infrastructure without naming WIPO or any sovereign body. Retain all other sections, the sticky left-sidebar table of contents (updating anchor links to reflect any section title changes), smooth scroll, print-to-PDF button, and the existing dark navy/gold theme.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5"
+          "msg-4"
         ],
         "quotes": [
-          "revert all non-whitepaper pages back to their original look"
+          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
         ]
       },
       "acceptanceCriteria": [
-        "Header appearance (colors, font sizes, spacing, logo) matches the original dark navy/gold design from before the whitepaper feature.",
-        "The 'Whitepaper' nav link remains present and functional.",
-        "Authenticated user balance and login/logout button render correctly."
+        "The Whitepaper page contains no text mentioning 'WIPO' in any form.",
+        "The Whitepaper page contains no text mentioning 'Sovereign IP' integration or sovereign registries.",
+        "No hypothetical or unverified statistics appear anywhere in the whitepaper prose.",
+        "The table of contents sidebar accurately reflects any section title changes.",
+        "All other whitepaper sections remain intact with their full prose content.",
+        "Sticky TOC, smooth scroll, and print-to-PDF button continue to function correctly.",
+        "Dark navy/gold theme with Playfair Display headings and Inter body text is unchanged."
       ]
     },
     {
-      "id": "REQ-20",
-      "text": "Restore frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and frontend/src/pages/CoinDashboard.tsx to their pre-whitepaper visual state — reverting any layout, typography, color, or spacing changes that were introduced as a side effect of the whitepaper feature implementation.",
+      "id": "REQ-34",
+      "text": "In frontend/src/components/Footer.tsx, remove every reference to WIPO and Sovereign IP integration (including any footer copy, taglines, or navigation links mentioning WIPO). Also remove any hypothetical statistics if present. Do not change the footer's dark navy/gold theme, copyright line, or remaining navigation links (Home, IP Database, Whitepaper).",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5"
+          "msg-4"
         ],
         "quotes": [
-          "revert all non-whitepaper pages (Home, IP Database, Registration, Coin Dashboard) back to their original look"
+          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
         ]
       },
       "acceptanceCriteria": [
-        "IP Database page card layout, filter controls, pagination, and dark navy/gold styling are identical to before the whitepaper was added.",
-        "Register IP page form fields, file upload, error/success states, and gold-accented button styling are identical to before the whitepaper was added.",
-        "Coin Dashboard stats cards and transfer form appearance are identical to before the whitepaper was added.",
-        "No whitepaper-specific global CSS or Tailwind overrides affect these pages."
+        "The Footer contains no text mentioning 'WIPO' in any form.",
+        "The Footer contains no text mentioning 'Sovereign IP' integration.",
+        "No hypothetical or unverified statistics appear in the Footer.",
+        "The Footer's dark navy/gold theme, copyright line, and remaining navigation links are unchanged."
       ]
     },
     {
-      "id": "REQ-21",
-      "text": "Restore frontend/src/components/Layout.tsx and frontend/src/components/Footer.tsx to their pre-whitepaper visual state, reverting any structural or styling changes introduced by the whitepaper feature while preserving the whitepaper route in App.tsx.",
+      "id": "REQ-35",
+      "text": "Audit frontend/src/components/Header.tsx, frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and any other frontend files not already covered above for any remaining references to WIPO, Sovereign IP integration, or hypothetical statistics (e.g. '180+ jurisdictions served'). Remove all such references. Do not modify Mock IP record data, functionality, or visual styling of any component.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-4",
-          "msg-5"
+          "msg-4"
         ],
         "quotes": [
-          "revert all non-whitepaper pages back to their original look"
+          "Remove all WIPO references and hypothetical statistics (like '180+ jurisdictions served') from every section of the app — Hero, homepage sections, Whitepaper, Footer, and anywhere else they appear — while keeping all Mock IP records intact."
         ]
       },
       "acceptanceCriteria": [
-        "Layout wrapper (Header + Footer + content area) renders identically to before the whitepaper was added on all non-whitepaper pages.",
-        "Footer branding, copyright, and links are unchanged.",
-        "The /whitepaper route remains registered in App.tsx and Whitepaper.tsx is untouched."
-      ]
-    },
-    {
-      "id": "REQ-22",
-      "text": "Audit frontend/src/index.css and frontend/tailwind.config.js for any global style changes introduced by the whitepaper feature implementation that affect non-whitepaper pages, and revert only those changes while preserving whitepaper-specific print styles and prose utilities.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-4",
-          "msg-5"
-        ],
-        "quotes": [
-          "the app does not look the same please revert the app to what it looked like before but keep the whitepaper in"
-        ]
-      },
-      "acceptanceCriteria": [
-        "Global CSS variables and Tailwind config are restored to their pre-whitepaper values for all shared tokens.",
-        "Whitepaper-specific styles (e.g., print media queries, prose classes scoped to the whitepaper page) remain intact.",
-        "No visual regressions appear on Home, IP Database, Register IP, or Coin Dashboard pages due to global style changes."
+        "No frontend file outside of Whitepaper.tsx and Home.tsx contains any reference to 'WIPO' or 'Sovereign IP'.",
+        "No frontend file contains hypothetical or unverified statistics.",
+        "Mock IP records in IPDatabase.tsx remain completely intact.",
+        "No visual styling or functionality changes are introduced."
       ]
     }
   ],
   "constraints": [
-    "Do not modify frontend/src/pages/Whitepaper.tsx — its content, layout, and styling must remain exactly as implemented.",
-    "Keep the /whitepaper route registered in frontend/src/App.tsx.",
-    "Keep the 'Whitepaper' navigation link in frontend/src/components/Header.tsx.",
-    "Do not touch any files listed in frontend.immutablePaths.",
-    "Do not modify any backend files."
+    "Do not remove or modify Mock IP records in IPDatabase.tsx.",
+    "Do not alter the visual theme, layout, or spacing of any page.",
+    "Do not remove any sections other than those containing WIPO references or hypothetical statistics.",
+    "Whitepaper.tsx TOC must remain accurate if any section titles change."
   ],
   "nonGoals": [
-    "Redesigning or improving any page beyond restoring the pre-whitepaper state.",
-    "Adding new features to any page other than the Whitepaper CTA on the homepage.",
-    "Changing the Whitepaper page content, layout, or styling.",
-    "Any backend changes."
+    "Adding new content sections to any page.",
+    "Changing the dark navy/gold visual theme.",
+    "Modifying backend logic.",
+    "Altering authentication or Internet Identity flows.",
+    "Changing any functionality of the IP registration form or coin dashboard."
   ],
   "imageRequirements": {
     "required": [],

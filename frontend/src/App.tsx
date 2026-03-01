@@ -6,7 +6,6 @@ import ProfileSetupModal from './components/ProfileSetupModal';
 import Home from './pages/Home';
 import RegisterIP from './pages/RegisterIP';
 import IPDatabase from './pages/IPDatabase';
-import CoinDashboard from './pages/CoinDashboard';
 import Whitepaper from './pages/Whitepaper';
 
 function RootComponent() {
@@ -19,7 +18,7 @@ function RootComponent() {
   return (
     <Layout>
       <Outlet />
-      {showProfileSetup && <ProfileSetupModal />}
+      <ProfileSetupModal open={showProfileSetup} />
     </Layout>
   );
 }
@@ -46,12 +45,6 @@ const databaseRoute = createRoute({
   component: IPDatabase,
 });
 
-const dashboardRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: '/dashboard',
-  component: CoinDashboard,
-});
-
 const whitepaperRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/whitepaper',
@@ -62,7 +55,6 @@ const routeTree = rootRoute.addChildren([
   indexRoute,
   registerRoute,
   databaseRoute,
-  dashboardRoute,
   whitepaperRoute,
 ]);
 

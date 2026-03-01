@@ -5,100 +5,73 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
+import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { CheckCircle, Copy } from 'lucide-react';
-import { useState } from 'react';
-import { useNavigate } from '@tanstack/react-router';
 
 interface RegistrationSuccessModalProps {
-  ipId: bigint;
-  burnAmount: number;
+  open: boolean;
   onClose: () => void;
+  ipId: bigint | null;
+  burnAmount: number;
 }
 
-export default function RegistrationSuccessModal({ ipId, burnAmount, onClose }: RegistrationSuccessModalProps) {
-  const [copied, setCopied] = useState(false);
-  const navigate = useNavigate();
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(ipId.toString());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  const handleViewDatabase = () => {
-    onClose();
-    navigate({ to: '/database' });
-  };
-
-  // Format the burn amount to avoid trailing zeros (e.g. 0.02 not 0.020000)
-  const burnAmountDisplay = Number.isInteger(burnAmount)
-    ? burnAmount.toLocaleString()
-    : burnAmount.toFixed(2).replace(/\.?0+$/, '') || burnAmount.toString();
+export default function RegistrationSuccessModal({
+  open,
+  onClose,
+  ipId,
+  burnAmount,
+}: RegistrationSuccessModalProps) {
+  const formattedBurn = (burnAmount / 100).toFixed(2);
 
   return (
-    <Dialog open={true} onOpenChange={(open) => !open && onClose()}>
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
-        className="border-border max-w-md"
-        style={{ backgroundColor: 'oklch(0.16 0.025 240)' }}
+        className="max-w-md border border-gold/30 text-gray-100"
+        style={{ background: 'oklch(0.13 0.03 240)' }}
       >
         <DialogHeader>
-          <div className="flex flex-col items-center text-center gap-4 py-4">
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.15)' }}
-            >
-              <CheckCircle className="w-8 h-8" style={{ color: 'oklch(0.78 0.14 85)' }} />
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-sm bg-green-500/15 border border-green-500/30 flex items-center justify-center">
+              <CheckCircle2 className="w-5 h-5 text-green-400" />
             </div>
-            <div>
-              <DialogTitle className="font-serif text-2xl text-foreground mb-2">
-                IP Registered Successfully
-              </DialogTitle>
-              <DialogDescription className="text-muted-foreground">
-                Your intellectual property has been secured on the IPGT blockchain.
-              </DialogDescription>
-            </div>
+            <DialogTitle className="font-serif text-xl text-gold">IP Registered!</DialogTitle>
           </div>
+          <DialogDescription className="text-gray-400 text-sm">
+            Your intellectual property has been successfully registered on the blockchain.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          <div
-            className="rounded-lg p-4 space-y-3"
-            style={{ backgroundColor: 'oklch(0.20 0.025 240)', border: '1px solid oklch(0.28 0.03 240)' }}
-          >
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">IP Record ID</span>
-              <div className="flex items-center gap-2">
-                <span className="font-mono font-bold text-foreground">#{ipId.toString()}</span>
-                <button onClick={handleCopy} className="text-muted-foreground hover:text-foreground transition-colors">
-                  {copied ? <CheckCircle className="w-4 h-4 text-green-500" /> : <Copy className="w-4 h-4" />}
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-muted-foreground">IPGT Burned</span>
-              <span className="font-semibold" style={{ color: 'oklch(0.78 0.14 85)' }}>
-                {burnAmountDisplay} IPGT
+        <div className="space-y-3 mt-2">
+          {ipId !== null && (
+            <div
+              className="flex items-center justify-between p-3 rounded-sm border border-gold/15"
+              style={{ background: 'oklch(0.10 0.025 240)' }}
+            >
+              <span className="text-gray-400 text-sm">IP Record ID</span>
+              <span className="text-gold font-mono font-semibold">
+                #{String(ipId).padStart(4, '0')}
               </span>
             </div>
+          )}
+          <div
+            className="flex items-center justify-between p-3 rounded-sm border border-gold/15"
+            style={{ background: 'oklch(0.10 0.025 240)' }}
+          >
+            <span className="text-gray-400 text-sm">IPGT Burned</span>
+            <span className="text-orange-400 font-semibold">{formattedBurn} IPGT</span>
           </div>
+          <p className="text-xs text-gray-500 leading-relaxed">
+            Your IP record is now permanently stored on the Internet Computer blockchain. The registration fee has been burned, reducing the total IPGT supply.
+          </p>
+        </div>
 
-          <div className="flex gap-3">
-            <Button
-              variant="outline"
-              className="flex-1 border-border text-foreground hover:bg-charcoal"
-              onClick={onClose}
-            >
-              Register Another
-            </Button>
-            <Button
-              className="flex-1 font-semibold"
-              style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
-              onClick={handleViewDatabase}
-            >
-              View Database
-            </Button>
-          </div>
+        <div className="mt-4">
+          <Button
+            onClick={onClose}
+            className="w-full bg-gold text-navy font-semibold hover:bg-gold/90"
+          >
+            Done
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

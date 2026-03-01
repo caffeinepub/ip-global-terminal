@@ -1,12 +1,8 @@
 import { useState, useRef } from 'react';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useRegisterIP } from '../hooks/useQueries';
-import { IPCategory } from '../backend';
-import { ExternalBlob } from '../backend';
-import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
-import { Button } from '@/components/ui/button';
+import { useNavigate } from '@tanstack/react-router';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import {
   Select,
@@ -16,68 +12,49 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Upload, FileText, Hash, AlertCircle, Lock, Loader2 } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
+import { Loader2, Upload, FileText, AlertCircle, Info } from 'lucide-react';
+import { useRegisterIP } from '../hooks/useQueries';
+import { useGetBalance } from '../hooks/useQueries';
+import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { IPCategory, ExternalBlob } from '../backend';
+import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 
-async function computeSHA256(file: File): Promise<{ hex: string; bytes: Uint8Array }> {
-  const arrayBuffer = await file.arrayBuffer();
-  const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  const hex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-  return { hex, bytes: new Uint8Array(hashBuffer) };
-}
-
-function hexToBytes(hex: string): Uint8Array {
-  const clean = hex.replace(/\s/g, '');
-  if (clean.length % 2 !== 0) return new Uint8Array(0);
-  const bytes = new Uint8Array(clean.length / 2);
-  for (let i = 0; i < clean.length; i += 2) {
-    bytes[i / 2] = parseInt(clean.slice(i, i + 2), 16);
-  }
-  return bytes;
-}
+const JURISDICTIONS = ['US', 'EU', 'UK', 'CN', 'JP', 'CA', 'AU', 'IN', 'BR', 'Global'];
+const BURN_AMOUNT = 2; // 2 base units = 0.02 IPGT
 
 export default function RegisterIP() {
+  const navigate = useNavigate();
   const { identity } = useInternetIdentity();
-  const isAuthenticated = !!identity;
+  const { data: balance } = useGetBalance(identity?.getPrincipal());
   const { mutateAsync: registerIP, isPending } = useRegisterIP();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState<IPCategory | ''>('');
   const [jurisdiction, setJurisdiction] = useState('');
-  const [documentHash, setDocumentHash] = useState('');
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [fileBlob, setFileBlob] = useState<ExternalBlob | null>(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [file, setFile] = useState<File | null>(null);
+  const [fileHash, setFileHash] = useState<Uint8Array | null>(null);
   const [isHashing, setIsHashing] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [successId, setSuccessId] = useState<bigint | null>(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [error, setError] = useState('');
+  const [successIpId, setSuccessIpId] = useState<bigint | null>(null);
+  const [showSuccess, setShowSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // 1/50th of 1 IPGT = 0.02 IPGT
-  const BURN_AMOUNT = 0.02;
-  const BURN_AMOUNT_DISPLAY = '0.02';
+  const isAuthenticated = !!identity;
+  const hasEnoughBalance = balance !== undefined && balance >= BigInt(BURN_AMOUNT);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setSelectedFile(file);
+    const f = e.target.files?.[0];
+    if (!f) return;
+    setFile(f);
     setIsHashing(true);
-    setError(null);
-
     try {
-      const { hex, bytes: _bytes } = await computeSHA256(file);
-      setDocumentHash(hex);
-
-      const fileBytes = new Uint8Array(await file.arrayBuffer());
-      const blob = ExternalBlob.fromBytes(fileBytes).withUploadProgress((pct) => {
-        setUploadProgress(pct);
-      });
-      setFileBlob(blob);
-    } catch (err) {
-      setError('Failed to process file. Please try again.');
+      const buffer = await f.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+      setFileHash(new Uint8Array(hashBuffer));
+    } catch {
+      setError('Failed to hash file. Please try again.');
     } finally {
       setIsHashing(false);
     }
@@ -85,272 +62,254 @@ export default function RegisterIP() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
+    setError('');
 
-    if (!title.trim()) { setError('Title is required.'); return; }
-    if (!description.trim()) { setError('Description is required.'); return; }
-    if (!category) { setError('Category is required.'); return; }
-    if (!jurisdiction.trim()) { setError('Jurisdiction is required.'); return; }
-    if (!documentHash.trim()) { setError('Document hash is required. Upload a file or enter a hash manually.'); return; }
-
-    const hashBytes = hexToBytes(documentHash.trim());
-    if (hashBytes.length === 0) {
-      setError('Invalid document hash format. Please enter a valid hex string.');
+    if (!isAuthenticated) {
+      setError('Please log in to register IP.');
+      return;
+    }
+    if (!hasEnoughBalance) {
+      setError('Insufficient IPGT balance. You need at least 0.02 IPGT to register.');
+      return;
+    }
+    if (!title.trim() || !description.trim() || !category || !jurisdiction) {
+      setError('Please fill in all required fields.');
+      return;
+    }
+    if (!fileHash) {
+      setError('Please upload a document to generate its hash.');
       return;
     }
 
     try {
+      let externalBlob: ExternalBlob | null = null;
+      if (file) {
+        const buffer = await file.arrayBuffer();
+        const bytes = new Uint8Array(buffer);
+        externalBlob = ExternalBlob.fromBytes(bytes).withUploadProgress((pct) =>
+          setUploadProgress(pct)
+        );
+      }
+
       const ipId = await registerIP({
         title: title.trim(),
         description: description.trim(),
         category: category as IPCategory,
-        documentHash: hashBytes,
-        fileBlob: fileBlob,
-        jurisdiction: jurisdiction.trim(),
+        documentHash: fileHash,
+        fileBlob: externalBlob,
+        jurisdiction,
       });
-      setSuccessId(ipId);
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('Insufficient IPGT')) {
-        setError(`Insufficient IPGT balance. You need at least ${BURN_AMOUNT_DISPLAY} IPGT coins to register an IP.`);
-      } else if (msg.includes('Unauthorized')) {
-        setError('You must be logged in to register an IP.');
-      } else {
-        setError(msg || 'Registration failed. Please try again.');
-      }
+
+      setSuccessIpId(ipId);
+      setShowSuccess(true);
+    } catch (err: any) {
+      setError(err?.message ?? 'Registration failed. Please try again.');
     }
   };
 
   const handleSuccessClose = () => {
-    setSuccessId(null);
-    setTitle('');
-    setDescription('');
-    setCategory('');
-    setJurisdiction('');
-    setDocumentHash('');
-    setSelectedFile(null);
-    setFileBlob(null);
-    setUploadProgress(0);
-    if (fileInputRef.current) fileInputRef.current.value = '';
+    setShowSuccess(false);
+    navigate({ to: '/database' });
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="container mx-auto px-4 py-20 text-center max-w-lg">
-        <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-          style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.12)' }}
-        >
-          <Lock className="w-8 h-8" style={{ color: 'oklch(0.78 0.14 85)' }} />
-        </div>
-        <h1 className="font-serif text-3xl font-bold text-foreground mb-4">Authentication Required</h1>
-        <p className="text-muted-foreground mb-8">
-          You must be logged in with Internet Identity and hold IPGT coins to register intellectual property.
-        </p>
-        <div className="flex flex-col sm:flex-row gap-3 justify-center">
-          <Link to="/database">
-            <Button variant="outline" className="border-border text-foreground hover:bg-charcoal">
-              Browse IP Database
-            </Button>
-          </Link>
-        </div>
-      </div>
-    );
-  }
+  const inputStyle = { background: 'oklch(0.10 0.025 240)' };
+  const inputClass = 'border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50';
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-2xl">
-      {successId !== null && (
-        <RegistrationSuccessModal
-          ipId={successId}
-          burnAmount={BURN_AMOUNT}
-          onClose={handleSuccessClose}
-        />
-      )}
-
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-3">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.15)' }}
-          >
-            <FileText className="w-5 h-5" style={{ color: 'oklch(0.78 0.14 85)' }} />
-          </div>
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-foreground">Register IP</h1>
-            <p className="text-sm text-muted-foreground">Secure your intellectual property on the IPGT blockchain</p>
-          </div>
-        </div>
-        <div
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm mt-4"
-          style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.08)', border: '1px solid oklch(0.78 0.14 85 / 0.25)' }}
-        >
-          <Hash className="w-4 h-4 flex-shrink-0" style={{ color: 'oklch(0.78 0.14 85)' }} />
-          <span className="text-muted-foreground">
-            Registration burns <strong style={{ color: 'oklch(0.78 0.14 85)' }}>{BURN_AMOUNT_DISPLAY} IPGT</strong> from your balance permanently.
-          </span>
-        </div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="space-y-6">
-        {/* Title */}
-        <div className="space-y-2">
-          <Label htmlFor="title" className="text-foreground font-medium">
-            Title <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
-          </Label>
-          <Input
-            id="title"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="e.g., Method for Quantum Data Compression"
-            className="bg-charcoal border-border text-foreground placeholder:text-muted-foreground"
-            required
-          />
-        </div>
-
-        {/* Description */}
-        <div className="space-y-2">
-          <Label htmlFor="description" className="text-foreground font-medium">
-            Description <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
-          </Label>
-          <Textarea
-            id="description"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Provide a detailed description of your intellectual property..."
-            rows={5}
-            className="bg-charcoal border-border text-foreground placeholder:text-muted-foreground resize-none"
-            required
-          />
-        </div>
-
-        {/* Category + Jurisdiction */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div className="space-y-2">
-            <Label className="text-foreground font-medium">
-              Category <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
-            </Label>
-            <Select value={category} onValueChange={(v) => setCategory(v as IPCategory)}>
-              <SelectTrigger className="bg-charcoal border-border text-foreground">
-                <SelectValue placeholder="Select category" />
-              </SelectTrigger>
-              <SelectContent style={{ backgroundColor: 'oklch(0.18 0.025 240)', borderColor: 'oklch(0.28 0.03 240)' }}>
-                <SelectItem value={IPCategory.patent}>Patent</SelectItem>
-                <SelectItem value={IPCategory.trademark}>Trademark</SelectItem>
-                <SelectItem value={IPCategory.copyright}>Copyright</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="jurisdiction" className="text-foreground font-medium">
-              Jurisdiction <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
-            </Label>
-            <Input
-              id="jurisdiction"
-              value={jurisdiction}
-              onChange={(e) => setJurisdiction(e.target.value)}
-              placeholder="e.g., United States, EU, Global"
-              className="bg-charcoal border-border text-foreground placeholder:text-muted-foreground"
-              required
-            />
-          </div>
-        </div>
-
-        {/* File Upload */}
-        <div className="space-y-2">
-          <Label className="text-foreground font-medium">Supporting Document</Label>
-          <div
-            className="relative rounded-lg border-2 border-dashed p-6 text-center cursor-pointer transition-colors"
-            style={{ borderColor: selectedFile ? 'oklch(0.78 0.14 85 / 0.5)' : 'oklch(0.28 0.03 240)' }}
-            onClick={() => fileInputRef.current?.click()}
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={(e) => {
-              e.preventDefault();
-              const file = e.dataTransfer.files[0];
-              if (file && fileInputRef.current) {
-                const dt = new DataTransfer();
-                dt.items.add(file);
-                fileInputRef.current.files = dt.files;
-                handleFileChange({ target: fileInputRef.current } as React.ChangeEvent<HTMLInputElement>);
-              }
-            }}
-          >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.doc,.docx"
-              className="hidden"
-              onChange={handleFileChange}
-            />
-            {isHashing ? (
-              <div className="flex flex-col items-center gap-2">
-                <Loader2 className="w-8 h-8 animate-spin" style={{ color: 'oklch(0.78 0.14 85)' }} />
-                <p className="text-sm text-muted-foreground">Computing SHA-256 hash...</p>
-              </div>
-            ) : selectedFile ? (
-              <div className="flex flex-col items-center gap-2">
-                <FileText className="w-8 h-8" style={{ color: 'oklch(0.78 0.14 85)' }} />
-                <p className="text-sm font-medium text-foreground">{selectedFile.name}</p>
-                <p className="text-xs text-muted-foreground">
-                  {(selectedFile.size / 1024).toFixed(1)} KB · Click to change
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col items-center gap-2">
-                <Upload className="w-8 h-8 text-muted-foreground" />
-                <p className="text-sm text-muted-foreground">
-                  Drop a file here or <span style={{ color: 'oklch(0.78 0.14 85)' }}>click to upload</span>
-                </p>
-                <p className="text-xs text-muted-foreground">PDF, PNG, JPG, DOC up to any size</p>
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Document Hash */}
-        <div className="space-y-2">
-          <Label htmlFor="docHash" className="text-foreground font-medium">
-            Document Hash (SHA-256) <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
-          </Label>
-          <div className="relative">
-            <Hash className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input
-              id="docHash"
-              value={documentHash}
-              onChange={(e) => setDocumentHash(e.target.value)}
-              placeholder="Auto-filled when file uploaded, or enter manually"
-              className="bg-charcoal border-border text-foreground placeholder:text-muted-foreground font-mono text-sm pl-10"
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">
-            Upload a file to auto-compute, or enter a SHA-256 hex hash manually.
+    <div className="min-h-screen py-10 px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="font-serif text-4xl font-bold text-gold mb-2">Register IP</h1>
+          <p className="text-gray-400">
+            Protect your intellectual property on the blockchain. Registration burns 0.02 IPGT.
           </p>
         </div>
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
+        {/* Auth warning */}
+        {!isAuthenticated && (
+          <Alert className="mb-6 border-yellow-500/30 bg-yellow-500/10">
+            <AlertCircle className="w-4 h-4 text-yellow-400" />
+            <AlertDescription className="text-yellow-300">
+              You must be logged in to register IP.
+            </AlertDescription>
           </Alert>
         )}
 
-        <Button
-          type="submit"
-          disabled={isPending || isHashing}
-          className="w-full font-semibold h-12 text-base"
-          style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
+        {/* Balance warning */}
+        {isAuthenticated && !hasEnoughBalance && (
+          <Alert className="mb-6 border-red-500/30 bg-red-500/10">
+            <AlertCircle className="w-4 h-4 text-red-400" />
+            <AlertDescription className="text-red-300">
+              Insufficient balance. You need at least 0.02 IPGT to register. Current balance:{' '}
+              {balance !== undefined ? `${(Number(balance) / 100).toFixed(2)} IPGT` : '…'}
+            </AlertDescription>
+          </Alert>
+        )}
+
+        {/* Info banner */}
+        <div
+          className="flex items-start gap-3 p-4 rounded-sm border border-gold/20 mb-6"
+          style={{ background: 'oklch(0.13 0.03 240)' }}
         >
-          {isPending ? (
-            <span className="flex items-center gap-2">
-              <Loader2 className="w-4 h-4 animate-spin" />
-              Registering on Blockchain...
-            </span>
-          ) : (
-            `Register IP — Burn ${BURN_AMOUNT_DISPLAY} IPGT`
+          <Info className="w-4 h-4 text-gold mt-0.5 flex-shrink-0" />
+          <p className="text-gray-300 text-sm leading-relaxed">
+            Registering an IP record will burn <span className="text-gold font-semibold">0.02 IPGT</span> from your balance. This is a permanent, irreversible action that creates an immutable on-chain record.
+          </p>
+        </div>
+
+        {/* Form */}
+        <form
+          onSubmit={handleSubmit}
+          className="space-y-5 p-6 rounded-sm border border-gold/20"
+          style={{ background: 'oklch(0.13 0.03 240)' }}
+        >
+          {/* Title */}
+          <div className="space-y-1.5">
+            <Label htmlFor="title" className="text-gray-300">Title <span className="text-gold">*</span></Label>
+            <Input
+              id="title"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="e.g. Novel Compression Algorithm"
+              required
+              className={inputClass}
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Description */}
+          <div className="space-y-1.5">
+            <Label htmlFor="description" className="text-gray-300">Description <span className="text-gold">*</span></Label>
+            <Textarea
+              id="description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Describe your intellectual property in detail…"
+              rows={4}
+              required
+              className={inputClass}
+              style={inputStyle}
+            />
+          </div>
+
+          {/* Category & Jurisdiction */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <Label className="text-gray-300">Category <span className="text-gold">*</span></Label>
+              <Select value={category} onValueChange={(v) => setCategory(v as IPCategory)}>
+                <SelectTrigger className={`${inputClass}`} style={inputStyle}>
+                  <SelectValue placeholder="Select category" />
+                </SelectTrigger>
+                <SelectContent style={{ background: 'oklch(0.13 0.03 240)' }} className="border-gold/25">
+                  <SelectItem value={IPCategory.patent} className="text-gray-300">Patent</SelectItem>
+                  <SelectItem value={IPCategory.trademark} className="text-gray-300">Trademark</SelectItem>
+                  <SelectItem value={IPCategory.copyright} className="text-gray-300">Copyright</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-1.5">
+              <Label className="text-gray-300">Jurisdiction <span className="text-gold">*</span></Label>
+              <Select value={jurisdiction} onValueChange={setJurisdiction}>
+                <SelectTrigger className={`${inputClass}`} style={inputStyle}>
+                  <SelectValue placeholder="Select jurisdiction" />
+                </SelectTrigger>
+                <SelectContent style={{ background: 'oklch(0.13 0.03 240)' }} className="border-gold/25">
+                  {JURISDICTIONS.map((j) => (
+                    <SelectItem key={j} value={j} className="text-gray-300">{j}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          {/* File Upload */}
+          <div className="space-y-1.5">
+            <Label className="text-gray-300">Document <span className="text-gold">*</span></Label>
+            <div
+              onClick={() => fileInputRef.current?.click()}
+              className="cursor-pointer flex flex-col items-center justify-center gap-2 p-6 rounded-sm border border-dashed border-gold/25 hover:border-gold/50 transition-colors"
+              style={{ background: 'oklch(0.10 0.025 240)' }}
+            >
+              {file ? (
+                <>
+                  <FileText className="w-8 h-8 text-gold" />
+                  <span className="text-gray-300 text-sm font-medium">{file.name}</span>
+                  <span className="text-gray-500 text-xs">{(file.size / 1024).toFixed(1)} KB</span>
+                  {isHashing && (
+                    <span className="text-gold text-xs flex items-center gap-1">
+                      <Loader2 className="w-3 h-3 animate-spin" /> Hashing…
+                    </span>
+                  )}
+                  {fileHash && !isHashing && (
+                    <span className="text-green-400 text-xs">✓ Hash computed</span>
+                  )}
+                </>
+              ) : (
+                <>
+                  <Upload className="w-8 h-8 text-gray-600" />
+                  <span className="text-gray-500 text-sm">Click to upload document</span>
+                  <span className="text-gray-600 text-xs">PDF, DOCX, PNG, JPG, etc.</span>
+                </>
+              )}
+            </div>
+            <input
+              ref={fileInputRef}
+              type="file"
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </div>
+
+          {/* Upload progress */}
+          {isPending && uploadProgress > 0 && uploadProgress < 100 && (
+            <div className="space-y-1">
+              <div className="flex justify-between text-xs text-gray-500">
+                <span>Uploading…</span>
+                <span>{uploadProgress}%</span>
+              </div>
+              <div className="h-1.5 rounded-full bg-gray-800 overflow-hidden">
+                <div
+                  className="h-full bg-gold transition-all duration-300"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+            </div>
           )}
-        </Button>
-      </form>
+
+          {/* Error */}
+          {error && (
+            <Alert className="border-red-500/30 bg-red-500/10">
+              <AlertCircle className="w-4 h-4 text-red-400" />
+              <AlertDescription className="text-red-300">{error}</AlertDescription>
+            </Alert>
+          )}
+
+          {/* Submit */}
+          <Button
+            type="submit"
+            disabled={isPending || isHashing || !isAuthenticated || !hasEnoughBalance}
+            className="w-full bg-gold text-navy font-semibold hover:bg-gold/90 disabled:opacity-50 py-3"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Registering…
+              </>
+            ) : (
+              'Register IP — Burn 0.02 IPGT'
+            )}
+          </Button>
+        </form>
+      </div>
+
+      <RegistrationSuccessModal
+        open={showSuccess}
+        onClose={handleSuccessClose}
+        ipId={successIpId}
+        burnAmount={BURN_AMOUNT}
+      />
     </div>
   );
 }

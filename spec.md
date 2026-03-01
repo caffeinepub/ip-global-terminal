@@ -1,13 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Restore all non-whitepaper pages to their original dark navy/gold visual state while keeping the whitepaper feature intact, and add a "Read the Whitepaper" CTA to the homepage.
+**Goal:** Remove all WIPO references, Sovereign IP integration mentions, and hypothetical/unverified statistics from every page and component of the IP Global Terminal frontend.
 
 **Planned changes:**
-- Restore `Home.tsx` to its pre-whitepaper layout (hero banner, feature grid, CTAs, color scheme, typography, spacing), while adding a "Read the Whitepaper" button/card linking to `/whitepaper` using the existing gold accent button style.
-- Restore `Header.tsx` to its original dark navy/gold design (logo, nav link styling, balance display, mobile menu) while keeping the existing "Whitepaper" nav link.
-- Restore `IPDatabase.tsx`, `RegisterIP.tsx`, and `CoinDashboard.tsx` to their pre-whitepaper visual state (card layouts, form styling, gold-accented buttons, dark navy theme).
-- Restore `Layout.tsx` and `Footer.tsx` to their pre-whitepaper structural and visual state while preserving the `/whitepaper` route in `App.tsx`.
-- Audit and revert any global changes in `index.css` and `tailwind.config.js` that affect non-whitepaper pages, while preserving whitepaper-specific print styles and prose utilities.
+- In `Home.tsx`, remove any section titled "Integration with WIPO & Sovereign IP" or similar, remove hero/subtitle copy mentioning WIPO or Sovereign IP, and remove hypothetical statistics such as "180+ jurisdictions served".
+- In `Whitepaper.tsx`, remove the "WIPO & Sovereign IP Integration" section (section 7) and all inline WIPO/Sovereign IP mentions and unverified statistics; replace with a neutral "Global IP Ecosystem Interoperability" section framed as blockchain-as-infrastructure; update the sticky TOC sidebar anchor links to reflect the section title change.
+- In `Footer.tsx`, remove any copy, taglines, or links referencing WIPO, Sovereign IP integration, or hypothetical statistics.
+- Audit `Header.tsx`, `IPDatabase.tsx`, `RegisterIP.tsx`, and any other frontend files for remaining WIPO, Sovereign IP, or hypothetical statistic references and remove them all.
+- Preserve all Mock IP records, all other content sections, visual theme, layout, spacing, and functionality throughout.
 
-**User-visible outcome:** All non-whitepaper pages look exactly as they did before the whitepaper feature was added. The homepage includes a gold-accented "Read the Whitepaper" CTA, and the whitepaper page and its navigation link remain fully functional.
+**User-visible outcome:** The application contains no references to WIPO, Sovereign IP integration, or unverified statistics on any page or in any component, while all other content, mock data, and the dark navy/gold theme remain unchanged.

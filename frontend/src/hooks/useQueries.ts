@@ -86,6 +86,20 @@ export function useGetTotalBurnedTokens() {
   });
 }
 
+/** Convenience hook that fetches circulating supply and total burned together. */
+export function useGetTokenStats() {
+  const { data: circulatingSupply, isLoading: csLoading } = useGetCirculatingSupply();
+  const { data: totalBurned, isLoading: tbLoading } = useGetTotalBurnedTokens();
+
+  return {
+    data:
+      circulatingSupply !== undefined && totalBurned !== undefined
+        ? { circulatingSupply, totalBurned }
+        : undefined,
+    isLoading: csLoading || tbLoading,
+  };
+}
+
 export function useTransferTokens() {
   const { actor } = useActor();
   const { identity } = useInternetIdentity();
@@ -146,16 +160,16 @@ export function useFilterByCategory(category: IPCategory | null) {
   });
 }
 
-export function useFilterByJurisdiction(jurisdiction: string) {
+export function useFilterByJurisdiction(jurisdiction: string | null) {
   const { actor, isFetching: actorFetching } = useActor();
 
   return useQuery<IPRecord[]>({
     queryKey: ['filterByJurisdiction', jurisdiction],
     queryFn: async () => {
-      if (!actor || !jurisdiction.trim()) return [];
+      if (!actor || !jurisdiction || !jurisdiction.trim()) return [];
       return actor.filterByJurisdiction(jurisdiction);
     },
-    enabled: !!actor && !actorFetching && jurisdiction.trim().length > 0,
+    enabled: !!actor && !actorFetching && !!jurisdiction && jurisdiction.trim().length > 0,
   });
 }
 

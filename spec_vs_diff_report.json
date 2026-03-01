@@ -1,66 +1,16 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T04:13:27.536Z",
-  "summary": "The diff shows only 3 files modified: frontend/src/pages/CoinDashboard.tsx, frontend-file-summaries.txt (a metadata/documentation file), and project_state.json. The build request requires restoring pre-whitepaper styling across Home.tsx, Header.tsx, IPDatabase.tsx, RegisterIP.tsx, CoinDashboard.tsx, Layout.tsx, Footer.tsx, index.css, and tailwind.config.js. Only CoinDashboard.tsx appears to have been touched among the actual source files, and its changes appear functional rather than styling restorations.",
-  "missing_requirements": [
-    {
-      "id": "REQ-18",
-      "requirement": "Restore frontend/src/pages/Home.tsx to its pre-whitepaper visual state while retaining the 'Read the Whitepaper' CTA button linking to /whitepaper using gold accent button style.",
-      "reason": "frontend/src/pages/Home.tsx is not present in the modified files list. No changes were made to this file in the diff.",
-      "evidence": [
-        "frontend/src/pages/Home.tsx"
-      ]
-    },
-    {
-      "id": "REQ-19",
-      "requirement": "Restore frontend/src/components/Header.tsx to its pre-whitepaper visual state while keeping the 'Whitepaper' navigation link.",
-      "reason": "frontend/src/components/Header.tsx is not present in the modified files list. No changes were made to this file in the diff.",
-      "evidence": [
-        "frontend/src/components/Header.tsx"
-      ]
-    },
-    {
-      "id": "REQ-20",
-      "requirement": "Restore frontend/src/pages/IPDatabase.tsx and frontend/src/pages/RegisterIP.tsx to their pre-whitepaper visual state.",
-      "reason": "frontend/src/pages/IPDatabase.tsx and frontend/src/pages/RegisterIP.tsx are not present in the modified files list. Only CoinDashboard.tsx was modified, and its modification appears to be functional rather than restoring pre-whitepaper styling.",
-      "evidence": [
-        "frontend/src/pages/IPDatabase.tsx",
-        "frontend/src/pages/RegisterIP.tsx"
-      ]
-    },
-    {
-      "id": "REQ-21",
-      "requirement": "Restore frontend/src/components/Layout.tsx and frontend/src/components/Footer.tsx to their pre-whitepaper visual state.",
-      "reason": "Neither frontend/src/components/Layout.tsx nor frontend/src/components/Footer.tsx appear in the modified files list. No changes were made to these files.",
-      "evidence": [
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/components/Footer.tsx"
-      ]
-    },
-    {
-      "id": "REQ-22",
-      "requirement": "Audit frontend/src/index.css and frontend/tailwind.config.js for global style changes introduced by the whitepaper feature and revert only those changes while preserving whitepaper-specific styles.",
-      "reason": "Neither frontend/src/index.css nor frontend/tailwind.config.js appear in the modified files list. No audit or reversion was performed on these files.",
-      "evidence": [
-        "frontend/src/index.css",
-        "frontend/tailwind.config.js"
-      ]
-    }
-  ],
-  "hallucinated_features": [
-    {
-      "description": "CoinDashboard.tsx was modified to update burn amount display logic and coin info text to reflect 0.02 IPGT, which is a functional/content change not requested by any REQ.",
-      "reason": "The build request only asks to restore pre-whitepaper styling on CoinDashboard.tsx. The diff shows content changes to burn fee amounts and coin info text, which are outside the scope of styling restoration and were not requested.",
-      "evidence": [
-        "frontend/src/pages/CoinDashboard.tsx"
-      ]
-    }
-  ],
-  "confidence": 0.82,
+  "generatedAt": "2026-03-01T04:57:46.560Z",
+  "summary": "The diff addresses all four requirements (REQ-32 through REQ-35). Home.tsx has WIPO references and hypothetical statistics removed, Whitepaper.tsx has the WIPO/Sovereign IP section replaced with 'Global IP Ecosystem Interoperability' and the TOC updated, Footer.tsx no longer contains WIPO references, and the file summaries confirm audits of Header.tsx, IPDatabase.tsx, and RegisterIP.tsx. All changes appear to be in scope and correctly implemented based on the available evidence.",
+  "missing_requirements": [],
+  "hallucinated_features": [],
+  "confidence": 0.88,
   "changed_files": [
     "frontend-file-summaries.txt",
-    "frontend/src/pages/CoinDashboard.tsx",
+    "frontend/src/components/Footer.tsx",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/Whitepaper.tsx",
     "project_state.json"
   ]
 }

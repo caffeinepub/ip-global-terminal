@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useSaveCallerUserProfile } from '../hooks/useQueries';
 import {
   Dialog,
   DialogContent,
@@ -7,67 +6,64 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Globe } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Loader2, User } from 'lucide-react';
+import { useSaveCallerUserProfile } from '../hooks/useQueries';
 
-export default function ProfileSetupModal() {
+interface ProfileSetupModalProps {
+  open: boolean;
+}
+
+export default function ProfileSetupModal({ open }: ProfileSetupModalProps) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
-  const { mutate: saveProfile, isPending, error } = useSaveCallerUserProfile();
+  const { mutateAsync: saveProfile, isPending } = useSaveCallerUserProfile();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) return;
-    saveProfile({
-      name: name.trim(),
-      email: email.trim() || undefined,
-    });
+    await saveProfile({ name: name.trim(), email: email.trim() || undefined });
   };
 
   return (
-    <Dialog open={true}>
+    <Dialog open={open}>
       <DialogContent
-        className="border-border max-w-md"
-        style={{ backgroundColor: 'oklch(0.16 0.025 240)' }}
-        onInteractOutside={(e) => e.preventDefault()}
+        className="max-w-md border border-gold/30 text-gray-100 [&>button]:hidden"
+        style={{ background: 'oklch(0.13 0.03 240)' }}
       >
         <DialogHeader>
-          <div className="flex items-center gap-3 mb-2">
-            <div
-              className="w-10 h-10 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.15)' }}
-            >
-              <Globe className="w-5 h-5" style={{ color: 'oklch(0.78 0.14 85)' }} />
+          <div className="flex items-center gap-3 mb-1">
+            <div className="w-10 h-10 rounded-sm bg-gold/15 border border-gold/30 flex items-center justify-center">
+              <User className="w-5 h-5 text-gold" />
             </div>
-            <DialogTitle className="font-serif text-xl text-foreground">
-              Welcome to IPGT
-            </DialogTitle>
+            <DialogTitle className="font-serif text-xl text-gold">Welcome to IPGT</DialogTitle>
           </div>
-          <DialogDescription className="text-muted-foreground">
-            Set up your profile to start registering intellectual property on the blockchain.
+          <DialogDescription className="text-gray-400 text-sm">
+            Set up your profile to get started with the IP registry.
           </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4 mt-2">
-          <div className="space-y-2">
-            <Label htmlFor="name" className="text-foreground font-medium">
-              Full Name <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
+          <div className="space-y-1.5">
+            <Label htmlFor="name" className="text-gray-300 text-sm">
+              Display Name <span className="text-gold">*</span>
             </Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your full name"
+              placeholder="Your name"
               required
-              className="ipgt-input bg-charcoal border-border text-foreground placeholder:text-muted-foreground focus:border-gold-DEFAULT"
+              className="border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
+              style={{ background: 'oklch(0.10 0.025 240)' }}
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-foreground font-medium">
-              Email <span className="text-muted-foreground text-xs">(optional)</span>
+          <div className="space-y-1.5">
+            <Label htmlFor="email" className="text-gray-300 text-sm">
+              Email <span className="text-gray-600 text-xs">(optional)</span>
             </Label>
             <Input
               id="email"
@@ -75,23 +71,24 @@ export default function ProfileSetupModal() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="your@email.com"
-              className="ipgt-input bg-charcoal border-border text-foreground placeholder:text-muted-foreground"
+              className="border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
+              style={{ background: 'oklch(0.10 0.025 240)' }}
             />
           </div>
-
-          {error && (
-            <p className="text-sm text-destructive">
-              {error instanceof Error ? error.message : 'Failed to save profile'}
-            </p>
-          )}
 
           <Button
             type="submit"
             disabled={isPending || !name.trim()}
-            className="w-full font-semibold"
-            style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
+            className="w-full bg-gold text-navy font-semibold hover:bg-gold/90 disabled:opacity-50"
           >
-            {isPending ? 'Saving...' : 'Create Profile'}
+            {isPending ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                Saving…
+              </>
+            ) : (
+              'Save Profile'
+            )}
           </Button>
         </form>
       </DialogContent>

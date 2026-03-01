@@ -1,233 +1,204 @@
 import { useState } from 'react';
 import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useTransferTokens } from '../hooks/useQueries';
-import { Principal } from '@dfinity/principal';
-import TokenStats from '../components/TokenStats';
-import { Button } from '@/components/ui/button';
+import { useGetBalance, useTransferTokens, useGetTokenStats } from '../hooks/useQueries';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Separator } from '@/components/ui/separator';
-import { Coins, Send, Lock, AlertCircle, CheckCircle, Loader2, Info } from 'lucide-react';
-import { Link } from '@tanstack/react-router';
+import { Loader2, Send, Coins, TrendingDown, BarChart3, AlertCircle, Info } from 'lucide-react';
+import TokenStats from '../components/TokenStats';
+import { Principal } from '@dfinity/principal';
 
 export default function CoinDashboard() {
   const { identity } = useInternetIdentity();
   const isAuthenticated = !!identity;
-  const { mutateAsync: transferTokens, isPending } = useTransferTokens();
+  const { data: balance, isLoading: balanceLoading } = useGetBalance(identity?.getPrincipal());
+  const { data: stats } = useGetTokenStats();
+  const { mutateAsync: transfer, isPending: transferring } = useTransferTokens();
 
   const [recipient, setRecipient] = useState('');
   const [amount, setAmount] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
-
-  const validatePrincipal = (p: string): boolean => {
-    try {
-      Principal.fromText(p);
-      return true;
-    } catch {
-      return false;
-    }
-  };
+  const [transferError, setTransferError] = useState('');
+  const [transferSuccess, setTransferSuccess] = useState('');
 
   const handleTransfer = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setSuccess(null);
+    setTransferError('');
+    setTransferSuccess('');
 
-    if (!recipient.trim()) {
-      setError('Recipient principal is required.');
+    if (!recipient.trim() || !amount) {
+      setTransferError('Please enter a recipient and amount.');
       return;
     }
-    if (!validatePrincipal(recipient.trim())) {
-      setError('Invalid principal format. Please enter a valid ICP principal ID.');
+
+    let toPrincipal: Principal;
+    try {
+      toPrincipal = Principal.fromText(recipient.trim());
+    } catch {
+      setTransferError('Invalid principal ID. Please check the recipient address.');
       return;
     }
-    const amountNum = parseInt(amount, 10);
-    if (!amount || isNaN(amountNum) || amountNum <= 0) {
-      setError('Please enter a valid amount greater than 0.');
+
+    const amountNum = parseFloat(amount);
+    if (isNaN(amountNum) || amountNum <= 0) {
+      setTransferError('Please enter a valid positive amount.');
+      return;
+    }
+
+    const amountBase = BigInt(Math.round(amountNum * 100));
+    if (balance !== undefined && amountBase > balance) {
+      setTransferError('Insufficient balance.');
       return;
     }
 
     try {
-      await transferTokens({
-        to: Principal.fromText(recipient.trim()),
-        amount: BigInt(amountNum),
-      });
-      setSuccess(`Successfully transferred ${amountNum.toLocaleString()} IPGT to ${recipient.slice(0, 12)}...`);
+      await transfer({ to: toPrincipal, amount: amountBase });
+      setTransferSuccess(`Successfully transferred ${amountNum.toFixed(2)} IPGT.`);
       setRecipient('');
       setAmount('');
-    } catch (err: unknown) {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (msg.includes('Insufficient')) {
-        setError('Insufficient IPGT balance for this transfer.');
-      } else if (msg.includes('Unauthorized')) {
-        setError('You must be logged in to transfer tokens.');
-      } else {
-        setError(msg || 'Transfer failed. Please try again.');
-      }
+    } catch (err: any) {
+      setTransferError(err?.message ?? 'Transfer failed. Please try again.');
     }
   };
 
   if (!isAuthenticated) {
     return (
-      <div className="container mx-auto px-4 py-20 text-center max-w-lg">
+      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
         <div
-          className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6"
-          style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.12)' }}
+          className="text-center p-10 rounded-sm border border-gold/20 max-w-md"
+          style={{ background: 'oklch(0.13 0.03 240)' }}
         >
-          <Lock className="w-8 h-8" style={{ color: 'oklch(0.78 0.14 85)' }} />
+          <Coins className="w-12 h-12 text-gold mx-auto mb-4" />
+          <h2 className="font-serif text-2xl font-bold text-gold mb-2">IPGT Dashboard</h2>
+          <p className="text-gray-400">Please log in to view your IPGT token dashboard.</p>
         </div>
-        <h1 className="font-serif text-3xl font-bold text-foreground mb-4">Login Required</h1>
-        <p className="text-muted-foreground mb-8">
-          Connect with Internet Identity to view your IPGT balance and manage your coins.
-        </p>
-        <Link to="/">
-          <Button variant="outline" className="border-border text-foreground hover:bg-charcoal">
-            Back to Home
-          </Button>
-        </Link>
       </div>
     );
   }
 
   return (
-    <div className="container mx-auto px-4 py-12 max-w-3xl">
-      {/* Header */}
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-3">
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.15)' }}
-          >
-            <Coins className="w-5 h-5" style={{ color: 'oklch(0.78 0.14 85)' }} />
-          </div>
-          <div>
-            <h1 className="font-serif text-3xl font-bold text-foreground">IPGT Coin Dashboard</h1>
-            <p className="text-sm text-muted-foreground">Manage your IPGT tokens</p>
-          </div>
+    <div className="min-h-screen py-10 px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
+      <div className="max-w-4xl mx-auto">
+        {/* Header */}
+        <div className="mb-8">
+          <h1 className="font-serif text-4xl font-bold text-gold mb-2">IPGT Dashboard</h1>
+          <p className="text-gray-400">Manage your IPGT tokens and view network statistics.</p>
         </div>
-      </div>
 
-      {/* Token Stats */}
-      <section className="mb-10">
-        <h2 className="font-serif text-xl font-semibold text-foreground mb-4">Token Overview</h2>
-        <TokenStats showAll />
-      </section>
+        {/* Token Stats */}
+        <section className="mb-8">
+          <h2 className="font-serif text-xl font-semibold text-gold mb-4">Token Statistics</h2>
+          <TokenStats />
+        </section>
 
-      <Separator className="bg-border mb-10" />
-
-      {/* Coin Info */}
-      <section className="mb-10">
-        <h2 className="font-serif text-xl font-semibold text-foreground mb-4">About IPGT Coin</h2>
-        <div
-          className="rounded-xl p-6 space-y-4"
-          style={{ backgroundColor: 'oklch(0.16 0.025 240)', border: '1px solid oklch(0.28 0.03 240)' }}
-        >
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+        {/* Coin Info */}
+        <section className="mb-8">
+          <h2 className="font-serif text-xl font-semibold text-gold mb-4">About IPGT</h2>
+          <div
+            className="p-6 rounded-sm border border-gold/20 space-y-3"
+            style={{ background: 'oklch(0.13 0.03 240)' }}
+          >
             {[
-              { label: 'Total Supply', value: '100,000,000,000 IPGT' },
-              { label: 'Registration Burn', value: '0.02 IPGT per IP' },
-              { label: 'Blockchain', value: 'Internet Computer (ICP)' },
-              { label: 'Token Model', value: 'Deflationary (burn-on-use)' },
+              { label: 'Token Name', value: 'Intellectual Property Global Token' },
+              { label: 'Symbol', value: 'IPGT' },
+              { label: 'Total Supply', value: '1,000,000,000 IPGT' },
+              { label: 'Registration Burn', value: '0.02 IPGT per registration' },
+              { label: 'Blockchain', value: 'Internet Computer Protocol (ICP)' },
+              { label: 'Model', value: 'Deflationary — tokens burned on each registration' },
             ].map((item) => (
-              <div key={item.label} className="flex justify-between items-center py-2 border-b border-border last:border-0">
-                <span className="text-muted-foreground">{item.label}</span>
-                <span className="font-medium text-foreground">{item.value}</span>
+              <div key={item.label} className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4">
+                <span className="text-gray-500 text-sm sm:w-44 flex-shrink-0">{item.label}</span>
+                <span className="text-gray-200 text-sm font-medium">{item.value}</span>
               </div>
             ))}
           </div>
-          <div
-            className="flex items-start gap-3 p-3 rounded-lg text-sm"
-            style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.08)', border: '1px solid oklch(0.78 0.14 85 / 0.2)' }}
+        </section>
+
+        {/* Transfer Form */}
+        <section>
+          <h2 className="font-serif text-xl font-semibold text-gold mb-4">Transfer IPGT</h2>
+          <form
+            onSubmit={handleTransfer}
+            className="p-6 rounded-sm border border-gold/20 space-y-4"
+            style={{ background: 'oklch(0.13 0.03 240)' }}
           >
-            <Info className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: 'oklch(0.78 0.14 85)' }} />
-            <p className="text-muted-foreground">
-              IPGT coins are required to register intellectual property. Each registration permanently burns 0.02 IPGT, creating a deflationary pressure that preserves long-term coin value.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      <Separator className="bg-border mb-10" />
-
-      {/* Transfer Form */}
-      <section>
-        <h2 className="font-serif text-xl font-semibold text-foreground mb-4">Transfer IPGT</h2>
-        <div
-          className="rounded-xl p-6"
-          style={{ backgroundColor: 'oklch(0.16 0.025 240)', border: '1px solid oklch(0.28 0.03 240)' }}
-        >
-          <form onSubmit={handleTransfer} className="space-y-5">
-            <div className="space-y-2">
-              <Label htmlFor="recipient" className="text-foreground font-medium">
-                Recipient Principal <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
-              </Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="recipient" className="text-gray-300">Recipient Principal ID</Label>
               <Input
                 id="recipient"
                 value={recipient}
                 onChange={(e) => setRecipient(e.target.value)}
-                placeholder="e.g., aaaaa-aa or full principal ID"
-                className="bg-charcoal border-border text-foreground placeholder:text-muted-foreground font-mono text-sm"
+                placeholder="e.g. aaaaa-aa"
+                className="border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
+                style={{ background: 'oklch(0.10 0.025 240)' }}
               />
-              <p className="text-xs text-muted-foreground">
-                Enter the ICP principal ID of the recipient.
-              </p>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="amount" className="text-foreground font-medium">
-                Amount (IPGT) <span style={{ color: 'oklch(0.78 0.14 85)' }}>*</span>
+            <div className="space-y-1.5">
+              <Label htmlFor="amount" className="text-gray-300">
+                Amount (IPGT)
+                {balance !== undefined && (
+                  <span className="ml-2 text-gray-500 text-xs">
+                    Balance: {(Number(balance) / 100).toFixed(2)} IPGT
+                  </span>
+                )}
               </Label>
               <Input
                 id="amount"
                 type="number"
-                min="1"
+                step="0.01"
+                min="0.01"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                placeholder="e.g., 1000"
-                className="bg-charcoal border-border text-foreground placeholder:text-muted-foreground"
+                placeholder="0.00"
+                className="border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
+                style={{ background: 'oklch(0.10 0.025 240)' }}
               />
             </div>
 
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
+            {transferError && (
+              <Alert className="border-red-500/30 bg-red-500/10">
+                <AlertCircle className="w-4 h-4 text-red-400" />
+                <AlertDescription className="text-red-300">{transferError}</AlertDescription>
               </Alert>
             )}
 
-            {success && (
-              <div
-                className="flex items-center gap-3 p-3 rounded-lg text-sm"
-                style={{ backgroundColor: 'oklch(0.50 0.14 160 / 0.12)', border: '1px solid oklch(0.50 0.14 160 / 0.3)' }}
-              >
-                <CheckCircle className="w-4 h-4 flex-shrink-0" style={{ color: 'oklch(0.65 0.14 160)' }} />
-                <span className="text-foreground">{success}</span>
-              </div>
+            {transferSuccess && (
+              <Alert className="border-green-500/30 bg-green-500/10">
+                <AlertDescription className="text-green-300">{transferSuccess}</AlertDescription>
+              </Alert>
             )}
+
+            <div
+              className="flex items-start gap-2 p-3 rounded-sm border border-gold/15"
+              style={{ background: 'oklch(0.10 0.025 240)' }}
+            >
+              <Info className="w-4 h-4 text-gold/60 mt-0.5 flex-shrink-0" />
+              <p className="text-gray-500 text-xs leading-relaxed">
+                Transfers are irreversible on-chain transactions. Double-check the recipient principal before confirming.
+              </p>
+            </div>
 
             <Button
               type="submit"
-              disabled={isPending}
-              className="w-full font-semibold h-11 gap-2"
-              style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
+              disabled={transferring}
+              className="w-full bg-gold text-navy font-semibold hover:bg-gold/90 disabled:opacity-50"
             >
-              {isPending ? (
+              {transferring ? (
                 <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Transferring...
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  Transferring…
                 </>
               ) : (
                 <>
-                  <Send className="w-4 h-4" />
+                  <Send className="w-4 h-4 mr-2" />
                   Transfer IPGT
                 </>
               )}
             </Button>
           </form>
-        </div>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

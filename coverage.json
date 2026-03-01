@@ -1,63 +1,61 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T04:13:27.540Z",
+  "generatedAt": "2026-03-01T04:57:46.564Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 5,
-    "implemented": 1,
+    "total": 4,
+    "implemented": 3,
     "items": [
       {
-        "id": "REQ-18",
-        "summary": "Restore frontend/src/pages/Home.tsx to its pre-whitepaper visual state (hero banner, feature grid, navigation buttons, color scheme, typography, spacing, and layout) exactly as it appeared before the whitepaper feature was added, while retaining the 'Read the Whitepaper' call-to-action button or card that links to /whitepaper using the existing gold accent button style.",
-        "status": "missing",
+        "id": "REQ-32",
+        "summary": "In frontend/src/pages/Home.tsx, remove every reference to WIPO (e.g. any section titled 'Integration with WIPO & Sovereign IP', any subtitle copy mentioning WIPO or Sovereign IP integration) and remove all hypothetical or unverified statistics (e.g. '180+ jurisdictions served', any fabricated numeric claims). Do not remove or alter the Mock IP records, the How It Works section, Automated Filing Strategy, SME-First Infrastructure, Open Cryptographic Auditing, or any other content. Preserve the dark navy/gold theme, layout, and all remaining section content exactly as-is.",
+        "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/Home.tsx"
         ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-19",
-        "summary": "Restore frontend/src/components/Header.tsx to its pre-whitepaper visual state (logo placement, nav link styling, authenticated balance display, mobile menu) while keeping the existing 'Whitepaper' navigation link that was already added.",
-        "status": "missing",
-        "plannedFiles": [
-          "frontend/src/components/Header.tsx"
-        ],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-20",
-        "summary": "Restore frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and frontend/src/pages/CoinDashboard.tsx to their pre-whitepaper visual state — reverting any layout, typography, color, or spacing changes that were introduced as a side effect of the whitepaper feature implementation.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/IPDatabase.tsx",
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/pages/CoinDashboard.tsx"
-        ],
         "matchedFiles": [
-          "frontend/src/pages/CoinDashboard.tsx"
+          "frontend/src/pages/Home.tsx"
         ]
       },
       {
-        "id": "REQ-21",
-        "summary": "Restore frontend/src/components/Layout.tsx and frontend/src/components/Footer.tsx to their pre-whitepaper visual state, reverting any structural or styling changes introduced by the whitepaper feature while preserving the whitepaper route in App.tsx.",
-        "status": "missing",
+        "id": "REQ-33",
+        "summary": "In frontend/src/pages/Whitepaper.tsx, remove every reference to WIPO, Sovereign IP integration, and any hypothetical or unverified statistics. This includes removing or rewriting the 'WIPO & Sovereign IP Integration' section (section 7 in the current whitepaper) and any inline mentions of WIPO, sovereign IP registries, or fabricated metrics throughout the document. Replace removed WIPO/Sovereign IP content with a neutral section on 'Global IP Ecosystem Interoperability' framed purely as blockchain-as-infrastructure without naming WIPO or any sovereign body. Retain all other sections, the sticky left-sidebar table of contents (updating anchor links to reflect any section title changes), smooth scroll, print-to-PDF button, and the existing dark navy/gold theme.",
+        "status": "implemented",
         "plannedFiles": [
-          "frontend/src/components/Layout.tsx",
-          "frontend/src/components/Footer.tsx"
+          "frontend/src/pages/Whitepaper.tsx"
         ],
-        "matchedFiles": []
+        "matchedFiles": [
+          "frontend/src/pages/Whitepaper.tsx"
+        ]
       },
       {
-        "id": "REQ-22",
-        "summary": "Audit frontend/src/index.css and frontend/tailwind.config.js for any global style changes introduced by the whitepaper feature implementation that affect non-whitepaper pages, and revert only those changes while preserving whitepaper-specific print styles and prose utilities.",
+        "id": "REQ-34",
+        "summary": "In frontend/src/components/Footer.tsx, remove every reference to WIPO and Sovereign IP integration (including any footer copy, taglines, or navigation links mentioning WIPO). Also remove any hypothetical statistics if present. Do not change the footer's dark navy/gold theme, copyright line, or remaining navigation links (Home, IP Database, Whitepaper).",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/Footer.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/Footer.tsx"
+        ]
+      },
+      {
+        "id": "REQ-35",
+        "summary": "Audit frontend/src/components/Header.tsx, frontend/src/pages/IPDatabase.tsx, frontend/src/pages/RegisterIP.tsx, and any other frontend files not already covered above for any remaining references to WIPO, Sovereign IP integration, or hypothetical statistics (e.g. '180+ jurisdictions served'). Remove all such references. Do not modify Mock IP record data, functionality, or visual styling of any component.",
         "status": "missing",
         "plannedFiles": [
-          "frontend/src/index.css",
-          "frontend/tailwind.config.js"
+          "frontend/src/components/Header.tsx",
+          "frontend/src/pages/IPDatabase.tsx",
+          "frontend/src/pages/RegisterIP.tsx",
+          "frontend/src/pages/CoinDashboard.tsx",
+          "frontend/src/components/TokenStats.tsx",
+          "frontend/src/components/IPCard.tsx",
+          "frontend/src/components/IPDetailModal.tsx",
+          "frontend/src/components/RegistrationSuccessModal.tsx"
         ],
         "matchedFiles": []
       }
@@ -68,7 +66,9 @@
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/pages/CoinDashboard.tsx",
+    "frontend/src/components/Footer.tsx",
+    "frontend/src/pages/Home.tsx",
+    "frontend/src/pages/Whitepaper.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

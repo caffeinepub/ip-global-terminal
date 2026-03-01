@@ -1,9 +1,8 @@
 import { IPRecord, IPCategory } from '../backend';
-import { Calendar, Globe, User, Hash } from 'lucide-react';
 
 interface IPCardProps {
   record: IPRecord;
-  onClick: (record: IPRecord) => void;
+  onClick: () => void;
 }
 
 const categoryLabels: Record<string, string> = {
@@ -13,96 +12,64 @@ const categoryLabels: Record<string, string> = {
 };
 
 const categoryColors: Record<string, string> = {
-  [IPCategory.patent]: 'oklch(0.60 0.12 200)',
-  [IPCategory.trademark]: 'oklch(0.65 0.14 85)',
-  [IPCategory.copyright]: 'oklch(0.60 0.14 160)',
+  [IPCategory.patent]: 'oklch(0.55 0.18 250)',
+  [IPCategory.trademark]: 'oklch(0.55 0.18 140)',
+  [IPCategory.copyright]: 'oklch(0.55 0.18 30)',
 };
 
-function truncatePrincipal(principal: string): string {
-  if (principal.length <= 16) return principal;
-  return `${principal.slice(0, 8)}...${principal.slice(-6)}`;
-}
+export default function IPCard({ record, onClick }: IPCardProps) {
+  const categoryKey = Object.keys(IPCategory).find(
+    (k) => IPCategory[k as keyof typeof IPCategory] === record.category
+  ) ?? 'patent';
 
-function truncateHash(hash: Uint8Array): string {
-  const hex = Array.from(hash).map(b => b.toString(16).padStart(2, '0')).join('');
-  if (hex.length <= 16) return hex;
-  return `${hex.slice(0, 12)}...${hex.slice(-6)}`;
-}
-
-function formatDate(timestamp: bigint): string {
-  const ms = Number(timestamp) / 1_000_000;
-  return new Date(ms).toLocaleDateString('en-US', {
+  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
   });
-}
 
-export default function IPCard({ record, onClick }: IPCardProps) {
-  const categoryKey = Object.keys(IPCategory).find(
-    k => IPCategory[k as keyof typeof IPCategory] === record.category
-  ) || '';
-
-  const catColor = categoryColors[categoryKey] || 'oklch(0.60 0.12 200)';
+  const hashHex = Array.from(record.documentHash)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
 
   return (
     <div
-      className="rounded-lg p-5 cursor-pointer transition-all duration-200 group"
-      style={{
-        backgroundColor: 'oklch(0.16 0.025 240)',
-        border: '1px solid oklch(0.28 0.03 240)',
-      }}
-      onClick={() => onClick(record)}
-      onMouseEnter={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = 'oklch(0.78 0.14 85)';
-        (e.currentTarget as HTMLDivElement).style.boxShadow = '0 0 20px oklch(0.78 0.14 85 / 0.15)';
-      }}
-      onMouseLeave={(e) => {
-        (e.currentTarget as HTMLDivElement).style.borderColor = 'oklch(0.28 0.03 240)';
-        (e.currentTarget as HTMLDivElement).style.boxShadow = 'none';
-      }}
+      onClick={onClick}
+      className="group cursor-pointer rounded-sm border border-gold/20 hover:border-gold/50 p-5 transition-all duration-200 hover:shadow-gold"
+      style={{ background: 'oklch(0.13 0.03 240)' }}
     >
+      {/* Header row */}
       <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="text-xs font-mono text-muted-foreground">#{record.id.toString()}</span>
-            <span
-              className="text-xs font-semibold px-2 py-0.5 rounded-full"
-              style={{
-                backgroundColor: 'oklch(0.20 0.025 240)',
-                color: catColor,
-              }}
-            >
-              {categoryLabels[categoryKey] || String(record.category)}
-            </span>
-          </div>
-          <h3
-            className="font-serif font-semibold text-base leading-tight line-clamp-2 transition-colors"
-            style={{ color: 'oklch(0.95 0.01 240)' }}
-            onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.color = 'oklch(0.78 0.14 85)'; }}
-            onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.color = 'oklch(0.95 0.01 240)'; }}
-          >
-            {record.title}
-          </h3>
-        </div>
+        <span className="text-xs text-gray-500 font-mono">#{String(record.id).padStart(4, '0')}</span>
+        <span
+          className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
+          style={{ background: categoryColors[categoryKey] ?? categoryColors[IPCategory.patent] }}
+        >
+          {categoryLabels[record.category] ?? record.category}
+        </span>
       </div>
 
-      <div className="space-y-1.5 text-xs text-muted-foreground">
-        <div className="flex items-center gap-2">
-          <Globe className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="truncate">{record.jurisdiction || 'N/A'}</span>
+      {/* Title */}
+      <h3 className="font-serif text-base font-semibold text-gold mb-1 line-clamp-2 group-hover:text-gold/90 transition-colors">
+        {record.title}
+      </h3>
+
+      {/* Description */}
+      <p className="text-gray-400 text-sm line-clamp-2 mb-4 leading-relaxed">{record.description}</p>
+
+      {/* Meta */}
+      <div className="space-y-1.5 text-xs text-gray-500">
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-600">Jurisdiction:</span>
+          <span className="text-gray-300">{record.jurisdiction}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <User className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="font-mono truncate">{truncatePrincipal(record.owner.toString())}</span>
+        <div className="flex items-center gap-1.5">
+          <span className="text-gray-600">Registered:</span>
+          <span className="text-gray-300">{date}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>{formatDate(record.registrationDate)}</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <Hash className="w-3.5 h-3.5 flex-shrink-0" />
-          <span className="font-mono truncate">{truncateHash(record.documentHash)}</span>
+        <div className="flex items-center gap-1.5 overflow-hidden">
+          <span className="text-gray-600 flex-shrink-0">Hash:</span>
+          <span className="text-gray-400 font-mono truncate">{hashHex.slice(0, 20)}…</span>
         </div>
       </div>
     </div>

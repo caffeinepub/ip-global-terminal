@@ -1,264 +1,253 @@
 import { Link } from '@tanstack/react-router';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { Shield, Globe, Lock, Zap, ArrowRight, Database, Coins, FileText } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-
-const features = [
-  {
-    icon: <Shield className="w-6 h-6" />,
-    title: 'Blockchain-Secured',
-    description: 'Every IP record is immutably stored on the Internet Computer blockchain, providing tamper-proof protection.',
-  },
-  {
-    icon: <Globe className="w-6 h-6" />,
-    title: 'Globally Recognized',
-    description: 'Build a universally accessible IP registry that transcends borders and jurisdictions.',
-  },
-  {
-    icon: <Lock className="w-6 h-6" />,
-    title: 'Cryptographic Proof',
-    description: 'SHA-256 document hashing ensures the integrity and authenticity of every registered IP.',
-  },
-  {
-    icon: <Coins className="w-6 h-6" />,
-    title: 'IPGT Coin Economy',
-    description: 'A deflationary token model where each IP registration burns IPGT coins, preserving long-term value.',
-  },
-  {
-    icon: <Database className="w-6 h-6" />,
-    title: 'Open Database',
-    description: 'The global IP database is publicly searchable and browsable — no login required.',
-  },
-  {
-    icon: <Zap className="w-6 h-6" />,
-    title: 'Instant Registration',
-    description: 'Register patents, trademarks, and copyrights in seconds with on-chain finality.',
-  },
-];
+import { Shield, Globe, FileText, Lock, ChevronRight, Database, Zap, Users } from 'lucide-react';
 
 export default function Home() {
-  const { identity } = useInternetIdentity();
-  const isAuthenticated = !!identity;
-
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen bg-navy">
       {/* Hero Section */}
       <section className="relative overflow-hidden">
-        <div className="relative h-[420px] sm:h-[500px]">
-          <img
-            src="/assets/generated/ipgt-hero-banner.dim_1400x500.png"
-            alt="IP Global Terminal — Global Blockchain Network"
-            className="w-full h-full object-cover"
-          />
-          {/* Overlay */}
-          <div
-            className="absolute inset-0"
-            style={{
-              background: 'linear-gradient(to right, oklch(0.10 0.02 240 / 0.92) 0%, oklch(0.10 0.02 240 / 0.65) 60%, oklch(0.10 0.02 240 / 0.3) 100%)',
-            }}
-          />
-          <div className="absolute inset-0 flex items-center">
-            <div className="container mx-auto px-4">
-              <div className="max-w-2xl">
-                <div
-                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold mb-4 tracking-widest uppercase"
-                  style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.15)', color: 'oklch(0.78 0.14 85)', border: '1px solid oklch(0.78 0.14 85 / 0.3)' }}
-                >
-                  <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ backgroundColor: 'oklch(0.78 0.14 85)' }} />
-                  IPGT Blockchain — Live
-                </div>
-                <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-foreground leading-tight mb-4">
-                  IP Global{' '}
-                  <span style={{ color: 'oklch(0.78 0.14 85)' }}>Terminal</span>
-                </h1>
-                <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-xl">
-                  Secure, Transparent, Decentralized — The world's first blockchain-powered global intellectual property registry.
-                </p>
-                <div className="flex flex-wrap gap-3">
-                  <Link to="/database">
-                    <Button
-                      size="lg"
-                      className="font-semibold gap-2"
-                      style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
-                    >
-                      <Database className="w-4 h-4" />
-                      Browse IP Database
-                    </Button>
-                  </Link>
-                  {isAuthenticated ? (
-                    <Link to="/register">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="font-semibold gap-2 border-border text-foreground hover:bg-charcoal"
-                      >
-                        Register Your IP
-                        <ArrowRight className="w-4 h-4" />
-                      </Button>
-                    </Link>
-                  ) : (
-                    <Link to="/dashboard">
-                      <Button
-                        size="lg"
-                        variant="outline"
-                        className="font-semibold gap-2 border-border text-foreground hover:bg-charcoal"
-                      >
-                        <Coins className="w-4 h-4" />
-                        Get IPGT Coins
-                      </Button>
-                    </Link>
-                  )}
-                </div>
-              </div>
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: "url('/assets/generated/hero-globe-vivid.dim_1920x900.png')" }}
+        />
+        <div className="absolute inset-0 bg-navy/70" />
+        <div className="relative z-10 max-w-7xl mx-auto px-6 py-32 md:py-48">
+          <div className="max-w-3xl">
+            <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-1.5 mb-6">
+              <span className="w-2 h-2 rounded-full bg-gold animate-pulse" />
+              <span className="text-gold text-sm font-medium tracking-wide">Blockchain-Secured IP Registry</span>
+            </div>
+            <h1 className="font-serif text-5xl md:text-7xl font-bold text-white leading-tight mb-6">
+              IP Global<br />
+              <span className="text-gold">Terminal</span>
+            </h1>
+            <p className="text-lg md:text-xl text-white/70 mb-10 leading-relaxed max-w-2xl">
+              A decentralized platform for registering, protecting, and managing intellectual property rights on the Internet Computer blockchain.
+            </p>
+            <div className="flex flex-wrap gap-4">
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 bg-gold text-navy font-semibold px-8 py-3.5 rounded-sm hover:bg-gold/90 transition-colors"
+              >
+                Register IP <ChevronRight className="w-4 h-4" />
+              </Link>
+              <Link
+                to="/database"
+                className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-8 py-3.5 rounded-sm hover:border-gold hover:text-gold transition-colors"
+              >
+                Explore Database
+              </Link>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section
-        className="border-y border-border py-6"
-        style={{ backgroundColor: 'oklch(0.14 0.025 240)' }}
-      >
-        <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 text-center">
-            {[
-              { label: 'Total Supply', value: '100B', unit: 'IPGT' },
-              { label: 'Blockchain', value: 'ICP', unit: 'Internet Computer' },
-              { label: 'IP Categories', value: '3', unit: 'Types' },
-              { label: 'Registration Fee', value: '0.02', unit: 'IPGT Burned' },
-            ].map((stat) => (
-              <div key={stat.label}>
-                <div className="font-serif font-bold text-2xl" style={{ color: 'oklch(0.78 0.14 85)' }}>
-                  {stat.value}
-                </div>
-                <div className="text-xs text-muted-foreground mt-0.5">{stat.unit}</div>
-                <div className="text-xs text-muted-foreground">{stat.label}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Features */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-14">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-4">
-              Why Choose <span style={{ color: 'oklch(0.78 0.14 85)' }}>IPGT</span>?
-            </h2>
-            <p className="text-muted-foreground max-w-2xl mx-auto text-lg">
-              The IP Global Terminal combines blockchain immutability with a globally accessible registry to protect intellectual property like never before.
+      {/* How It Works */}
+      <section className="py-24 bg-navy-light">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="font-serif text-4xl font-bold text-white mb-4">How It Works</h2>
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">
+              Three steps to immutable, verifiable intellectual property protection on-chain.
             </p>
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {features.map((feature) => (
-              <div
-                key={feature.title}
-                className="rounded-lg p-6 transition-all duration-200 hover:shadow-gold"
-                style={{
-                  backgroundColor: 'oklch(0.16 0.025 240)',
-                  border: '1px solid oklch(0.28 0.03 240)',
-                }}
-                onMouseEnter={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'oklch(0.78 0.14 85 / 0.4)';
-                }}
-                onMouseLeave={(e) => {
-                  (e.currentTarget as HTMLDivElement).style.borderColor = 'oklch(0.28 0.03 240)';
-                }}
-              >
-                <div
-                  className="w-12 h-12 rounded-lg flex items-center justify-center mb-4"
-                  style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.12)', color: 'oklch(0.78 0.14 85)' }}
-                >
-                  {feature.icon}
+          <div className="grid md:grid-cols-3 gap-8">
+            {[
+              {
+                step: '01',
+                icon: <FileText className="w-6 h-6" />,
+                title: 'Submit Your IP',
+                desc: 'Upload your document or file. Our system generates a cryptographic SHA-256 hash that uniquely identifies your intellectual property.',
+              },
+              {
+                step: '02',
+                icon: <Lock className="w-6 h-6" />,
+                title: 'On-Chain Registration',
+                desc: 'Your IP record is written to the Internet Computer blockchain — immutable, timestamped, and permanently verifiable.',
+              },
+              {
+                step: '03',
+                icon: <Shield className="w-6 h-6" />,
+                title: 'Proof of Ownership',
+                desc: 'Receive a unique IP ID and cryptographic proof of registration that can be independently verified by any party.',
+              },
+            ].map((item) => (
+              <div key={item.step} className="relative bg-charcoal border border-white/10 p-8 rounded-sm group hover:border-gold/40 transition-colors">
+                <div className="absolute top-6 right-6 font-serif text-5xl font-bold text-white/5 group-hover:text-gold/10 transition-colors">
+                  {item.step}
                 </div>
-                <h3 className="font-serif font-semibold text-lg text-foreground mb-2">{feature.title}</h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{feature.description}</p>
+                <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center text-gold mb-6">
+                  {item.icon}
+                </div>
+                <h3 className="font-serif text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-white/60 leading-relaxed">{item.desc}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Whitepaper CTA */}
-      <section
-        className="py-14 border-t border-border"
-        style={{ backgroundColor: 'oklch(0.13 0.025 240)' }}
-      >
-        <div className="container mx-auto px-4">
-          <div
-            className="rounded-xl p-8 sm:p-10 flex flex-col sm:flex-row items-center gap-6 sm:gap-10"
-            style={{
-              background: 'linear-gradient(135deg, oklch(0.16 0.025 240) 0%, oklch(0.18 0.04 85 / 0.3) 100%)',
-              border: '1px solid oklch(0.78 0.14 85 / 0.25)',
-            }}
-          >
-            <div
-              className="w-16 h-16 rounded-xl flex items-center justify-center shrink-0"
-              style={{ backgroundColor: 'oklch(0.78 0.14 85 / 0.15)', border: '1px solid oklch(0.78 0.14 85 / 0.3)' }}
-            >
-              <FileText className="w-8 h-8" style={{ color: 'oklch(0.78 0.14 85)' }} />
-            </div>
-            <div className="flex-1 text-center sm:text-left">
-              <h3 className="font-serif text-2xl font-bold text-foreground mb-2">
-                Read the IPGT Whitepaper
-              </h3>
-              <p className="text-muted-foreground leading-relaxed max-w-xl">
-                Explore the full technical architecture, tokenomics, SHA-256 hashing methodology, duplicate IP protection, 48-month vesting schedule, and long-term vision behind the IP Global Terminal protocol.
+      {/* Automated Filing Strategy */}
+      <section className="py-24 bg-navy">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div>
+              <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-1.5 mb-6">
+                <Zap className="w-3.5 h-3.5 text-gold" />
+                <span className="text-gold text-sm font-medium">Automated Filing</span>
+              </div>
+              <h2 className="font-serif text-4xl font-bold text-white mb-6">
+                Automated Filing Strategy
+              </h2>
+              <p className="text-white/60 leading-relaxed mb-6">
+                IPGT's automated filing engine streamlines the IP registration process, reducing manual overhead and ensuring consistent, accurate submissions every time.
               </p>
+              <ul className="space-y-3">
+                {[
+                  'Automated SHA-256 document fingerprinting',
+                  'Duplicate detection before submission',
+                  'Structured metadata capture and validation',
+                  'Instant on-chain confirmation and receipt',
+                ].map((item) => (
+                  <li key={item} className="flex items-start gap-3 text-white/70">
+                    <span className="w-1.5 h-1.5 rounded-full bg-gold mt-2 flex-shrink-0" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <Link to="/whitepaper" className="shrink-0">
-              <Button
-                size="lg"
-                className="font-semibold gap-2 whitespace-nowrap"
-                style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
-              >
-                <FileText className="w-4 h-4" />
-                Read Whitepaper
-              </Button>
-            </Link>
+            <div className="bg-charcoal border border-white/10 p-8 rounded-sm">
+              <div className="space-y-4">
+                {[
+                  { label: 'Document Hash', value: 'SHA-256 fingerprint', icon: <Lock className="w-4 h-4" /> },
+                  { label: 'Timestamp', value: 'Block-level precision', icon: <Database className="w-4 h-4" /> },
+                  { label: 'Duplicate Check', value: 'Pre-submission scan', icon: <Shield className="w-4 h-4" /> },
+                  { label: 'Confirmation', value: 'Instant on-chain receipt', icon: <FileText className="w-4 h-4" /> },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-4 p-4 bg-navy/50 border border-white/5 rounded-sm">
+                    <div className="w-8 h-8 bg-gold/10 rounded-sm flex items-center justify-center text-gold flex-shrink-0">
+                      {item.icon}
+                    </div>
+                    <div>
+                      <div className="text-white/40 text-xs uppercase tracking-wider">{item.label}</div>
+                      <div className="text-white font-medium text-sm">{item.value}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section
-        className="py-20 border-t border-border"
-        style={{ backgroundColor: 'oklch(0.14 0.025 240)' }}
-      >
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-foreground mb-4">
-            Ready to Protect Your{' '}
-            <span style={{ color: 'oklch(0.78 0.14 85)' }}>Intellectual Property</span>?
+      {/* SME-First Infrastructure */}
+      <section className="py-24 bg-navy-light">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="grid md:grid-cols-2 gap-16 items-center">
+            <div className="order-2 md:order-1">
+              <div className="grid grid-cols-2 gap-4">
+                {[
+                  { icon: <Users className="w-5 h-5" />, title: 'Accessible', desc: 'Designed for individuals and small businesses' },
+                  { icon: <Globe className="w-5 h-5" />, title: 'Global Reach', desc: 'Register IP across multiple jurisdictions' },
+                  { icon: <Shield className="w-5 h-5" />, title: 'Secure', desc: 'Cryptographic proof of ownership' },
+                  { icon: <Zap className="w-5 h-5" />, title: 'Fast', desc: 'Near-instant on-chain registration' },
+                ].map((item) => (
+                  <div key={item.title} className="bg-charcoal border border-white/10 p-6 rounded-sm hover:border-gold/30 transition-colors">
+                    <div className="w-10 h-10 bg-gold/10 border border-gold/20 rounded-sm flex items-center justify-center text-gold mb-4">
+                      {item.icon}
+                    </div>
+                    <h4 className="text-white font-semibold mb-1">{item.title}</h4>
+                    <p className="text-white/50 text-sm">{item.desc}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className="order-1 md:order-2">
+              <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-1.5 mb-6">
+                <Users className="w-3.5 h-3.5 text-gold" />
+                <span className="text-gold text-sm font-medium">SME-First</span>
+              </div>
+              <h2 className="font-serif text-4xl font-bold text-white mb-6">
+                SME-First Infrastructure
+              </h2>
+              <p className="text-white/60 leading-relaxed mb-6">
+                Traditional IP registration is expensive, slow, and inaccessible to small and medium enterprises. IPGT democratizes IP protection by bringing enterprise-grade security to every creator and innovator.
+              </p>
+              <p className="text-white/60 leading-relaxed">
+                With a minimal token burn fee and a straightforward registration flow, protecting your intellectual property has never been more accessible.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Open Cryptographic Auditing */}
+      <section className="py-24 bg-navy">
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <div className="inline-flex items-center gap-2 bg-gold/10 border border-gold/30 rounded-full px-4 py-1.5 mb-6">
+              <Database className="w-3.5 h-3.5 text-gold" />
+              <span className="text-gold text-sm font-medium">Open Auditing</span>
+            </div>
+            <h2 className="font-serif text-4xl font-bold text-white mb-4">
+              Open Cryptographic Auditing
+            </h2>
+            <p className="text-white/60 text-lg max-w-2xl mx-auto">
+              Every IP registration is publicly verifiable. Anyone can independently confirm the existence, ownership, and timestamp of any registered IP record.
+            </p>
+          </div>
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                icon: <Lock className="w-5 h-5" />,
+                title: 'Immutable Records',
+                desc: 'Once written to the blockchain, IP records cannot be altered or deleted.',
+              },
+              {
+                icon: <Globe className="w-5 h-5" />,
+                title: 'Public Verification',
+                desc: 'Any party can verify the authenticity of an IP record using the public canister interface.',
+              },
+              {
+                icon: <Shield className="w-5 h-5" />,
+                title: 'Cryptographic Proof',
+                desc: 'SHA-256 document hashes provide tamper-evident proof of the original file contents.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="bg-charcoal border border-white/10 p-8 rounded-sm hover:border-gold/30 transition-colors">
+                <div className="w-12 h-12 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center text-gold mb-6">
+                  {item.icon}
+                </div>
+                <h3 className="font-serif text-xl font-bold text-white mb-3">{item.title}</h3>
+                <p className="text-white/60 leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA */}
+      <section className="py-24 bg-charcoal border-t border-white/10">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="font-serif text-4xl md:text-5xl font-bold text-white mb-6">
+            Protect Your IP Today
           </h2>
-          <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Join the global IP registry. Login with Internet Identity, acquire IPGT coins, and register your patents, trademarks, and copyrights on-chain.
+          <p className="text-white/60 text-lg mb-10 max-w-2xl mx-auto">
+            Join the decentralized IP registry. Register your intellectual property on-chain and receive immutable proof of ownership.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link to="/database">
-              <Button
-                size="lg"
-                variant="outline"
-                className="font-semibold border-border text-foreground hover:bg-charcoal gap-2"
-              >
-                <Database className="w-4 h-4" />
-                Explore Database
-              </Button>
+            <Link
+              to="/register"
+              className="inline-flex items-center gap-2 bg-gold text-navy font-semibold px-10 py-4 rounded-sm hover:bg-gold/90 transition-colors text-lg"
+            >
+              Register Now <ChevronRight className="w-5 h-5" />
             </Link>
-            {isAuthenticated && (
-              <Link to="/register">
-                <Button
-                  size="lg"
-                  className="font-semibold gap-2"
-                  style={{ backgroundColor: 'oklch(0.78 0.14 85)', color: 'oklch(0.10 0.02 240)' }}
-                >
-                  Register IP Now
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
-            )}
+            <Link
+              to="/whitepaper"
+              className="inline-flex items-center gap-2 border border-white/30 text-white font-semibold px-10 py-4 rounded-sm hover:border-gold hover:text-gold transition-colors text-lg"
+            >
+              Read Whitepaper
+            </Link>
           </div>
         </div>
       </section>
