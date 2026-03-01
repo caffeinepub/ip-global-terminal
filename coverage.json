@@ -1,60 +1,39 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T05:53:00.972Z",
+  "generatedAt": "2026-03-01T18:58:49.629Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 3,
-    "implemented": 2,
+    "total": 1,
+    "implemented": 1,
     "items": [
       {
-        "id": "REQ-42",
-        "summary": "In frontend/src/pages/RegisterIP.tsx, remove all remaining token balance checks, 'Insufficient IPGT tokens' error messages, and any related conditional logic that blocks or warns the user about token balance. The registration form must submit without any token-related validation or error states.",
+        "id": "REQ-1",
+        "summary": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a `caffeineAdminToken` URL fragment. The app should load normally for any visitor at the clean URL (e.g., `https://ip-global-terminal-2sw.caffeine.xyz/`) without checking for or redirecting based on any token.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/RegisterIP.tsx"
+          "frontend/src/utils/urlParams.ts",
+          "frontend/src/App.tsx",
+          "frontend/src/components/Header.tsx",
+          "frontend/src/main.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/RegisterIP.tsx"
-        ]
-      },
-      {
-        "id": "REQ-43",
-        "summary": "In backend/main.mo, remove any token balance validation from the IP registration function (e.g. any check that the caller has sufficient IPGT balance before registering an IP). The registerIP function must accept valid registration requests without checking token balances.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
-      },
-      {
-        "id": "REQ-44",
-        "summary": "In frontend/src/pages/RegisterIP.tsx, make the file upload input optional. Remove any 'required' constraint, validation error, or submission guard that prevents the form from being submitted without an attached document. Users may optionally upload a PDF or image to auto-populate the document hash field, but it must not be required.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/pages/RegisterIP.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/pages/RegisterIP.tsx"
+          "frontend/src/utils/urlParams.ts",
+          "frontend/src/App.tsx"
         ]
       }
     ]
   },
   "changedFiles": [
-    "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/backend.d.ts",
-    "frontend/src/backend.ts",
-    "frontend/src/components/TokenStats.tsx",
-    "frontend/src/declarations/backend.did.d.ts",
-    "frontend/src/declarations/backend.did.js",
-    "frontend/src/hooks/useQueries.ts",
-    "frontend/src/pages/RegisterIP.tsx",
+    "frontend/src/App.tsx",
+    "frontend/src/utils/urlParams.ts",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

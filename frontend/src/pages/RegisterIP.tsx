@@ -12,20 +12,29 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, Upload, FileText, AlertCircle, LogIn, Shield } from 'lucide-react';
-import { useRegisterIP, useGetCallerUserProfile } from '../hooks/useQueries';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
+import { Loader2, Upload, FileText, AlertCircle } from 'lucide-react';
+import { useRegisterIP } from '../hooks/useQueries';
 import { IPCategory, ExternalBlob } from '../backend';
 import RegistrationSuccessModal from '../components/RegistrationSuccessModal';
 
 const JURISDICTIONS = ['US', 'EU', 'UK', 'CN', 'JP', 'CA', 'AU', 'IN', 'BR', 'Global'];
 
+/** Convert a Uint8Array to a lowercase hex string */
+function uint8ArrayToHex(bytes: Uint8Array): string {
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, '0'))
+    .join('');
+}
+
+/** Compute SHA-256 of arbitrary bytes and return as hex string */
+async function computeSha256Hex(data: ArrayBuffer): Promise<string> {
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  return uint8ArrayToHex(new Uint8Array(hashBuffer));
+}
+
 export default function RegisterIP() {
   const navigate = useNavigate();
-  const { login, loginStatus, identity, clear } = useInternetIdentity();
   const { mutateAsync: registerIP, isPending } = useRegisterIP();
-
-  const { data: userProfile, isLoading: profileLoading, isFetched: profileFetched } = useGetCallerUserProfile();
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -33,6 +42,7 @@ export default function RegisterIP() {
   const [jurisdiction, setJurisdiction] = useState('');
   const [file, setFile] = useState<File | null>(null);
   const [fileHash, setFileHash] = useState<Uint8Array | null>(null);
+  const [fileHashHex, setFileHashHex] = useState<string>('');
   const [isHashing, setIsHashing] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState('');
@@ -40,30 +50,20 @@ export default function RegisterIP() {
   const [showSuccess, setShowSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const isAuthenticated = !!identity;
-  const isLoggingIn = loginStatus === 'logging-in';
-  const isProfileComplete = isAuthenticated && profileFetched && userProfile !== null;
-
-  const handleLogin = async () => {
-    try {
-      await login();
-    } catch (error: any) {
-      if (error.message === 'User is already authenticated') {
-        await clear();
-        setTimeout(() => login(), 300);
-      }
-    }
-  };
-
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
     setFile(f);
     setIsHashing(true);
+    setFileHash(null);
+    setFileHashHex('');
     try {
       const buffer = await f.arrayBuffer();
       const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
-      setFileHash(new Uint8Array(hashBuffer));
+      const hashBytes = new Uint8Array(hashBuffer);
+      const hashHex = uint8ArrayToHex(hashBytes);
+      setFileHash(hashBytes);
+      setFileHashHex(hashHex);
     } catch {
       setError('Failed to hash file. Please try again.');
     } finally {
@@ -75,10 +75,6 @@ export default function RegisterIP() {
     e.preventDefault();
     setError('');
 
-    if (!isAuthenticated) {
-      setError('Please log in to register IP.');
-      return;
-    }
     if (!title.trim() || !description.trim() || !category || !jurisdiction) {
       setError('Please fill in all required fields.');
       return;
@@ -86,16 +82,33 @@ export default function RegisterIP() {
 
     try {
       let externalBlob: ExternalBlob | null = null;
+      let documentHash: Uint8Array;
+      let hashHex: string;
+
       if (file) {
         const buffer = await file.arrayBuffer();
         const bytes = new Uint8Array(buffer);
         externalBlob = ExternalBlob.fromBytes(bytes).withUploadProgress((pct) =>
           setUploadProgress(pct)
         );
+        // Use the already-computed file hash, or recompute if needed
+        if (fileHashHex && fileHash) {
+          documentHash = fileHash;
+          hashHex = fileHashHex;
+        } else {
+          const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+          documentHash = new Uint8Array(hashBuffer);
+          hashHex = uint8ArrayToHex(documentHash);
+        }
+      } else {
+        // No file: compute SHA-256 from title + description as the content hash
+        const contentString = `${title.trim()}|${description.trim()}|${category}|${jurisdiction}`;
+        const encoder = new TextEncoder();
+        const contentBuffer = encoder.encode(contentString).buffer as ArrayBuffer;
+        hashHex = await computeSha256Hex(contentBuffer);
+        const hashBuffer = await crypto.subtle.digest('SHA-256', contentBuffer);
+        documentHash = new Uint8Array(hashBuffer);
       }
-
-      // Use the computed file hash if available, otherwise use an empty hash
-      const documentHash = fileHash ?? new Uint8Array(0);
 
       const ipId = await registerIP({
         title: title.trim(),
@@ -104,6 +117,7 @@ export default function RegisterIP() {
         documentHash,
         fileBlob: externalBlob,
         jurisdiction,
+        hash: hashHex,
       });
 
       setSuccessIpId(ipId);
@@ -121,73 +135,6 @@ export default function RegisterIP() {
   const inputStyle = { background: 'oklch(0.10 0.025 240)' };
   const inputClass = 'border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50';
 
-  // ── Not authenticated: show login prompt ──────────────────────────────────
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-16" style={{ background: 'oklch(0.12 0.025 240)' }}>
-        <div
-          className="text-center p-10 rounded-sm border border-gold/20 max-w-md w-full"
-          style={{ background: 'oklch(0.13 0.03 240)' }}
-        >
-          <div className="w-16 h-16 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center mx-auto mb-6">
-            <Shield className="w-8 h-8 text-gold" />
-          </div>
-          <h2 className="font-serif text-2xl font-bold text-gold mb-3">Login Required</h2>
-          <p className="text-gray-400 text-sm leading-relaxed mb-8">
-            You must be logged in to register intellectual property. Your identity is used to establish on-chain ownership of your IP record.
-          </p>
-          <Button
-            onClick={handleLogin}
-            disabled={isLoggingIn}
-            className="w-full bg-gold text-navy font-semibold hover:bg-gold/90 disabled:opacity-50"
-          >
-            {isLoggingIn ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                Logging in…
-              </>
-            ) : (
-              <>
-                <LogIn className="w-4 h-4 mr-2" />
-                Login to Register IP
-              </>
-            )}
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Authenticated but profile not yet loaded ──────────────────────────────
-  if (isAuthenticated && profileLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
-        <Loader2 className="w-8 h-8 text-gold animate-spin" />
-      </div>
-    );
-  }
-
-  // ── Authenticated but profile incomplete: ProfileSetupModal handles this via App.tsx ──
-  if (isAuthenticated && profileFetched && userProfile === null) {
-    return (
-      <div className="min-h-screen flex items-center justify-center px-4 py-16" style={{ background: 'oklch(0.12 0.025 240)' }}>
-        <div
-          className="text-center p-10 rounded-sm border border-gold/20 max-w-md w-full"
-          style={{ background: 'oklch(0.13 0.03 240)' }}
-        >
-          <div className="w-16 h-16 bg-gold/10 border border-gold/30 rounded-sm flex items-center justify-center mx-auto mb-6">
-            <Loader2 className="w-8 h-8 text-gold animate-spin" />
-          </div>
-          <h2 className="font-serif text-2xl font-bold text-gold mb-3">Complete Your Profile</h2>
-          <p className="text-gray-400 text-sm leading-relaxed">
-            Please complete your profile setup to access IP registration.
-          </p>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Authenticated and profile complete: show the registration form ────────
   return (
     <div className="min-h-screen py-10 px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
       <div className="max-w-2xl mx-auto">
@@ -293,8 +240,13 @@ export default function RegisterIP() {
                       <Loader2 className="w-3 h-3 animate-spin" /> Hashing…
                     </span>
                   )}
-                  {fileHash && !isHashing && (
+                  {fileHashHex && !isHashing && (
                     <span className="text-green-400 text-xs">✓ Hash computed</span>
+                  )}
+                  {fileHashHex && !isHashing && (
+                    <span className="text-gray-600 text-xs font-mono truncate max-w-full px-2">
+                      {fileHashHex.slice(0, 16)}…{fileHashHex.slice(-8)}
+                    </span>
                   )}
                 </>
               ) : (
@@ -311,6 +263,11 @@ export default function RegisterIP() {
               onChange={handleFileChange}
               className="hidden"
             />
+            {!file && (
+              <p className="text-gray-600 text-xs">
+                No file? A SHA-256 hash will be derived from your title, description, category, and jurisdiction.
+              </p>
+            )}
           </div>
 
           {/* Upload progress */}
@@ -340,7 +297,7 @@ export default function RegisterIP() {
           {/* Submit */}
           <Button
             type="submit"
-            disabled={isPending || isHashing || !isProfileComplete}
+            disabled={isPending || isHashing}
             className="w-full bg-gold text-navy font-semibold hover:bg-gold/90 disabled:opacity-50 py-3"
           >
             {isPending ? (

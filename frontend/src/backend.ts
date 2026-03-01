@@ -101,6 +101,7 @@ export interface IPRecord {
     documentHash: Uint8Array;
     title: string;
     owner: Principal;
+    hash: string;
     fileBlob?: ExternalBlob;
     description: string;
     jurisdiction: string;
@@ -160,12 +161,16 @@ export interface backendInterface {
     getIP(id: bigint): Promise<IPRecord | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    registerIP(title: string, description: string, category: IPCategory, documentHash: Uint8Array, fileBlob: ExternalBlob | null, jurisdiction: string): Promise<bigint>;
+    registerIP(title: string, description: string, category: IPCategory, documentHash: Uint8Array, fileBlob: ExternalBlob | null, jurisdiction: string, hash: string): Promise<bigint>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     /**
      * / Search IPs whose title contains the given keyword (case-sensitive).
      */
     searchByTitle(keyword: string): Promise<Array<IPRecord>>;
+    /**
+     * / Search IPs by title or hash (case-insensitive for titles, case-insensitive for hashes).
+     */
+    searchByTitleOrHash(search: string): Promise<Array<IPRecord>>;
 }
 import type { ExternalBlob as _ExternalBlob, IPCategory as _IPCategory, IPRecord as _IPRecord, UserProfile as _UserProfile, UserRole as _UserRole, _CaffeineStorageRefillInformation as __CaffeineStorageRefillInformation, _CaffeineStorageRefillResult as __CaffeineStorageRefillResult } from "./declarations/backend.did.d.ts";
 export class Backend implements backendInterface {
@@ -408,17 +413,17 @@ export class Backend implements backendInterface {
             return result;
         }
     }
-    async registerIP(arg0: string, arg1: string, arg2: IPCategory, arg3: Uint8Array, arg4: ExternalBlob | null, arg5: string): Promise<bigint> {
+    async registerIP(arg0: string, arg1: string, arg2: IPCategory, arg3: Uint8Array, arg4: ExternalBlob | null, arg5: string, arg6: string): Promise<bigint> {
         if (this.processError) {
             try {
-                const result = await this.actor.registerIP(arg0, arg1, to_candid_IPCategory_n10(this._uploadFile, this._downloadFile, arg2), arg3, await to_candid_opt_n26(this._uploadFile, this._downloadFile, arg4), arg5);
+                const result = await this.actor.registerIP(arg0, arg1, to_candid_IPCategory_n10(this._uploadFile, this._downloadFile, arg2), arg3, await to_candid_opt_n26(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
                 return result;
             } catch (e) {
                 this.processError(e);
                 throw new Error("unreachable");
             }
         } else {
-            const result = await this.actor.registerIP(arg0, arg1, to_candid_IPCategory_n10(this._uploadFile, this._downloadFile, arg2), arg3, await to_candid_opt_n26(this._uploadFile, this._downloadFile, arg4), arg5);
+            const result = await this.actor.registerIP(arg0, arg1, to_candid_IPCategory_n10(this._uploadFile, this._downloadFile, arg2), arg3, await to_candid_opt_n26(this._uploadFile, this._downloadFile, arg4), arg5, arg6);
             return result;
         }
     }
@@ -447,6 +452,20 @@ export class Backend implements backendInterface {
             }
         } else {
             const result = await this.actor.searchByTitle(arg0);
+            return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+        }
+    }
+    async searchByTitleOrHash(arg0: string): Promise<Array<IPRecord>> {
+        if (this.processError) {
+            try {
+                const result = await this.actor.searchByTitleOrHash(arg0);
+                return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
+            } catch (e) {
+                this.processError(e);
+                throw new Error("unreachable");
+            }
+        } else {
+            const result = await this.actor.searchByTitleOrHash(arg0);
             return from_candid_vec_n12(this._uploadFile, this._downloadFile, result);
         }
     }
@@ -492,6 +511,7 @@ async function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promi
     documentHash: Uint8Array;
     title: string;
     owner: Principal;
+    hash: string;
     fileBlob: [] | [_ExternalBlob];
     description: string;
     jurisdiction: string;
@@ -502,6 +522,7 @@ async function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promi
     documentHash: Uint8Array;
     title: string;
     owner: Principal;
+    hash: string;
     fileBlob?: ExternalBlob;
     description: string;
     jurisdiction: string;
@@ -513,6 +534,7 @@ async function from_candid_record_n14(_uploadFile: (file: ExternalBlob) => Promi
         documentHash: value.documentHash,
         title: value.title,
         owner: value.owner,
+        hash: value.hash,
         fileBlob: record_opt_to_undefined(await from_candid_opt_n15(_uploadFile, _downloadFile, value.fileBlob)),
         description: value.description,
         jurisdiction: value.jurisdiction,

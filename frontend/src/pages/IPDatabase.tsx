@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { Search, Filter, X, Loader2, Database, ExternalLink } from 'lucide-react';
+import { Search, Filter, X, Loader2, Database } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,7 +13,7 @@ import IPCard from '../components/IPCard';
 import IPDetailModal from '../components/IPDetailModal';
 import {
   useGetAllIPs,
-  useSearchByTitle,
+  useSearchByTitleOrHash,
   useFilterByCategory,
   useFilterByJurisdiction,
 } from '../hooks/useQueries';
@@ -50,6 +50,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-03-12T08:14:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('a3f8c2d1e4b7091f6a5d3c8e2b1f4a7d9c0e3b6f2a5d8c1e4b7f0a3d6c9e2b5'),
     jurisdiction: 'US',
+    hash: 'a3f8c2d1e4b7091f6a5d3c8e2b1f4a7d9c0e3b6f2a5d8c1e4b7f0a3d6c9e2b5f8',
     blockHeight: BigInt(14_892_341),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-03-12T08:14:22Z').getTime() * 1_000_000),
@@ -64,6 +65,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-04-01T10:00:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('b1e2f3a4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2'),
     jurisdiction: 'Global',
+    hash: 'b1e2f3a4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2',
     blockHeight: BigInt(14_901_005),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-04-01T10:00:45Z').getTime() * 1_000_000),
@@ -78,6 +80,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-05-20T14:30:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3'),
     jurisdiction: 'EU',
+    hash: 'c2d3e4f5a6b7c8d9e0f1a2b3c4d5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3',
     blockHeight: BigInt(14_955_780),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-05-20T14:30:18Z').getTime() * 1_000_000),
@@ -92,6 +95,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-06-08T09:45:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('d4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5'),
     jurisdiction: 'JP',
+    hash: 'd4e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5',
     blockHeight: BigInt(14_978_234),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-06-08T09:45:33Z').getTime() * 1_000_000),
@@ -106,6 +110,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-07-15T11:20:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6'),
     jurisdiction: 'CN',
+    hash: 'e5f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6',
     blockHeight: BigInt(15_012_667),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-07-15T11:20:09Z').getTime() * 1_000_000),
@@ -120,6 +125,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-08-03T16:00:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7'),
     jurisdiction: 'UK',
+    hash: 'f6a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7',
     blockHeight: BigInt(15_045_112),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-08-03T16:00:27Z').getTime() * 1_000_000),
@@ -134,6 +140,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-09-10T13:15:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8'),
     jurisdiction: 'CA',
+    hash: 'a7b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8',
     blockHeight: BigInt(15_089_445),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-09-10T13:15:41Z').getTime() * 1_000_000),
@@ -148,6 +155,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-10-22T07:50:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9'),
     jurisdiction: 'AU',
+    hash: 'b8c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9',
     blockHeight: BigInt(15_134_890),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-10-22T07:50:15Z').getTime() * 1_000_000),
@@ -162,6 +170,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-11-05T15:30:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0'),
     jurisdiction: 'IN',
+    hash: 'c9d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0',
     blockHeight: BigInt(15_167_223),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-11-05T15:30:52Z').getTime() * 1_000_000),
@@ -176,6 +185,7 @@ const MOCK_RECORDS: MockIPRecord[] = [
     registrationDate: BigInt(new Date('2025-12-01T09:00:00Z').getTime() * 1_000_000),
     documentHash: hexToBytes('d0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1'),
     jurisdiction: 'BR',
+    hash: 'd0e1f2a3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1',
     blockHeight: BigInt(15_201_778),
     canisterID: 'rrkah-fqaaa-aaaaa-aaaaq-cai',
     txTimestamp: BigInt(new Date('2025-12-01T09:00:38Z').getTime() * 1_000_000),
@@ -197,6 +207,7 @@ const categoryLabels: Record<string, string> = {
 
 function ExtendedIPDetailModal({ record, open, onClose }: ExtendedDetailModalProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedSha, setCopiedSha] = useState(false);
 
   if (!record) return null;
 
@@ -204,22 +215,37 @@ function ExtendedIPDetailModal({ record, open, onClose }: ExtendedDetailModalPro
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('');
 
-  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleDateString('en-US', {
+  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleString('en-US', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
+    hour12: true,
   });
 
   const txDate = record.txTimestamp
-    ? new Date(Number(record.txTimestamp) / 1_000_000).toISOString()
+    ? new Date(Number(record.txTimestamp) / 1_000_000).toLocaleString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        hour: 'numeric',
+        minute: '2-digit',
+        hour12: true,
+      })
     : '—';
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(hashHex);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopySha = async () => {
+    if (!record.hash) return;
+    await navigator.clipboard.writeText(record.hash);
+    setCopiedSha(true);
+    setTimeout(() => setCopiedSha(false), 2000);
   };
 
   return (
@@ -242,8 +268,17 @@ function ExtendedIPDetailModal({ record, open, onClose }: ExtendedDetailModalPro
         <div className="mb-5">
           <div className="flex items-center gap-2 mb-1">
             <span className="text-xs text-gray-500 font-mono">#{String(record.id).padStart(4, '0')}</span>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
-              style={{ background: record.category === IPCategory.patent ? 'oklch(0.55 0.18 250)' : record.category === IPCategory.trademark ? 'oklch(0.55 0.18 140)' : 'oklch(0.55 0.18 30)' }}>
+            <span
+              className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
+              style={{
+                background:
+                  record.category === IPCategory.patent
+                    ? 'oklch(0.55 0.18 250)'
+                    : record.category === IPCategory.trademark
+                    ? 'oklch(0.55 0.18 140)'
+                    : 'oklch(0.55 0.18 30)',
+              }}
+            >
               {categoryLabels[record.category] ?? record.category}
             </span>
           </div>
@@ -278,7 +313,7 @@ function ExtendedIPDetailModal({ record, open, onClose }: ExtendedDetailModalPro
               {[
                 { label: 'Block Height', value: record.blockHeight ? record.blockHeight.toLocaleString() : '—' },
                 { label: 'Canister ID', value: record.canisterID ?? '—', mono: true },
-                { label: 'On-Chain Timestamp', value: txDate, mono: true },
+                { label: 'On-Chain Timestamp', value: txDate, mono: false },
               ].map((f) => (
                 <div key={f.label} className="flex flex-col sm:flex-row sm:items-start gap-1 sm:gap-3">
                   <span className="text-xs text-gray-500 sm:w-36 flex-shrink-0">{f.label}</span>
@@ -301,14 +336,74 @@ function ExtendedIPDetailModal({ record, open, onClose }: ExtendedDetailModalPro
               <button
                 onClick={handleCopy}
                 className="flex-shrink-0 p-1.5 rounded-sm hover:bg-gold/10 text-gray-400 hover:text-gold transition-colors"
-                title="Copy hash"
+                title="Copy document hash"
               >
                 {copied ? (
-                  <svg className="w-4 h-4 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                  <span className="text-green-400 text-xs">✓</span>
                 ) : (
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                  <span className="text-xs">⎘</span>
                 )}
               </button>
+            </div>
+          </div>
+
+          {/* SHA-256 Hash */}
+          {record.hash && (
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-gray-500">SHA-256 Hash</span>
+              <div
+                className="flex items-center gap-2 p-3 rounded-sm border border-gold/15"
+                style={{ background: 'oklch(0.10 0.025 240)' }}
+              >
+                <span className="font-mono text-xs text-gold/80 break-all flex-1">{record.hash}</span>
+                <button
+                  onClick={handleCopySha}
+                  className="flex-shrink-0 p-1.5 rounded-sm hover:bg-gold/10 text-gray-400 hover:text-gold transition-colors"
+                  title="Copy SHA-256 hash"
+                >
+                  {copiedSha ? (
+                    <span className="text-green-400 text-xs">✓</span>
+                  ) : (
+                    <span className="text-xs">⎘</span>
+                  )}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Cross-chain simulated section */}
+          <div
+            className="rounded-sm border border-gold/20 overflow-hidden"
+            style={{ background: 'oklch(0.10 0.025 240)' }}
+          >
+            <div
+              className="flex items-center gap-2 px-3 py-2 border-b border-gold/15"
+              style={{ background: 'oklch(0.11 0.028 240)' }}
+            >
+              <span className="text-gold/80 text-xs font-semibold uppercase tracking-wider">
+                Also Recorded On
+              </span>
+              <span className="ml-auto text-xs text-gray-600 italic">
+                Future Integration — Simulated Reference
+              </span>
+            </div>
+            <div className="p-3 border-b border-white/5">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-4 h-4 rounded-full bg-blue-500/20 border border-blue-500/40 flex items-center justify-center flex-shrink-0">
+                  <span className="text-blue-400 text-[8px] font-bold">Ξ</span>
+                </div>
+                <span className="text-gray-300 text-xs font-semibold">Ethereum</span>
+              </div>
+              <span className="text-gray-600 text-xs pl-6">Simulated reference only</span>
+            </div>
+            <div className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-4 h-4 rounded-full bg-purple-500/20 border border-purple-500/40 flex items-center justify-center flex-shrink-0">
+                  <span className="text-purple-400 text-[8px] font-bold">◎</span>
+                </div>
+                <span className="text-gray-300 text-xs font-semibold">Solana</span>
+              </div>
+              <span className="text-gray-600 text-xs pl-6">Simulated reference only</span>
             </div>
           </div>
         </div>
@@ -317,300 +412,287 @@ function ExtendedIPDetailModal({ record, open, onClose }: ExtendedDetailModalPro
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Main IPDatabase page ──────────────────────────────────────────────────────
 export default function IPDatabase() {
-  const [search, setSearch] = useState('');
-  const [activeSearch, setActiveSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [jurisdictionFilter, setJurisdictionFilter] = useState<string>('all');
-  const [selectedRecord, setSelectedRecord] = useState<MockIPRecord | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  // Use '' instead of null so types match hook signatures (IPCategory | '' and string)
+  const [categoryFilter, setCategoryFilter] = useState<IPCategory | ''>('');
+  const [jurisdictionFilter, setJurisdictionFilter] = useState<string>('');
   const [page, setPage] = useState(0);
+  const [selectedRecord, setSelectedRecord] = useState<MockIPRecord | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
 
-  const hasFilters = !!activeSearch || categoryFilter !== 'all' || jurisdictionFilter !== 'all';
+  const isSearching = searchQuery.trim().length > 0;
+  const isCategoryFiltering = categoryFilter !== '';
+  const isJurisdictionFiltering = jurisdictionFilter !== '';
+  const isFiltering = isCategoryFiltering || isJurisdictionFiltering;
 
-  // Backend queries
   const { data: allIPs, isLoading: allLoading } = useGetAllIPs(page * PAGE_SIZE, PAGE_SIZE);
-  const { data: searchResults, isLoading: searchLoading } = useSearchByTitle(activeSearch);
-  const { data: categoryResults, isLoading: categoryLoading } = useFilterByCategory(
-    categoryFilter !== 'all' ? (categoryFilter as IPCategory) : null
-  );
-  const { data: jurisdictionResults, isLoading: jurisdictionLoading } = useFilterByJurisdiction(
-    jurisdictionFilter !== 'all' ? jurisdictionFilter : null
-  );
+  const { data: searchResults, isLoading: searchLoading } = useSearchByTitleOrHash(searchQuery.trim());
+  const { data: categoryResults, isLoading: categoryLoading } = useFilterByCategory(categoryFilter);
+  const { data: jurisdictionResults, isLoading: jurisdictionLoading } = useFilterByJurisdiction(jurisdictionFilter);
 
   const isLoading = allLoading || searchLoading || categoryLoading || jurisdictionLoading;
 
-  // Merge mock + real records
-  const combinedAll = useMemo(() => {
-    const real = allIPs ?? [];
-    return [...MOCK_RECORDS, ...real];
+  // Merge backend records with mock records, deduplicating by id
+  const mergedRecords = useMemo(() => {
+    const backendRecords: MockIPRecord[] = (allIPs ?? []).map((r) => ({ ...r }));
+    const backendIds = new Set(backendRecords.map((r) => String(r.id)));
+    const uniqueMocks = MOCK_RECORDS.filter((m) => !backendIds.has(String(m.id)));
+    return [...backendRecords, ...uniqueMocks];
   }, [allIPs]);
 
-  const combinedSearch = useMemo(() => {
-    const real = searchResults ?? [];
-    const mockFiltered = MOCK_RECORDS.filter((r) =>
-      r.title.toLowerCase().includes(activeSearch.toLowerCase())
-    );
-    return [...mockFiltered, ...real];
-  }, [searchResults, activeSearch]);
-
-  const combinedCategory = useMemo(() => {
-    const real = categoryResults ?? [];
-    const mockFiltered = MOCK_RECORDS.filter((r) => r.category === categoryFilter);
-    return [...mockFiltered, ...real];
-  }, [categoryResults, categoryFilter]);
-
-  const combinedJurisdiction = useMemo(() => {
-    const real = jurisdictionResults ?? [];
-    const mockFiltered = MOCK_RECORDS.filter((r) => r.jurisdiction === jurisdictionFilter);
-    return [...mockFiltered, ...real];
-  }, [jurisdictionResults, jurisdictionFilter]);
-
-  // Compute displayed records
-  let records: MockIPRecord[] = [];
-  if (!hasFilters) {
-    records = combinedAll;
-  } else if (activeSearch) {
-    records = combinedSearch;
-    if (categoryFilter !== 'all') {
-      records = records.filter((r) => r.category === categoryFilter);
+  // Apply client-side filtering on merged records when filters are active
+  const displayRecords = useMemo((): MockIPRecord[] => {
+    if (isSearching) {
+      const backendSearch: MockIPRecord[] = (searchResults ?? []).map((r) => ({ ...r }));
+      const backendIds = new Set(backendSearch.map((r) => String(r.id)));
+      const q = searchQuery.trim().toLowerCase();
+      const mockSearch = MOCK_RECORDS.filter(
+        (m) =>
+          !backendIds.has(String(m.id)) &&
+          (m.title.toLowerCase().includes(q) || m.hash.toLowerCase().includes(q))
+      );
+      return [...backendSearch, ...mockSearch];
     }
-    if (jurisdictionFilter !== 'all') {
-      records = records.filter((r) => r.jurisdiction === jurisdictionFilter);
-    }
-  } else if (categoryFilter !== 'all' && jurisdictionFilter !== 'all') {
-    records = combinedCategory.filter((r) => r.jurisdiction === jurisdictionFilter);
-  } else if (categoryFilter !== 'all') {
-    records = combinedCategory;
-  } else if (jurisdictionFilter !== 'all') {
-    records = combinedJurisdiction;
-  }
 
-  const handleSearch = () => {
-    setActiveSearch(search);
+    if (isCategoryFiltering && isJurisdictionFiltering) {
+      const backendCat: MockIPRecord[] = (categoryResults ?? []).map((r) => ({ ...r }));
+      const backendIds = new Set(backendCat.map((r) => String(r.id)));
+      const mockFiltered = MOCK_RECORDS.filter(
+        (m) =>
+          !backendIds.has(String(m.id)) &&
+          m.category === categoryFilter &&
+          m.jurisdiction === jurisdictionFilter
+      );
+      const combined = [...backendCat, ...mockFiltered];
+      return combined.filter((r) => r.jurisdiction === jurisdictionFilter);
+    }
+
+    if (isCategoryFiltering) {
+      const backendCat: MockIPRecord[] = (categoryResults ?? []).map((r) => ({ ...r }));
+      const backendIds = new Set(backendCat.map((r) => String(r.id)));
+      const mockFiltered = MOCK_RECORDS.filter(
+        (m) => !backendIds.has(String(m.id)) && m.category === categoryFilter
+      );
+      return [...backendCat, ...mockFiltered];
+    }
+
+    if (isJurisdictionFiltering) {
+      const backendJur: MockIPRecord[] = (jurisdictionResults ?? []).map((r) => ({ ...r }));
+      const backendIds = new Set(backendJur.map((r) => String(r.id)));
+      const mockFiltered = MOCK_RECORDS.filter(
+        (m) => !backendIds.has(String(m.id)) && m.jurisdiction === jurisdictionFilter
+      );
+      return [...backendJur, ...mockFiltered];
+    }
+
+    return mergedRecords;
+  }, [
+    isSearching,
+    isCategoryFiltering,
+    isJurisdictionFiltering,
+    searchQuery,
+    searchResults,
+    categoryResults,
+    jurisdictionResults,
+    categoryFilter,
+    jurisdictionFilter,
+    mergedRecords,
+  ]);
+
+  const handleCardClick = (record: MockIPRecord) => {
+    setSelectedRecord(record);
+    setModalOpen(true);
+  };
+
+  const handleClearFilters = () => {
+    setSearchQuery('');
+    setCategoryFilter('');
+    setJurisdictionFilter('');
     setPage(0);
   };
 
-  const clearFilters = () => {
-    setSearch('');
-    setActiveSearch('');
-    setCategoryFilter('all');
-    setJurisdictionFilter('all');
-    setPage(0);
-  };
+  const activeFilterCount = [
+    searchQuery.trim().length > 0,
+    isCategoryFiltering,
+    isJurisdictionFiltering,
+  ].filter(Boolean).length;
 
   return (
     <div className="min-h-screen py-10 px-4" style={{ background: 'oklch(0.12 0.025 240)' }}>
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
+      <div className="max-w-7xl mx-auto">
+        {/* Page header */}
         <div className="mb-8">
-          <div className="flex items-center gap-3 mb-2">
-            <Database className="w-6 h-6 text-gold" />
-            <h1 className="font-serif text-4xl font-bold text-gold">Global IP Database</h1>
-          </div>
+          <h1 className="font-serif text-4xl font-bold text-gold mb-2">IP Database</h1>
           <p className="text-gray-400">
-            Browse and search all registered intellectual property records with full blockchain metadata — cryptographically timestamped and publicly verifiable.
+            Browse and search all registered intellectual property records on the blockchain.
           </p>
-          <div className="mt-3 flex items-center gap-2 text-xs text-gray-500">
-            <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse" />
-            <span>{MOCK_RECORDS.length + (allIPs?.length ?? 0)} records on-chain</span>
-          </div>
         </div>
 
-        {/* Search & Filters */}
-        <div
-          className="p-5 rounded-sm border border-gold/20 mb-8"
-          style={{ background: 'oklch(0.13 0.03 240)' }}
-        >
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="flex-1 flex gap-2">
+        {/* Search & filter bar */}
+        <div className="mb-6 space-y-3">
+          <div className="flex gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
               <Input
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                placeholder="Search by title…"
-                className="border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
+                value={searchQuery}
+                onChange={(e) => { setSearchQuery(e.target.value); setPage(0); }}
+                placeholder="Search by title or SHA-256 hash…"
+                className="pl-9 border-gold/25 text-gray-100 placeholder:text-gray-600 focus:border-gold/50"
                 style={{ background: 'oklch(0.10 0.025 240)' }}
               />
-              <Button onClick={handleSearch} className="bg-gold text-navy hover:bg-gold/90 px-4">
-                <Search className="w-4 h-4" />
-              </Button>
             </div>
-
-            <div className="flex gap-2 flex-wrap">
-              <Select value={categoryFilter} onValueChange={setCategoryFilter}>
-                <SelectTrigger
-                  className="w-36 border-gold/25 text-gray-300"
-                  style={{ background: 'oklch(0.10 0.025 240)' }}
-                >
-                  <Filter className="w-3.5 h-3.5 mr-1.5 text-gold/60" />
-                  <SelectValue placeholder="Category" />
-                </SelectTrigger>
-                <SelectContent
-                  style={{ background: 'oklch(0.13 0.03 240)' }}
-                  className="border-gold/25"
-                >
-                  <SelectItem value="all" className="text-gray-300">All Categories</SelectItem>
-                  <SelectItem value={IPCategory.patent} className="text-gray-300">Patent</SelectItem>
-                  <SelectItem value={IPCategory.trademark} className="text-gray-300">Trademark</SelectItem>
-                  <SelectItem value={IPCategory.copyright} className="text-gray-300">Copyright</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={jurisdictionFilter} onValueChange={setJurisdictionFilter}>
-                <SelectTrigger
-                  className="w-36 border-gold/25 text-gray-300"
-                  style={{ background: 'oklch(0.10 0.025 240)' }}
-                >
-                  <SelectValue placeholder="Jurisdiction" />
-                </SelectTrigger>
-                <SelectContent
-                  style={{ background: 'oklch(0.13 0.03 240)' }}
-                  className="border-gold/25"
-                >
-                  <SelectItem value="all" className="text-gray-300">All Jurisdictions</SelectItem>
-                  {JURISDICTIONS.map((j) => (
-                    <SelectItem key={j} value={j} className="text-gray-300">{j}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-
-              {hasFilters && (
-                <Button
-                  variant="outline"
-                  onClick={clearFilters}
-                  className="border-gold/25 text-gray-400 hover:text-gold hover:border-gold/50"
-                  style={{ background: 'oklch(0.10 0.025 240)' }}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+            <Button
+              variant="outline"
+              onClick={() => setShowFilters((v) => !v)}
+              className={`border-gold/25 text-gray-300 hover:text-gold hover:border-gold/50 gap-1.5 ${showFilters ? 'bg-gold/10 text-gold border-gold/40' : ''}`}
+              style={{ background: showFilters ? undefined : 'oklch(0.10 0.025 240)' }}
+            >
+              <Filter className="w-4 h-4" />
+              Filters
+              {activeFilterCount > 0 && (
+                <span className="ml-1 bg-gold text-navy text-xs font-bold rounded-full w-4 h-4 flex items-center justify-center">
+                  {activeFilterCount}
+                </span>
               )}
-            </div>
+            </Button>
+            {(isSearching || isFiltering) && (
+              <Button
+                variant="ghost"
+                onClick={handleClearFilters}
+                className="text-gray-400 hover:text-gold gap-1.5"
+              >
+                <X className="w-4 h-4" />
+                Clear
+              </Button>
+            )}
           </div>
+
+          {/* Filter dropdowns */}
+          {showFilters && (
+            <div className="flex flex-wrap gap-3 p-4 rounded-sm border border-gold/15" style={{ background: 'oklch(0.11 0.028 240)' }}>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Category:</span>
+                <Select
+                  value={categoryFilter}
+                  onValueChange={(v) => { setCategoryFilter(v as IPCategory | ''); setPage(0); }}
+                >
+                  <SelectTrigger
+                    className="w-36 h-8 text-xs border-gold/25 text-gray-300"
+                    style={{ background: 'oklch(0.10 0.025 240)' }}
+                  >
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent style={{ background: 'oklch(0.13 0.03 240)' }} className="border-gold/25">
+                    <SelectItem value="" className="text-gray-300 text-xs">All Categories</SelectItem>
+                    <SelectItem value={IPCategory.patent} className="text-gray-300 text-xs">Patent</SelectItem>
+                    <SelectItem value={IPCategory.trademark} className="text-gray-300 text-xs">Trademark</SelectItem>
+                    <SelectItem value={IPCategory.copyright} className="text-gray-300 text-xs">Copyright</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-gray-500">Jurisdiction:</span>
+                <Select
+                  value={jurisdictionFilter}
+                  onValueChange={(v) => { setJurisdictionFilter(v); setPage(0); }}
+                >
+                  <SelectTrigger
+                    className="w-36 h-8 text-xs border-gold/25 text-gray-300"
+                    style={{ background: 'oklch(0.10 0.025 240)' }}
+                  >
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent style={{ background: 'oklch(0.13 0.03 240)' }} className="border-gold/25">
+                    <SelectItem value="" className="text-gray-300 text-xs">All Jurisdictions</SelectItem>
+                    {JURISDICTIONS.map((j) => (
+                      <SelectItem key={j} value={j} className="text-gray-300 text-xs">{j}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Results */}
+        {/* Results count */}
+        <div className="mb-4 flex items-center justify-between">
+          <span className="text-gray-500 text-sm">
+            {isLoading ? (
+              <span className="flex items-center gap-1.5">
+                <Loader2 className="w-3.5 h-3.5 animate-spin" /> Loading…
+              </span>
+            ) : (
+              `${displayRecords.length} record${displayRecords.length !== 1 ? 's' : ''} found`
+            )}
+          </span>
+          {!isSearching && !isFiltering && (
+            <div className="flex items-center gap-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPage((p) => Math.max(0, p - 1))}
+                disabled={page === 0}
+                className="text-gray-400 hover:text-gold disabled:opacity-30 h-7 px-2 text-xs"
+              >
+                ← Prev
+              </Button>
+              <span className="text-gray-600 text-xs">Page {page + 1}</span>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPage((p) => p + 1)}
+                disabled={(allIPs?.length ?? 0) < PAGE_SIZE}
+                className="text-gray-400 hover:text-gold disabled:opacity-30 h-7 px-2 text-xs"
+              >
+                Next →
+              </Button>
+            </div>
+          )}
+        </div>
+
+        {/* Grid */}
         {isLoading ? (
-          <div className="flex items-center justify-center py-20">
+          <div className="flex items-center justify-center py-24">
             <Loader2 className="w-8 h-8 text-gold animate-spin" />
           </div>
-        ) : records.length === 0 ? (
-          <div className="text-center py-20">
-            <p className="text-gray-500 text-lg">No IP records found.</p>
-            {hasFilters && (
-              <button onClick={clearFilters} className="mt-3 text-gold text-sm hover:underline">
-                Clear filters
-              </button>
-            )}
+        ) : displayRecords.length === 0 ? (
+          <div className="text-center py-24">
+            <p className="text-gray-500 text-lg mb-2">No records found</p>
+            <p className="text-gray-600 text-sm">Try adjusting your search or filters.</p>
           </div>
         ) : (
-          <>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-              {records.map((record) => (
-                <div
-                  key={String(record.id)}
-                  onClick={() => setSelectedRecord(record)}
-                  className="group cursor-pointer rounded-sm border border-gold/20 hover:border-gold/50 p-5 transition-all duration-200 hover:shadow-gold"
-                  style={{ background: 'oklch(0.13 0.03 240)' }}
-                >
-                  {/* Header row */}
-                  <div className="flex items-start justify-between gap-3 mb-3">
-                    <span className="text-xs text-gray-500 font-mono">#{String(record.id).padStart(4, '0')}</span>
-                    <div className="flex items-center gap-1.5">
-                      {(record as MockIPRecord).blockHeight && (
-                        <span className="text-xs text-gray-600 font-mono">
-                          ⛓ {Number((record as MockIPRecord).blockHeight).toLocaleString()}
-                        </span>
-                      )}
-                      <span
-                        className="text-xs font-semibold px-2 py-0.5 rounded-full text-white"
-                        style={{
-                          background:
-                            record.category === IPCategory.patent
-                              ? 'oklch(0.55 0.18 250)'
-                              : record.category === IPCategory.trademark
-                              ? 'oklch(0.55 0.18 140)'
-                              : 'oklch(0.55 0.18 30)',
-                        }}
-                      >
-                        {categoryLabels[record.category] ?? record.category}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <h3 className="font-serif text-base font-semibold text-gold mb-1 line-clamp-2 group-hover:text-gold/90 transition-colors">
-                    {record.title}
-                  </h3>
-
-                  {/* Description */}
-                  <p className="text-gray-400 text-sm line-clamp-2 mb-4 leading-relaxed">
-                    {record.description}
-                  </p>
-
-                  {/* Meta */}
-                  <div className="space-y-1.5 text-xs text-gray-500">
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-gray-600">Jurisdiction:</span>
-                      <span className="text-gray-300">{record.jurisdiction}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5">
-                      <span className="text-gray-600">Registered:</span>
-                      <span className="text-gray-300">
-                        {new Date(Number(record.registrationDate) / 1_000_000).toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short',
-                          day: 'numeric',
-                        })}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 overflow-hidden">
-                      <span className="text-gray-600 flex-shrink-0">Hash:</span>
-                      <span className="text-gray-400 font-mono truncate">
-                        {Array.from(record.documentHash)
-                          .map((b) => b.toString(16).padStart(2, '0'))
-                          .join('')
-                          .slice(0, 20)}…
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Pagination — only for unfiltered view */}
-            {!hasFilters && (
-              <div className="flex items-center justify-center gap-3 mt-10">
-                <Button
-                  variant="outline"
-                  onClick={() => setPage((p) => Math.max(0, p - 1))}
-                  disabled={page === 0}
-                  className="border-gold/25 text-gray-300 hover:text-gold hover:border-gold/50 disabled:opacity-40"
-                  style={{ background: 'oklch(0.13 0.03 240)' }}
-                >
-                  Previous
-                </Button>
-                <span className="text-gray-500 text-sm">Page {page + 1}</span>
-                <Button
-                  variant="outline"
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={(allIPs?.length ?? 0) < PAGE_SIZE}
-                  className="border-gold/25 text-gray-300 hover:text-gold hover:border-gold/50 disabled:opacity-40"
-                  style={{ background: 'oklch(0.13 0.03 240)' }}
-                >
-                  Next
-                </Button>
-              </div>
-            )}
-          </>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {displayRecords.map((record) => (
+              <IPCard
+                key={String(record.id)}
+                record={record}
+                onClick={() => handleCardClick(record)}
+              />
+            ))}
+          </div>
         )}
       </div>
 
-      <ExtendedIPDetailModal
-        record={selectedRecord}
-        open={!!selectedRecord}
-        onClose={() => setSelectedRecord(null)}
-      />
+      {/* Detail modal — uses the extended version for mock records, standard for backend records */}
+      {selectedRecord && (
+        selectedRecord.blockHeight !== undefined ? (
+          <ExtendedIPDetailModal
+            record={selectedRecord}
+            open={modalOpen}
+            onClose={() => { setModalOpen(false); setSelectedRecord(null); }}
+          />
+        ) : (
+          <IPDetailModal
+            record={selectedRecord}
+            open={modalOpen}
+            onClose={() => { setModalOpen(false); setSelectedRecord(null); }}
+          />
+        )
+      )}
     </div>
   );
 }

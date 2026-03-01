@@ -51,6 +51,7 @@ function seededBase58(seed: string, length: number): string {
 
 export default function IPDetailModal({ record, open, onClose }: IPDetailModalProps) {
   const [copied, setCopied] = useState(false);
+  const [copiedSha, setCopiedSha] = useState(false);
 
   const hashHex = useMemo(() => {
     if (!record) return '';
@@ -87,18 +88,26 @@ export default function IPDetailModal({ record, open, onClose }: IPDetailModalPr
 
   if (!record) return null;
 
-  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleDateString('en-US', {
+  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleString('en-US', {
     year: 'numeric',
-    month: 'long',
+    month: 'short',
     day: 'numeric',
-    hour: '2-digit',
+    hour: 'numeric',
     minute: '2-digit',
+    hour12: true,
   });
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(hashHex);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopySha = async () => {
+    if (!record.hash) return;
+    await navigator.clipboard.writeText(record.hash);
+    setCopiedSha(true);
+    setTimeout(() => setCopiedSha(false), 2000);
   };
 
   const fields = [
@@ -148,6 +157,26 @@ export default function IPDetailModal({ record, open, onClose }: IPDetailModalPr
               </button>
             </div>
           </div>
+
+          {/* SHA-256 Hash (record-level hash assigned at registration) */}
+          {record.hash && (
+            <div className="flex flex-col gap-1">
+              <span className="text-xs text-gray-500">SHA-256 Hash</span>
+              <div
+                className="flex items-center gap-2 p-3 rounded-sm border border-gold/20"
+                style={{ background: 'oklch(0.10 0.025 240)' }}
+              >
+                <span className="font-mono text-xs text-gold/80 break-all flex-1">{record.hash}</span>
+                <button
+                  onClick={handleCopySha}
+                  className="flex-shrink-0 p-1.5 rounded-sm hover:bg-gold/10 text-gray-400 hover:text-gold transition-colors"
+                  title="Copy SHA-256 hash"
+                >
+                  {copiedSha ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ICP Blockchain Metadata */}
           <div

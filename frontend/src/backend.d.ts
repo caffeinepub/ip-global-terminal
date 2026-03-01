@@ -19,6 +19,7 @@ export interface IPRecord {
     documentHash: Uint8Array;
     title: string;
     owner: Principal;
+    hash: string;
     fileBlob?: ExternalBlob;
     description: string;
     jurisdiction: string;
@@ -67,10 +68,14 @@ export interface backendInterface {
     getIP(id: bigint): Promise<IPRecord | null>;
     getUserProfile(user: Principal): Promise<UserProfile | null>;
     isCallerAdmin(): Promise<boolean>;
-    registerIP(title: string, description: string, category: IPCategory, documentHash: Uint8Array, fileBlob: ExternalBlob | null, jurisdiction: string): Promise<bigint>;
+    registerIP(title: string, description: string, category: IPCategory, documentHash: Uint8Array, fileBlob: ExternalBlob | null, jurisdiction: string, hash: string): Promise<bigint>;
     saveCallerUserProfile(profile: UserProfile): Promise<void>;
     /**
      * / Search IPs whose title contains the given keyword (case-sensitive).
      */
     searchByTitle(keyword: string): Promise<Array<IPRecord>>;
+    /**
+     * / Search IPs by title or hash (case-insensitive for titles, case-insensitive for hashes).
+     */
+    searchByTitleOrHash(search: string): Promise<Array<IPRecord>>;
 }

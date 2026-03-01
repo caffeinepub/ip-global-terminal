@@ -2,10 +2,11 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-frontend-src-pages-registerip-tsx-remove-all-remaining-token-balance-checks-insufficient-ipgt-tokens-error-messages-and-any-related-conditional-logic-that-blocks-or-warns-the-user-about-token-balance-the-registration-form-must-submit-without-any-token-related-validation-or-error-states",
-      "featureTitle": "In frontend/src/pages/RegisterIP.tsx, remove all remaining token balance checks, 'Insufficient IPGT tokens' error messages, and any related conditional logic that blocks or warns the user about token balance. The registration form must submit without any token-related validation or error states.",
+      "featureId": "feature-remove-the-admin-token-gate-from-the-frontend-so-the-app-is-fully-publicly-accessible-without-requiring-a-caffeineadmintoken-url-fragment-the-app-should-load-normally-for-any-visitor-at-the-clean-url-e-g-https-ip-global-terminal-2sw-caffeine-xyz-without-checking-for-or-redirecting-based-on-any-token",
+      "featureTitle": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a `caffeineAdminToken` URL fragment. The app should load normally for any visitor at the clean URL (e.g., `https://ip-global-terminal-2sw.caffeine.xyz/`) without checking for or redirecting based on any token.",
       "files": [
-        "frontend/src/pages/RegisterIP.tsx"
+        "frontend/src/App.tsx",
+        "frontend/src/utils/urlParams.ts"
       ],
       "components": [
         "authorization@4.0.0",
@@ -17,27 +18,7 @@
         "github-export-icp-cli@1.0.0"
       ],
       "testIds": [
-        "REQ-42"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-in-frontend-src-pages-registerip-tsx-make-the-file-upload-input-optional-remove-any-required-constraint-validation-error-or-submission-guard-that-prevents-the-form-from-being-submitted-without-an-attached-document-users-may-optionally-upload-a-pdf-or-image-to-auto-populate-the-document-hash-field-but-it-must-not-be-required",
-      "featureTitle": "In frontend/src/pages/RegisterIP.tsx, make the file upload input optional. Remove any 'required' constraint, validation error, or submission guard that prevents the form from being submitted without an attached document. Users may optionally upload a PDF or image to auto-populate the document hash field, but it must not be required.",
-      "files": [
-        "frontend/src/pages/RegisterIP.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-44"
+        "REQ-1"
       ],
       "confidence": "high"
     }

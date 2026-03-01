@@ -1,38 +1,37 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Remove IPGT token error, make document upload optional on IP registration",
+  "title": "Remove admin token gate for public shareable URL access",
   "requirements": [
     {
-      "id": "REQ-42",
-      "summary": "Remove all token balance checks and related error messages from the IP registration form",
+      "id": "REQ-1",
+      "summary": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a caffeineAdminToken URL fragment",
       "acceptanceCriteria": [
-        "No 'Insufficient IPGT tokens' or equivalent token balance error message appears anywhere on the registration form or after submission",
-        "The form does not perform any token balance check before or during submission",
-        "All other form validation (title, category, jurisdiction) remains intact"
+        "Visiting the app URL without any `#caffeineAdminToken=...` fragment loads the app normally with no authentication prompt or token check.",
+        "The `urlParams.ts` utility no longer reads, persists, or validates any `caffeineAdminToken` parameter.",
+        "No component in the app renders a token gate, token prompt, or access-denied state based on a missing admin token.",
+        "All four public routes (Home, Register IP, IP Database, Whitepaper) are accessible without any token in the URL."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/RegisterIP.tsx",
+          "path": "frontend/src/utils/urlParams.ts",
           "operation": "modify",
-          "description": "Remove all token balance checks, 'Insufficient IPGT tokens' error states, and any conditional logic that blocks or warns users about insufficient token balance. Strip out any useQuery or hook calls that fetch token balance for validation purposes. Ensure the registration form can submit without token-related validation while preserving all other form validation (title, category, jurisdiction, document hash)."
-        }
-      ]
-    },
-    {
-      "id": "REQ-44",
-      "summary": "Make the file upload input optional on the IP registration form",
-      "acceptanceCriteria": [
-        "The file upload input does not have a 'required' attribute or equivalent validation constraint",
-        "Submitting the registration form without uploading a file does not produce a validation error",
-        "If a file is uploaded, the SHA-256 hash is still computed and populates the document hash field as before",
-        "If no file is uploaded and no manual hash is provided, the document hash field may remain empty and the form still submits successfully"
-      ],
-      "file_operations": [
+          "description": "Remove all logic related to reading, persisting, or validating the `caffeineAdminToken` parameter. Keep only the generic URL parameter utility functions if they serve other purposes, or simplify the module to remove token-specific code entirely."
+        },
         {
-          "path": "frontend/src/pages/RegisterIP.tsx",
+          "path": "frontend/src/App.tsx",
           "operation": "modify",
-          "description": "Remove any 'required' constraint, validation error, or submission guard related to the file upload input. Allow the form to submit successfully without an attached document. If a file is uploaded, preserve the existing SHA-256 hash computation and auto-population of the document hash field. If no file is uploaded and the document hash field is empty, the form must still submit without validation errors."
+          "description": "Remove any token gate checks, conditional rendering based on `caffeineAdminToken`, or access-denied redirects. Ensure all four public routes (Home, Register IP, IP Database, Whitepaper) are unconditionally accessible without token validation."
+        },
+        {
+          "path": "frontend/src/components/Header.tsx",
+          "operation": "modify",
+          "description": "Remove any UI elements, state checks, or conditional rendering related to the admin token gate. Ensure the header displays the IPGT logo and navigation links without any token-based access restrictions."
+        },
+        {
+          "path": "frontend/src/main.tsx",
+          "operation": "modify",
+          "description": "Remove any initialization logic that checks for or validates the `caffeineAdminToken` before mounting the app. Ensure the app mounts immediately for all visitors without token checks."
         }
       ]
     }

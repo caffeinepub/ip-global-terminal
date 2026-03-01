@@ -19,6 +19,7 @@ export interface IPRecord {
   'documentHash' : Uint8Array,
   'title' : string,
   'owner' : Principal,
+  'hash' : string,
   'fileBlob' : [] | [ExternalBlob],
   'description' : string,
   'jurisdiction' : string,
@@ -88,7 +89,15 @@ export interface _SERVICE {
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'registerIP' : ActorMethod<
-    [string, string, IPCategory, Uint8Array, [] | [ExternalBlob], string],
+    [
+      string,
+      string,
+      IPCategory,
+      Uint8Array,
+      [] | [ExternalBlob],
+      string,
+      string,
+    ],
     bigint
   >,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
@@ -96,6 +105,10 @@ export interface _SERVICE {
    * / Search IPs whose title contains the given keyword (case-sensitive).
    */
   'searchByTitle' : ActorMethod<[string], Array<IPRecord>>,
+  /**
+   * / Search IPs by title or hash (case-insensitive for titles, case-insensitive for hashes).
+   */
+  'searchByTitleOrHash' : ActorMethod<[string], Array<IPRecord>>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

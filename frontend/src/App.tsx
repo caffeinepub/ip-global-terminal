@@ -1,33 +1,27 @@
-import { createRootRoute, createRoute, createRouter, RouterProvider, Outlet } from '@tanstack/react-router';
-import { useInternetIdentity } from './hooks/useInternetIdentity';
-import { useGetCallerUserProfile } from './hooks/useQueries';
+import { RouterProvider, createRouter, createRoute, createRootRoute, Outlet } from '@tanstack/react-router';
 import Layout from './components/Layout';
-import ProfileSetupModal from './components/ProfileSetupModal';
 import Home from './pages/Home';
 import RegisterIP from './pages/RegisterIP';
 import IPDatabase from './pages/IPDatabase';
 import Whitepaper from './pages/Whitepaper';
 
-function RootComponent() {
-  const { identity } = useInternetIdentity();
-  const { data: userProfile, isLoading: profileLoading, isFetched } = useGetCallerUserProfile();
-
-  const isAuthenticated = !!identity;
-  const showProfileSetup = isAuthenticated && !profileLoading && isFetched && userProfile === null;
-
-  return (
-    <Layout>
-      <Outlet />
-      <ProfileSetupModal open={showProfileSetup} />
-    </Layout>
-  );
+// Clear any stored admin tokens so the app is always publicly accessible
+try {
+  sessionStorage.removeItem('caffeineAdminToken');
+  sessionStorage.removeItem('secret_caffeineAdminToken');
+} catch {
+  // ignore
 }
 
 const rootRoute = createRootRoute({
-  component: RootComponent,
+  component: () => (
+    <Layout>
+      <Outlet />
+    </Layout>
+  ),
 });
 
-const indexRoute = createRoute({
+const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: Home,
@@ -52,7 +46,7 @@ const whitepaperRoute = createRoute({
 });
 
 const routeTree = rootRoute.addChildren([
-  indexRoute,
+  homeRoute,
   registerRoute,
   databaseRoute,
   whitepaperRoute,

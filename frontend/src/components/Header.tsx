@@ -1,36 +1,11 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { Shield, LogIn, LogOut, Loader2 } from 'lucide-react';
-import { useInternetIdentity } from '../hooks/useInternetIdentity';
-import { useQueryClient } from '@tanstack/react-query';
-import { useGetCallerUserProfile } from '../hooks/useQueries';
 
 export default function Header() {
-  const { login, clear, loginStatus, identity } = useInternetIdentity();
-  const queryClient = useQueryClient();
   const location = useLocation();
-  const isAuthenticated = !!identity;
-  const isLoggingIn = loginStatus === 'logging-in';
-
-  const { data: userProfile } = useGetCallerUserProfile();
-
-  const handleAuth = async () => {
-    if (isAuthenticated) {
-      await clear();
-      queryClient.clear();
-    } else {
-      try {
-        await login();
-      } catch (error: any) {
-        if (error.message === 'User is already authenticated') {
-          await clear();
-          setTimeout(() => login(), 300);
-        }
-      }
-    }
-  };
 
   const navLinks = [
     { to: '/', label: 'Home' },
+    { to: '/register', label: 'Register IP' },
     { to: '/database', label: 'IP Database' },
     { to: '/whitepaper', label: 'Whitepaper' },
   ];
@@ -73,32 +48,8 @@ export default function Header() {
           ))}
         </nav>
 
-        {/* Right side */}
-        <div className="flex items-center gap-3">
-          {isAuthenticated && userProfile && (
-            <span className="hidden sm:block text-gray-300 text-sm">
-              {userProfile.name}
-            </span>
-          )}
-          <button
-            onClick={handleAuth}
-            disabled={isLoggingIn}
-            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-sm text-sm font-medium transition-colors disabled:opacity-50 ${
-              isAuthenticated
-                ? 'border border-gold/30 text-gray-300 hover:text-gold hover:border-gold/60'
-                : 'bg-gold text-navy hover:bg-gold/90'
-            }`}
-          >
-            {isLoggingIn ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" />
-            ) : isAuthenticated ? (
-              <LogOut className="w-3.5 h-3.5" />
-            ) : (
-              <LogIn className="w-3.5 h-3.5" />
-            )}
-            {isLoggingIn ? 'Logging in…' : isAuthenticated ? 'Logout' : 'Login'}
-          </button>
-        </div>
+        {/* Mobile nav placeholder — keeps layout balanced */}
+        <div className="md:hidden" />
       </div>
     </header>
   );

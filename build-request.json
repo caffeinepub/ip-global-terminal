@@ -1,75 +1,39 @@
 {
   "kind": "build_request",
-  "title": "Remove IPGT token error, make document upload optional on IP registration",
+  "title": "Remove admin token gate for public shareable URL access",
   "projectName": "IP Global Terminal",
   "priority": "normal",
   "requirements": [
     {
-      "id": "REQ-42",
-      "text": "In frontend/src/pages/RegisterIP.tsx, remove all remaining token balance checks, 'Insufficient IPGT tokens' error messages, and any related conditional logic that blocks or warns the user about token balance. The registration form must submit without any token-related validation or error states.",
+      "id": "REQ-1",
+      "text": "Remove the admin token gate from the frontend so the app is fully publicly accessible without requiring a `caffeineAdminToken` URL fragment. The app should load normally for any visitor at the clean URL (e.g., `https://ip-global-terminal-2sw.caffeine.xyz/`) without checking for or redirecting based on any token.",
       "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-recent"
+          "msg-1",
+          "msg-2"
         ],
         "quotes": [
-          "Remove the 'Insufficient IPGT tokens' error — strip any remaining token balance check or error message from the registration form and backend call"
+          "it still requires an admin token can we make it so that it just a shareable URL",
+          "remove the admin token gate so the app is publicly accessible via a clean shareable URL — no token required"
         ]
       },
       "acceptanceCriteria": [
-        "No 'Insufficient IPGT tokens' or equivalent token balance error message appears anywhere on the registration form or after submission",
-        "The form does not perform any token balance check before or during submission",
-        "All other form validation (title, category, jurisdiction) remains intact"
-      ]
-    },
-    {
-      "id": "REQ-43",
-      "text": "In backend/main.mo, remove any token balance validation from the IP registration function (e.g. any check that the caller has sufficient IPGT balance before registering an IP). The registerIP function must accept valid registration requests without checking token balances.",
-      "target": "backend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "Remove the 'Insufficient IPGT tokens' error — strip any remaining token balance check or error message from the registration form and backend call"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The registerIP backend function does not return an error variant related to insufficient token balance",
-        "IP registration succeeds regardless of the caller's token balance",
-        "All other registration validations (duplicate hash check, required fields) remain intact"
-      ]
-    },
-    {
-      "id": "REQ-44",
-      "text": "In frontend/src/pages/RegisterIP.tsx, make the file upload input optional. Remove any 'required' constraint, validation error, or submission guard that prevents the form from being submitted without an attached document. Users may optionally upload a PDF or image to auto-populate the document hash field, but it must not be required.",
-      "target": "frontend",
-      "source": {
-        "messageIds": [
-          "msg-recent"
-        ],
-        "quotes": [
-          "Optional document upload — file upload will no longer be required; users can submit the form without attaching a document"
-        ]
-      },
-      "acceptanceCriteria": [
-        "The file upload input does not have a 'required' attribute or equivalent validation constraint",
-        "Submitting the registration form without uploading a file does not produce a validation error",
-        "If a file is uploaded, the SHA-256 hash is still computed and populates the document hash field as before",
-        "If no file is uploaded and no manual hash is provided, the document hash field may remain empty and the form still submits successfully"
+        "Visiting the app URL without any `#caffeineAdminToken=...` fragment loads the app normally with no authentication prompt or token check.",
+        "The `urlParams.ts` utility no longer reads, persists, or validates any `caffeineAdminToken` parameter.",
+        "No component in the app renders a token gate, token prompt, or access-denied state based on a missing admin token.",
+        "All four public routes (Home, Register IP, IP Database, Whitepaper) are accessible without any token in the URL."
       ]
     }
   ],
   "constraints": [
-    "Do not modify frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or any file under frontend/src/components/ui",
-    "Do not alter any other page, component, or backend logic beyond what is specified in these requirements",
-    "The duplicate document hash uniqueness check in the backend must remain intact"
+    "Do not modify any files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui.",
+    "Do not add any new authentication or access control mechanisms."
   ],
   "nonGoals": [
-    "Adding a random hash generator button (explicitly deferred from this build)",
-    "Persistent IP storage changes (not included in this scoped build)",
-    "Any visual or styling changes to RegisterIP.tsx beyond removing token-related UI",
-    "Changes to any other page, route, or component"
+    "Adding Internet Identity login or user authentication flows.",
+    "Changing any backend authorization logic.",
+    "Modifying any IP record registration or querying functionality."
   ],
   "imageRequirements": {
     "required": [],

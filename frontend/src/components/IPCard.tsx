@@ -17,15 +17,23 @@ const categoryColors: Record<string, string> = {
   [IPCategory.copyright]: 'oklch(0.55 0.18 30)',
 };
 
+function truncateHash(hash: string): string {
+  if (!hash || hash.length <= 16) return hash;
+  return `${hash.slice(0, 8)}…${hash.slice(-8)}`;
+}
+
 export default function IPCard({ record, onClick }: IPCardProps) {
   const categoryKey = Object.keys(IPCategory).find(
     (k) => IPCategory[k as keyof typeof IPCategory] === record.category
   ) ?? 'patent';
 
-  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleDateString('en-US', {
+  const date = new Date(Number(record.registrationDate) / 1_000_000).toLocaleString('en-US', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
   });
 
   const hashHex = Array.from(record.documentHash)
@@ -68,9 +76,15 @@ export default function IPCard({ record, onClick }: IPCardProps) {
           <span className="text-gray-300">{date}</span>
         </div>
         <div className="flex items-center gap-1.5 overflow-hidden">
-          <span className="text-gray-600 flex-shrink-0">Hash:</span>
+          <span className="text-gray-600 flex-shrink-0">Doc Hash:</span>
           <span className="text-gray-400 font-mono truncate">{hashHex.slice(0, 20)}…</span>
         </div>
+        {record.hash && (
+          <div className="flex items-center gap-1.5 overflow-hidden">
+            <span className="text-gray-600 flex-shrink-0">SHA-256:</span>
+            <span className="text-gold/60 font-mono text-xs">{truncateHash(record.hash)}</span>
+          </div>
+        )}
       </div>
     </div>
   );

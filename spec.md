@@ -1,12 +1,11 @@
 # Specification
 
 ## Summary
-**Goal:** Remove IPGT token balance checks from IP registration and make document upload optional.
+**Goal:** Remove the admin token gate so the IP Global Terminal app is fully publicly accessible via a clean shareable URL without requiring any `caffeineAdminToken` fragment.
 
 **Planned changes:**
-- Remove all token balance checks, "Insufficient IPGT tokens" error messages, and related conditional logic from `frontend/src/pages/RegisterIP.tsx`
-- Remove token balance validation from the `registerIP` function in `backend/main.mo`
-- Make the file upload input optional in `frontend/src/pages/RegisterIP.tsx`, removing any `required` constraint or submission guard that blocks submission without an attached document
-- File upload still computes and populates the document hash field when a file is provided, but the form can submit without a file or document hash
+- Remove any token-checking logic from `urlParams.ts` that reads, persists, or validates a `caffeineAdminToken` URL parameter
+- Remove any token gate, token prompt, or access-denied component that blocks app access based on a missing admin token
+- Ensure all four public routes (Home, Register IP, IP Database, Whitepaper) load normally for any visitor without a token
 
-**User-visible outcome:** Users can register an IP without owning any IPGT tokens and without uploading a document — both previously blocking requirements are removed.
+**User-visible outcome:** Anyone can visit the app URL directly without any token in the URL and the app loads fully with all routes accessible.

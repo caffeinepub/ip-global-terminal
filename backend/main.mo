@@ -6,15 +6,11 @@ import Principal "mo:core/Principal";
 import Iter "mo:core/Iter";
 import Blob "mo:core/Blob";
 import Time "mo:core/Time";
-import Nat64 "mo:core/Nat64";
-import VarArray "mo:core/VarArray";
 import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -70,6 +66,7 @@ actor {
     documentHash : Blob;
     fileBlob : ?Storage.ExternalBlob;
     jurisdiction : Text;
+    hash : Text;
   };
 
   // ── State ─────────────────────────────────────────────────────────────────
@@ -77,7 +74,7 @@ actor {
   let ipRecords = Map.empty<Nat, IPRecord>();
   var nextIpId = 0;
 
-  // ── IP registration ───────────────────────────────────────────────────────
+  // ── IP registration (no authentication required) ─────────────────────────────
 
   public shared ({ caller }) func registerIP(
     title : Text,
@@ -86,11 +83,8 @@ actor {
     documentHash : Blob,
     fileBlob : ?Storage.ExternalBlob,
     jurisdiction : Text,
+    hash : Text,
   ) : async Nat {
-    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
-      Runtime.trap("Unauthorized: Only users can register IP");
-    };
-
     let newIpId = nextIpId;
     let record : IPRecord = {
       id = newIpId;
@@ -102,6 +96,7 @@ actor {
       documentHash;
       fileBlob;
       jurisdiction;
+      hash;
     };
 
     ipRecords.add(newIpId, record);
@@ -132,6 +127,17 @@ actor {
     ipRecords.values().toArray().filter(
       func(record : IPRecord) : Bool {
         record.title.contains(#text(keyword));
+      }
+    );
+  };
+
+  /// Search IPs by title or hash (case-insensitive for titles, case-insensitive for hashes).
+  public query func searchByTitleOrHash(search : Text) : async [IPRecord] {
+    let lowerSearch = search.toLower();
+    ipRecords.values().toArray().filter(
+      func(record : IPRecord) : Bool {
+        record.title.toLower().contains(#text(lowerSearch)) or
+        record.hash.contains(#text(lowerSearch));
       }
     );
   };

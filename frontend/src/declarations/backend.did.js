@@ -35,6 +35,7 @@ export const IPRecord = IDL.Record({
   'documentHash' : IDL.Vec(IDL.Nat8),
   'title' : IDL.Text,
   'owner' : IDL.Principal,
+  'hash' : IDL.Text,
   'fileBlob' : IDL.Opt(ExternalBlob),
   'description' : IDL.Text,
   'jurisdiction' : IDL.Text,
@@ -97,12 +98,14 @@ export const idlService = IDL.Service({
         IDL.Vec(IDL.Nat8),
         IDL.Opt(ExternalBlob),
         IDL.Text,
+        IDL.Text,
       ],
       [IDL.Nat],
       [],
     ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
   'searchByTitle' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
+  'searchByTitleOrHash' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
 });
 
 export const idlInitArgs = [];
@@ -135,6 +138,7 @@ export const idlFactory = ({ IDL }) => {
     'documentHash' : IDL.Vec(IDL.Nat8),
     'title' : IDL.Text,
     'owner' : IDL.Principal,
+    'hash' : IDL.Text,
     'fileBlob' : IDL.Opt(ExternalBlob),
     'description' : IDL.Text,
     'jurisdiction' : IDL.Text,
@@ -201,12 +205,18 @@ export const idlFactory = ({ IDL }) => {
           IDL.Vec(IDL.Nat8),
           IDL.Opt(ExternalBlob),
           IDL.Text,
+          IDL.Text,
         ],
         [IDL.Nat],
         [],
       ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
     'searchByTitle' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
+    'searchByTitleOrHash' : IDL.Func(
+        [IDL.Text],
+        [IDL.Vec(IPRecord)],
+        ['query'],
+      ),
   });
 };
 
