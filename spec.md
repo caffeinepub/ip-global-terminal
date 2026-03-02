@@ -1,10 +1,13 @@
 # Specification
 
 ## Summary
-**Goal:** Fix the animated world map continent colors and sharpen the hero background.
+**Goal:** Add persistent on-chain IP record storage, auth-gated submission, and public search to the IPGT Platform.
 
 **Planned changes:**
-- Change continent fill/outline color in `AnimatedWorldMap.tsx` from blue to near-black (e.g., `#0a0a0a` or `#111111`) to match the Black, Gold & White theme
-- Reduce pixelation and blurriness on the hero background in `Home.tsx` by improving canvas/image rendering quality and setting appropriate `image-rendering` CSS properties
+- Store all IP registration form fields in stable backend storage (survives canister upgrades, accumulates over time)
+- Expose public backend query functions for listing and searching all IP records by title, category, jurisdiction, description, etc.
+- Require Internet Identity authentication to access the Register IP form; show a sign-in prompt to unauthenticated users
+- Allow the IP Database page to load and search all records without any login requirement
+- Wire the IP Database search and filter UI to live on-chain data from the backend
 
-**User-visible outcome:** Continents on the animated world map appear dark/black instead of blue, and the hero section background looks sharp and crisp without noticeable blur or pixelation.
+**User-visible outcome:** Authenticated users can register new IP records that are permanently stored on-chain. Anyone with the link can browse, search, and filter all submitted IP records on the IP Database page without logging in.

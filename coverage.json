@@ -1,49 +1,67 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-01T22:18:48.406Z",
+  "generatedAt": "2026-03-02T00:17:26.726Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 2,
-    "implemented": 2,
+    "total": 4,
+    "implemented": 1,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "In AnimatedWorldMap.tsx, change the continent fill/outline color from blue to near-black (e.g., #0a0a0a or #111111) so continents match the Black, Gold & White theme instead of appearing blue.",
-        "status": "implemented",
-        "plannedFiles": [
-          "frontend/src/components/AnimatedWorldMap.tsx"
-        ],
-        "matchedFiles": [
-          "frontend/src/components/AnimatedWorldMap.tsx"
-        ]
+        "summary": "Persist all IP registration form fields to on-chain stable storage in the backend. The backend actor must store submitted IP records in a stable data structure (e.g., stable var array or HashMap) so that records survive canister upgrades and accumulate over time as a growing database.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       },
       {
         "id": "REQ-2",
-        "summary": "Reduce pixelation and blurriness on the hero background in Home.tsx and any related background image or canvas rendering. Ensure the background appears sharp and crisp — use higher-resolution rendering, avoid CSS scaling artifacts, and set image-rendering to crisp or pixelated where appropriate.",
+        "summary": "Require Internet Identity authentication before a user can submit a new IP registration. On the Register IP page, if the user is not authenticated, show a prompt/button to sign in via Internet Identity. The registration form and submission action must be blocked until the user is logged in.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/components/AnimatedWorldMap.tsx",
-          "frontend/src/index.css"
+          "frontend/src/pages/RegisterIP.tsx",
+          "frontend/src/components/ProfileSetupModal.tsx",
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/components/Layout.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/Home.tsx",
-          "frontend/src/components/AnimatedWorldMap.tsx"
+          "frontend/src/pages/RegisterIP.tsx",
+          "frontend/src/components/ProfileSetupModal.tsx",
+          "frontend/src/components/Layout.tsx"
         ]
+      },
+      {
+        "id": "REQ-3",
+        "summary": "Allow anyone with the link to browse and search all submitted IP records on the IP Database page without requiring login. The backend must expose a public query endpoint for listing and searching all records, and the frontend must not gate the IP Database page behind authentication.",
+        "status": "missing",
+        "plannedFiles": [
+          "frontend/src/pages/IPDatabase.tsx"
+        ],
+        "matchedFiles": []
+      },
+      {
+        "id": "REQ-4",
+        "summary": "Expose backend query functions to support full-text or field-based search across all persisted IP records (by title, category, jurisdiction, description, etc.) so the existing search and filter UI on the IP Database page operates against real on-chain data.",
+        "status": "unknown",
+        "plannedFiles": [],
+        "matchedFiles": []
       }
     ]
   },
   "changedFiles": [
+    "backend/main.mo",
+    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/AnimatedWorldMap.tsx",
-    "frontend/src/pages/Home.tsx",
+    "frontend/src/components/Header.tsx",
+    "frontend/src/components/Layout.tsx",
+    "frontend/src/components/ProfileSetupModal.tsx",
+    "frontend/src/pages/RegisterIP.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

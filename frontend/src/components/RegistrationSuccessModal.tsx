@@ -1,131 +1,112 @@
-import React from 'react';
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
 } from '@/components/ui/dialog';
-import { CheckCircle, Shield, ExternalLink } from 'lucide-react';
+import { CheckCircle, Shield, Copy, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
 
 interface RegistrationSuccessModalProps {
   open: boolean;
-  ipId: bigint | null;
   onClose: () => void;
+  ipId: bigint | null;
+  ipTitle: string;
 }
 
-export default function RegistrationSuccessModal({ open, ipId, onClose }: RegistrationSuccessModalProps) {
-  const mockEthTxId = `0x${Array.from({ length: 64 }, () => Math.floor(Math.random() * 16).toString(16)).join('')}`;
-  const mockEthBlock = Math.floor(19_000_000 + Math.random() * 500_000);
-  const mockSolSig = Array.from({ length: 88 }, () => 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'[Math.floor(Math.random() * 62)]).join('');
-  const mockSolSlot = Math.floor(250_000_000 + Math.random() * 5_000_000);
+export default function RegistrationSuccessModal({
+  open,
+  onClose,
+  ipId,
+  ipTitle,
+}: RegistrationSuccessModalProps) {
+  const [copied, setCopied] = useState(false);
+
+  const idStr = ipId !== null ? ipId.toString() : '—';
+
+  const copyId = async () => {
+    try {
+      await navigator.clipboard.writeText(idStr);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
 
   return (
-    <Dialog open={open} onOpenChange={(o) => { if (!o) onClose(); }}>
-      <DialogContent
-        className="max-w-lg"
-        style={{
-          backgroundColor: 'oklch(0.09 0 0)',
-          border: '1px solid oklch(0.78 0.15 85 / 0.4)',
-          color: 'oklch(0.97 0 0)',
-        }}
-      >
+    <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className="bg-black border border-gold-700/40 text-white max-w-md">
         <DialogHeader>
-          <div className="flex flex-col items-center text-center gap-3 mb-2">
-            <div
-              className="w-16 h-16 rounded-full flex items-center justify-center"
-              style={{ backgroundColor: 'oklch(0.78 0.15 85 / 0.15)', border: '2px solid oklch(0.78 0.15 85 / 0.5)' }}
-            >
-              <CheckCircle className="w-8 h-8" style={{ color: 'oklch(0.78 0.15 85)' }} />
+          <div className="flex justify-center mb-4">
+            <div className="w-16 h-16 rounded-full bg-gold-900/30 border border-gold-600/40 flex items-center justify-center">
+              <CheckCircle className="w-8 h-8 text-gold-400" />
             </div>
-            <DialogTitle
-              className="text-2xl font-bold"
-              style={{ color: 'oklch(0.97 0 0)', fontFamily: 'Playfair Display, serif' }}
-            >
-              IP Successfully Registered
-            </DialogTitle>
-            <DialogDescription style={{ color: 'oklch(0.60 0 0)' }}>
-              Your intellectual property has been permanently recorded on the Internet Computer blockchain.
-            </DialogDescription>
           </div>
+          <DialogTitle className="font-serif text-2xl text-white text-center">
+            Registration Successful
+          </DialogTitle>
+          <DialogDescription className="text-white/60 text-center text-sm">
+            Your intellectual property has been registered on the blockchain.
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4">
-          {/* IP ID */}
-          <div
-            className="p-4 rounded-lg text-center"
-            style={{ backgroundColor: 'oklch(0.78 0.15 85 / 0.1)', border: '1px solid oklch(0.78 0.15 85 / 0.3)' }}
-          >
-            <p className="text-xs tracking-widest uppercase mb-1" style={{ color: 'oklch(0.78 0.15 85)' }}>
-              IP Record ID
-            </p>
-            <p className="text-3xl font-bold" style={{ color: 'oklch(0.78 0.15 85)', fontFamily: 'Playfair Display, serif' }}>
-              #{ipId?.toString() ?? '—'}
-            </p>
-          </div>
-
-          {/* ICP confirmation */}
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'oklch(0.13 0 0)', border: '1px solid oklch(0.22 0 0)' }}
-          >
-            <div className="flex items-center gap-2 mb-2">
-              <Shield className="w-4 h-4" style={{ color: 'oklch(0.78 0.15 85)' }} />
-              <span className="text-sm font-semibold" style={{ color: 'oklch(0.78 0.15 85)' }}>
-                Internet Computer — Confirmed
-              </span>
-              <div className="w-2 h-2 rounded-full ml-auto" style={{ backgroundColor: 'oklch(0.78 0.15 85)' }} />
-            </div>
-            <p className="text-xs" style={{ color: 'oklch(0.55 0 0)' }}>
-              Finalized on-chain. Immutable and tamper-proof.
-            </p>
-          </div>
-
-          {/* Future integrations */}
-          <div
-            className="p-4 rounded-lg"
-            style={{ backgroundColor: 'oklch(0.11 0 0)', border: '1px solid oklch(0.20 0 0)' }}
-          >
-            <p className="text-xs font-semibold tracking-widest uppercase mb-3" style={{ color: 'oklch(0.45 0 0)' }}>
-              Also Recorded On — Future Integration (Simulated Reference)
-            </p>
-            <div className="space-y-3">
-              {/* Ethereum */}
-              <div>
-                <p className="text-xs font-medium mb-1" style={{ color: 'oklch(0.65 0 0)' }}>Ethereum</p>
-                <p className="text-xs font-mono truncate" style={{ color: 'oklch(0.45 0 0)' }}>
-                  Tx: {mockEthTxId.slice(0, 20)}…
-                </p>
-                <p className="text-xs" style={{ color: 'oklch(0.40 0 0)' }}>
-                  Block #{mockEthBlock.toLocaleString()}
-                </p>
-              </div>
-              {/* Solana */}
-              <div>
-                <p className="text-xs font-medium mb-1" style={{ color: 'oklch(0.65 0 0)' }}>Solana</p>
-                <p className="text-xs font-mono truncate" style={{ color: 'oklch(0.45 0 0)' }}>
-                  Sig: {mockSolSig.slice(0, 20)}…
-                </p>
-                <p className="text-xs" style={{ color: 'oklch(0.40 0 0)' }}>
-                  Slot #{mockSolSlot.toLocaleString()}
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <button
-            onClick={onClose}
-            className="w-full py-3 rounded-lg font-semibold text-sm transition-all duration-200"
-            style={{
-              backgroundColor: 'oklch(0.78 0.15 85)',
-              color: 'oklch(0.08 0 0)',
-            }}
-            onMouseEnter={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'oklch(0.85 0.14 85)';
-            }}
-            onMouseLeave={(e) => {
-              (e.currentTarget as HTMLButtonElement).style.backgroundColor = 'oklch(0.78 0.15 85)';
-            }}
-          >
-            Close
-          </button>
+        {/* IP Title */}
+        <div className="bg-gold-900/10 border border-gold-800/30 rounded-sm px-4 py-3 text-center">
+          <div className="text-xs text-white/40 uppercase tracking-wider mb-1">Registered Title</div>
+          <div className="text-white font-medium">{ipTitle}</div>
         </div>
+
+        {/* IP ID */}
+        <div className="border border-gold-800/30 rounded-sm px-4 py-3">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-xs text-white/40 uppercase tracking-wider">IP Registry ID</span>
+            <button
+              onClick={copyId}
+              className="flex items-center gap-1 text-xs text-gold-500 hover:text-gold-400 transition-colors"
+            >
+              {copied ? <CheckCircle className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+              {copied ? 'Copied' : 'Copy'}
+            </button>
+          </div>
+          <div className="font-mono text-gold-400 text-lg font-bold">#{idStr}</div>
+        </div>
+
+        {/* On-chain confirmation */}
+        <div className="flex items-start gap-3 bg-gold-900/10 border border-gold-700/20 rounded-sm px-4 py-3">
+          <Shield className="w-4 h-4 text-gold-500 mt-0.5 flex-shrink-0" />
+          <div className="text-sm text-white/70">
+            <span className="text-gold-300 font-medium">On-Chain Confirmed.</span>{' '}
+            Your IP record is permanently stored on the Internet Computer blockchain and cannot be altered or deleted.
+          </div>
+        </div>
+
+        {/* What's next */}
+        <div className="border-t border-gold-900/20 pt-4">
+          <div className="text-xs text-white/40 uppercase tracking-wider mb-3">What's Next</div>
+          <ul className="space-y-2 text-sm text-white/60">
+            <li className="flex items-start gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-gold-600 mt-0.5 flex-shrink-0" />
+              Search the IP Database to verify your registration is visible
+            </li>
+            <li className="flex items-start gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-gold-600 mt-0.5 flex-shrink-0" />
+              Save your IP ID as proof of your registration date
+            </li>
+            <li className="flex items-start gap-2">
+              <ExternalLink className="w-3.5 h-3.5 text-gold-600 mt-0.5 flex-shrink-0" />
+              Consult a qualified IP attorney for formal legal protection
+            </li>
+          </ul>
+        </div>
+
+        <button
+          onClick={onClose}
+          className="w-full bg-gold-500 hover:bg-gold-400 text-black font-semibold py-3 rounded-sm transition-colors mt-2"
+        >
+          Done
+        </button>
       </DialogContent>
     </Dialog>
   );

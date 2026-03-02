@@ -10,7 +10,9 @@ import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
+import Migration "migration";
 
+(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -74,7 +76,7 @@ actor {
   let ipRecords = Map.empty<Nat, IPRecord>();
   var nextIpId = 0;
 
-  // ── IP registration (no authentication required) ─────────────────────────────
+  // ── IP registration (authentication required) ─────────────────────────────
 
   public shared ({ caller }) func registerIP(
     title : Text,
@@ -85,6 +87,10 @@ actor {
     jurisdiction : Text,
     hash : Text,
   ) : async Nat {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can register IP");
+    };
+
     let newIpId = nextIpId;
     let record : IPRecord = {
       id = newIpId;

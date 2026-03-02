@@ -43,9 +43,9 @@ export default function IPDatabase() {
     (jurisdictionFilter ? jurisdictionResults.isLoading : false);
 
   const selectStyle: React.CSSProperties = {
-    backgroundColor: 'oklch(0.13 0 0)',
-    border: '1px solid oklch(0.25 0.02 85 / 0.4)',
-    color: 'oklch(0.80 0 0)',
+    backgroundColor: 'rgba(0,0,0,0.35)',
+    border: '1px solid rgba(255,255,255,0.25)',
+    color: 'oklch(0.85 0 0)',
     borderRadius: '0.5rem',
     padding: '0.5rem 0.75rem',
     fontSize: '0.8rem',
@@ -72,12 +72,15 @@ export default function IPDatabase() {
           </p>
         </div>
 
-        {/* Search & Filters */}
+        {/* Search & Filters — gold border glass panel, matching Register IP form panel */}
         <div
           className="rounded-xl p-5 mb-8"
           style={{
-            backgroundColor: 'oklch(0.11 0 0)',
-            border: '1px solid oklch(0.22 0.02 85 / 0.4)',
+            backgroundColor: 'rgba(0, 0, 0, 0.40)',
+            border: '1.5px solid oklch(0.78 0.15 85 / 0.30)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            boxShadow: '0 0 20px oklch(0.78 0.15 85 / 0.15)',
           }}
         >
           <div className="flex flex-col sm:flex-row gap-3">
@@ -85,7 +88,7 @@ export default function IPDatabase() {
             <div className="relative flex-1">
               <Search
                 className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4"
-                style={{ color: 'oklch(0.50 0 0)' }}
+                style={{ color: 'rgba(255,255,255,0.45)' }}
               />
               <input
                 type="text"
@@ -94,13 +97,13 @@ export default function IPDatabase() {
                 placeholder="Search by title or SHA-256 hash…"
                 className="w-full pl-9 pr-4 py-2.5 rounded-lg text-sm"
                 style={{
-                  backgroundColor: 'oklch(0.09 0 0)',
-                  border: '1px solid oklch(0.22 0 0)',
+                  backgroundColor: 'rgba(0,0,0,0.3)',
+                  border: '1px solid rgba(255,255,255,0.2)',
                   color: 'oklch(0.90 0 0)',
                   outline: 'none',
                 }}
-                onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'oklch(0.78 0.15 85 / 0.6)'; }}
-                onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'oklch(0.22 0 0)'; }}
+                onFocus={(e) => { (e.target as HTMLInputElement).style.borderColor = 'oklch(0.78 0.15 85 / 0.7)'; }}
+                onBlur={(e) => { (e.target as HTMLInputElement).style.borderColor = 'rgba(255,255,255,0.2)'; }}
               />
             </div>
 
@@ -134,9 +137,9 @@ export default function IPDatabase() {
                 onClick={() => { setSearch(''); setCategoryFilter(''); setJurisdictionFilter(''); }}
                 className="px-4 py-2 rounded-lg text-sm font-medium transition-colors"
                 style={{
-                  backgroundColor: 'oklch(0.20 0 0)',
-                  color: 'oklch(0.70 0 0)',
-                  border: '1px solid oklch(0.28 0 0)',
+                  backgroundColor: 'rgba(255,255,255,0.08)',
+                  color: 'oklch(0.75 0 0)',
+                  border: '1px solid rgba(255,255,255,0.2)',
                 }}
               >
                 Clear
@@ -152,14 +155,9 @@ export default function IPDatabase() {
           </div>
         ) : records.length === 0 ? (
           <div className="text-center py-20">
-            <Database className="w-12 h-12 mx-auto mb-4" style={{ color: 'oklch(0.30 0 0)' }} />
+            <Database className="w-12 h-12 mx-auto mb-4 opacity-30" style={{ color: 'oklch(0.78 0.15 85)' }} />
             <p className="text-lg font-medium" style={{ color: 'oklch(0.55 0 0)' }}>
-              No IP records found
-            </p>
-            <p className="text-sm mt-1" style={{ color: 'oklch(0.40 0 0)' }}>
-              {search || categoryFilter || jurisdictionFilter
-                ? 'Try adjusting your search or filters.'
-                : 'Be the first to register an IP on-chain.'}
+              {search || categoryFilter || jurisdictionFilter ? 'No records match your search.' : 'No IP records registered yet.'}
             </p>
           </div>
         ) : (
@@ -172,7 +170,7 @@ export default function IPDatabase() {
                 <IPCard
                   key={record.id.toString()}
                   record={record}
-                  onClick={setSelectedRecord}
+                  onClick={() => setSelectedRecord(record)}
                 />
               ))}
             </div>
@@ -182,6 +180,7 @@ export default function IPDatabase() {
 
       <IPDetailModal
         record={selectedRecord}
+        open={selectedRecord !== null}
         onClose={() => setSelectedRecord(null)}
       />
     </div>

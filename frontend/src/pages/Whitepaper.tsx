@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Printer, ChevronRight, BookOpen } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Printer, ChevronRight } from 'lucide-react';
 
 interface Section {
   id: string;
@@ -14,10 +14,17 @@ const sections: Section[] = [
     content: (
       <div className="prose-content">
         <p>
-          IP Global Terminal (IPGT) is a decentralised intellectual property registration platform built on the Internet Computer Protocol (ICP). It provides a sovereign, censorship-resistant, and WIPO-independent mechanism for creators, inventors, and organisations to register patents, trademarks, and copyrights on a public blockchain.
+          The Intellectual Property Global Token (IPGT) platform presents a decentralized, blockchain-based
+          registry for intellectual property (IP) rights. By leveraging the Internet Computer Protocol (ICP),
+          IPGT provides an immutable, transparent, and globally accessible ledger for patents, trademarks,
+          and copyrights. This whitepaper outlines the technical architecture, governance model, and
+          economic framework underpinning the IPGT ecosystem.
         </p>
         <p>
-          By leveraging the Internet Computer's on-chain storage and smart contract capabilities, IPGT eliminates the need for centralised intermediaries, reduces registration costs, and provides cryptographic proof of IP ownership that is globally accessible and immutable.
+          Traditional IP registration systems are fragmented, jurisdiction-dependent, and susceptible to
+          administrative inefficiencies. IPGT addresses these limitations by providing a unified,
+          cryptographically secured registry that transcends national boundaries while maintaining
+          compliance with international IP frameworks.
         </p>
       </div>
     ),
@@ -28,19 +35,28 @@ const sections: Section[] = [
     content: (
       <div className="prose-content">
         <p>
-          The global intellectual property system has long been dominated by centralised bodies such as the World Intellectual Property Organization (WIPO) and national patent offices. While these institutions have served an important role, they introduce significant friction: high costs, geographic limitations, bureaucratic delays, and single points of failure.
+          Intellectual property represents one of the most valuable asset classes in the modern economy.
+          Yet the systems designed to protect these assets remain largely unchanged from their 19th-century
+          origins — paper-based, siloed by jurisdiction, and vulnerable to fraud, loss, and administrative
+          error.
         </p>
         <p>
-          Blockchain technology offers a compelling alternative. By recording IP registrations on a distributed ledger, we can achieve:
+          The emergence of blockchain technology offers a transformative opportunity: a single, immutable
+          record of IP ownership that is accessible to anyone, anywhere, at any time. IPGT is built on
+          this premise, utilizing the Internet Computer Protocol to deliver a next-generation IP registry
+          that is secure, transparent, and globally interoperable.
         </p>
-        <ul>
-          <li>Immutable proof of creation and ownership</li>
-          <li>Timestamped registration without intermediaries</li>
-          <li>Global accessibility without jurisdictional barriers</li>
-          <li>Cryptographic verification of document integrity</li>
-        </ul>
+        <h3>2.1 Vision</h3>
         <p>
-          IPGT is built on the Internet Computer, a blockchain that offers web-speed smart contracts, on-chain storage, and the ability to serve web content directly — making it uniquely suited for a production-grade IP registry.
+          Our vision is a world where creators, inventors, and innovators can instantly establish and
+          prove ownership of their intellectual property without relying on slow, expensive, or
+          geographically limited registration authorities.
+        </p>
+        <h3>2.2 Mission</h3>
+        <p>
+          To build the world's most trusted, accessible, and technologically advanced intellectual
+          property registry — one that empowers individuals and organizations to protect their innovations
+          on a global scale.
         </p>
       </div>
     ),
@@ -50,21 +66,34 @@ const sections: Section[] = [
     title: '3. Problem Statement',
     content: (
       <div className="prose-content">
-        <h3>3.1 Centralisation Risk</h3>
+        <p>The current global IP landscape suffers from several critical deficiencies:</p>
+        <h3>3.1 Fragmentation</h3>
         <p>
-          Traditional IP registries are centralised databases controlled by governments and intergovernmental organisations. This creates risks of censorship, data loss, political interference, and unequal access for creators in developing nations.
+          IP rights are registered and enforced on a jurisdiction-by-jurisdiction basis. A patent granted
+          in one country provides no automatic protection in another. This fragmentation creates enormous
+          complexity and cost for innovators seeking global protection.
         </p>
-        <h3>3.2 Cost Barriers</h3>
+        <h3>3.2 Opacity</h3>
         <p>
-          Filing a patent through WIPO's PCT system can cost tens of thousands of dollars when attorney fees, filing fees, and translation costs are included. This effectively excludes independent inventors and small businesses from meaningful IP protection.
+          Existing registries are often difficult to search, poorly indexed, and not interoperable.
+          Determining whether a particular IP right exists, who owns it, and what its current status is
+          can require significant legal expertise and expense.
         </p>
-        <h3>3.3 Lack of Transparency</h3>
+        <h3>3.3 Vulnerability to Fraud</h3>
         <p>
-          Existing IP databases are often fragmented, difficult to search, and not publicly accessible in machine-readable formats. This makes it hard to verify ownership, detect infringement, or build on existing knowledge.
+          Centralized databases are vulnerable to tampering, data loss, and administrative error.
+          The integrity of IP records depends entirely on the trustworthiness of the administering
+          authority.
         </p>
-        <h3>3.4 No Cryptographic Proof</h3>
+        <h3>3.4 Slow Registration Processes</h3>
         <p>
-          Traditional registration provides a paper trail but no cryptographic proof. There is no way to verify that a document submitted to a registry has not been altered after the fact.
+          Traditional IP registration can take months or years. During this period, innovators lack
+          formal protection and may be unable to enforce their rights or attract investment.
+        </p>
+        <h3>3.5 High Costs</h3>
+        <p>
+          Filing fees, attorney costs, and maintenance fees make comprehensive IP protection prohibitively
+          expensive for individual inventors and small enterprises, particularly in developing economies.
         </p>
       </div>
     ),
@@ -74,231 +103,301 @@ const sections: Section[] = [
     title: '4. Solution Architecture',
     content: (
       <div className="prose-content">
-        <h3>4.1 Internet Computer as Foundation</h3>
         <p>
-          IPGT is deployed as a canister smart contract on the Internet Computer Protocol. The ICP provides:
+          IPGT addresses these challenges through a multi-layered technical architecture built on the
+          Internet Computer Protocol.
         </p>
-        <ul>
-          <li><strong>On-chain storage:</strong> IP records are stored directly in canister memory, not on external databases</li>
-          <li><strong>Web-speed queries:</strong> Query calls return in milliseconds, enabling a responsive user experience</li>
-          <li><strong>Tamper-proof state:</strong> All state changes are finalized through consensus and cannot be altered</li>
-          <li><strong>Reverse gas model:</strong> Users do not need ICP tokens to interact with the platform</li>
-        </ul>
-        <h3>4.2 SHA-256 Document Hashing</h3>
+        <h3>4.1 Blockchain Foundation</h3>
         <p>
-          Before registration, documents are hashed client-side using SHA-256. The hash — not the document itself — is stored on-chain. This provides:
+          The Internet Computer Protocol provides a decentralized compute platform with unique properties
+          ideally suited for IP registry applications: web-speed transaction finality, on-chain storage
+          of arbitrary data, and native support for complex smart contract logic via Motoko canisters.
         </p>
-        <ul>
-          <li>Proof that a specific document existed at registration time</li>
-          <li>Privacy: the document content is never exposed</li>
-          <li>Efficiency: only 32 bytes stored per document reference</li>
-        </ul>
-        <h3>4.3 Data Model</h3>
+        <h3>4.2 Cryptographic Hashing</h3>
         <p>
-          Each IP record contains: title, description, category (patent/trademark/copyright), owner principal, registration timestamp, document hash, jurisdiction, and a SHA-256 hex string for human-readable verification.
+          Every IP document submitted to the IPGT registry is processed through a SHA-256 cryptographic
+          hash function. This hash serves as a unique digital fingerprint of the document, enabling
+          verification of document integrity without requiring storage of the full document on-chain.
         </p>
-      </div>
-    ),
-  },
-  {
-    id: 'registration',
-    title: '5. Registration Process',
-    content: (
-      <div className="prose-content">
-        <h3>5.1 Submission Flow</h3>
-        <p>The registration process is designed to be simple and accessible:</p>
-        <ol>
-          <li>The user provides a title, description, category, and jurisdiction</li>
-          <li>Optionally, the user uploads a document which is hashed client-side</li>
-          <li>The registration is submitted as an update call to the ICP canister</li>
-          <li>The canister assigns a unique ID and stores the record immutably</li>
-          <li>The user receives a confirmation with the on-chain record ID</li>
-        </ol>
-        <h3>5.2 Anonymous Registration</h3>
+        <h3>4.3 Immutable Record Storage</h3>
         <p>
-          IPGT supports anonymous registration — no account creation or KYC is required. The owner field records the caller's principal, which for anonymous users is the anonymous principal. This enables maximum accessibility while preserving the on-chain record.
+          IP records are stored in canister smart contracts on the Internet Computer. Once written,
+          these records cannot be altered or deleted, providing a permanent, tamper-proof history of
+          IP registrations.
         </p>
-        <h3>5.3 Immutability Guarantee</h3>
+        <h3>4.4 Decentralized Identity</h3>
         <p>
-          Once registered, an IP record cannot be modified or deleted. The Internet Computer's consensus mechanism ensures that all registered records are permanent and tamper-proof.
+          IPGT integrates with Internet Identity, the ICP's native authentication system, to provide
+          secure, privacy-preserving identity verification for IP registrants without relying on
+          centralized identity providers.
         </p>
       </div>
     ),
   },
   {
-    id: 'verification',
-    title: '6. Verification & Search',
-    content: (
-      <div className="prose-content">
-        <h3>6.1 Public Query Interface</h3>
-        <p>
-          All IP records are publicly queryable without authentication. The platform provides:
-        </p>
-        <ul>
-          <li>Full-text search by title</li>
-          <li>Hash-based lookup for document verification</li>
-          <li>Category and jurisdiction filtering</li>
-          <li>Paginated browsing of all records</li>
-        </ul>
-        <h3>6.2 Document Verification</h3>
-        <p>
-          To verify that a document matches a registered hash, a user can:
-        </p>
-        <ol>
-          <li>Locate the IP record by title or ID</li>
-          <li>Hash their copy of the document using SHA-256</li>
-          <li>Compare the resulting hash with the stored SHA-256 field</li>
-        </ol>
-        <p>
-          A match provides cryptographic proof that the document is identical to the one registered at the recorded timestamp.
-        </p>
-        <h3>6.3 Timestamp Proof</h3>
-        <p>
-          The <code>registrationDate</code> field stores the ICP system time in nanoseconds at the moment of registration. This provides a blockchain-anchored timestamp that can be used as evidence of prior art.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: 'interoperability',
-    title: '7. Global IP Ecosystem Interoperability',
-    content: (
-      <div className="prose-content">
-        <h3>7.1 Blockchain as Infrastructure</h3>
-        <p>
-          IPGT treats blockchain as neutral infrastructure for IP registration — analogous to how the internet provides neutral infrastructure for communication. The platform is designed to interoperate with existing legal frameworks without depending on any single jurisdiction or governing body.
-        </p>
-        <h3>7.2 Cross-Chain Anchoring (Roadmap)</h3>
-        <p>
-          Future versions of IPGT will support cross-chain anchoring, allowing IP registrations to be mirrored on Ethereum and Solana. This provides additional redundancy and enables IP holders to leverage the liquidity and tooling of multiple blockchain ecosystems.
-        </p>
-        <h3>7.3 Legal Recognition</h3>
-        <p>
-          While blockchain registration does not automatically confer legal rights in all jurisdictions, it provides strong evidence of prior art and creation date. Several jurisdictions are beginning to recognise blockchain timestamps as legally admissible evidence.
-        </p>
-        <h3>7.4 Open Standards</h3>
-        <p>
-          IPGT's data model is designed to be compatible with emerging open standards for digital IP registration, including W3C Verifiable Credentials and the emerging ISO/TC 307 blockchain standards for IP management.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: 'governance',
-    title: '8. Governance',
+    id: 'registry',
+    title: '5. IP Registry System',
     content: (
       <div className="prose-content">
         <p>
-          IPGT is governed by its canister smart contract code, which is publicly auditable on the Internet Computer. The platform operates without a central authority — registrations are processed automatically by the canister logic.
+          The IPGT registry supports three primary categories of intellectual property, each with
+          tailored registration workflows and metadata schemas.
         </p>
+        <h3>5.1 Patents</h3>
         <p>
-          Future governance improvements may include:
+          Patent registrations capture invention disclosures, claims, and technical specifications.
+          The registry records the filing date, inventor identity, and document hash, establishing
+          a clear priority date for the invention.
         </p>
-        <ul>
-          <li>On-chain voting for protocol upgrades</li>
-          <li>Community-driven dispute resolution mechanisms</li>
-          <li>Decentralised autonomous organisation (DAO) structure for platform governance</li>
-        </ul>
-      </div>
-    ),
-  },
-  {
-    id: 'security',
-    title: '9. Security Model',
-    content: (
-      <div className="prose-content">
-        <h3>9.1 Canister Security</h3>
+        <h3>5.2 Trademarks</h3>
         <p>
-          The IPGT canister is deployed on the Internet Computer, which provides Byzantine fault-tolerant consensus. The canister code is immutable once deployed (unless upgraded by the controller), and all state transitions are publicly verifiable.
+          Trademark registrations record brand identifiers including word marks, logos, and trade dress.
+          The registry captures the goods and services associated with the mark and the jurisdiction
+          of use.
         </p>
-        <h3>9.2 Client-Side Hashing</h3>
+        <h3>5.3 Copyrights</h3>
         <p>
-          Document hashing is performed client-side using the Web Crypto API's SHA-256 implementation. This ensures that document contents never leave the user's browser, providing strong privacy guarantees.
+          Copyright registrations establish authorship and creation date for literary, artistic, musical,
+          and software works. The cryptographic hash of the work provides irrefutable proof of the
+          work's content at the time of registration.
         </p>
-        <h3>9.3 Principal-Based Ownership</h3>
+        <h3>5.4 Jurisdiction Support</h3>
         <p>
-          Each IP record is associated with the caller's ICP principal at registration time. While the platform supports anonymous registration, users who authenticate with Internet Identity receive a stable, cryptographically-secured principal that provides stronger ownership proof.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: 'roadmap',
-    title: '10. Roadmap',
-    content: (
-      <div className="prose-content">
-        <h3>Phase 1 — Foundation (Current)</h3>
-        <ul>
-          <li>Core IP registration and query functionality</li>
-          <li>SHA-256 document hashing</li>
-          <li>Public IP database with search and filtering</li>
-          <li>Anonymous and authenticated registration</li>
-        </ul>
-        <h3>Phase 2 — Enhanced Verification</h3>
-        <ul>
-          <li>Internet Identity integration for persistent ownership</li>
-          <li>Document upload and storage via ICP blob storage</li>
-          <li>Enhanced search with full-text indexing</li>
-          <li>API access for third-party integrations</li>
-        </ul>
-        <h3>Phase 3 — Cross-Chain & Legal</h3>
-        <ul>
-          <li>Cross-chain anchoring to Ethereum and Solana</li>
-          <li>Legal jurisdiction mapping and compliance tools</li>
-          <li>Verifiable Credential export for legal proceedings</li>
-          <li>DAO governance implementation</li>
-        </ul>
-      </div>
-    ),
-  },
-  {
-    id: 'conclusion',
-    title: '11. Conclusion',
-    content: (
-      <div className="prose-content">
-        <p>
-          IP Global Terminal represents a fundamental shift in how intellectual property is registered and verified. By building on the Internet Computer Protocol, IPGT delivers a platform that is sovereign, censorship-resistant, and accessible to creators worldwide — without the cost and complexity of traditional IP systems.
-        </p>
-        <p>
-          The combination of blockchain immutability, cryptographic document hashing, and open public access creates a new standard for IP registration that is more transparent, more equitable, and more resilient than any centralised alternative.
-        </p>
-        <p>
-          We invite developers, creators, and legal professionals to engage with the platform, contribute to its development, and help shape the future of decentralised intellectual property.
+          The registry supports multi-jurisdiction filings, allowing registrants to specify the
+          geographic scope of their IP protection. This enables a single registration to establish
+          priority across multiple jurisdictions simultaneously.
         </p>
       </div>
     ),
   },
   {
     id: 'technical',
-    title: '12. Technical Appendix',
+    title: '6. Technical Implementation',
     content: (
       <div className="prose-content">
-        <h3>Smart Contract Interface</h3>
-        <p>The IPGT canister exposes the following public methods:</p>
-        <table>
-          <thead>
-            <tr>
-              <th>Method</th>
-              <th>Type</th>
-              <th>Description</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr><td><code>registerIP</code></td><td>Update</td><td>Register a new IP record</td></tr>
-            <tr><td><code>getIP</code></td><td>Query</td><td>Retrieve a record by ID</td></tr>
-            <tr><td><code>getAllIPs</code></td><td>Query</td><td>Paginated list of all records</td></tr>
-            <tr><td><code>searchByTitle</code></td><td>Query</td><td>Search by title keyword</td></tr>
-            <tr><td><code>searchByTitleOrHash</code></td><td>Query</td><td>Search by title or SHA-256 hash</td></tr>
-            <tr><td><code>filterByCategory</code></td><td>Query</td><td>Filter by IP category</td></tr>
-            <tr><td><code>filterByJurisdiction</code></td><td>Query</td><td>Filter by jurisdiction</td></tr>
-          </tbody>
-        </table>
-        <h3>Data Types</h3>
         <p>
-          <strong>IPCategory:</strong> <code>#patent | #trademark | #copyright</code>
+          The IPGT platform is implemented as a set of Motoko canister smart contracts deployed on
+          the Internet Computer Protocol mainnet.
+        </p>
+        <h3>6.1 Data Model</h3>
+        <p>
+          Each IP record contains: a unique identifier, title, description, category, owner principal,
+          registration timestamp, document hash (SHA-256), optional file blob reference, jurisdiction,
+          and a human-readable hash string for verification purposes.
+        </p>
+        <h3>6.2 Query Interface</h3>
+        <p>
+          The registry exposes a comprehensive query interface supporting: retrieval by ID, full-text
+          search by title, search by document hash, filtering by category, filtering by jurisdiction,
+          and filtering by owner principal. All queries are served as ICP query calls for maximum
+          performance.
+        </p>
+        <h3>6.3 Update Interface</h3>
+        <p>
+          IP registration is performed via ICP update calls, ensuring that new records are finalized
+          on the blockchain with full consensus. The registration function returns the unique IP ID
+          assigned to the new record.
+        </p>
+        <h3>6.4 Storage Architecture</h3>
+        <p>
+          IP records are stored in a stable Map data structure within the canister, ensuring persistence
+          across canister upgrades. Large file blobs are stored via the integrated blob storage system,
+          with references maintained in the IP record.
+        </p>
+        <h3>6.5 Security Model</h3>
+        <p>
+          The canister implements role-based access control with three roles: admin, user, and guest.
+          IP registration is open to all authenticated users. Administrative functions are restricted
+          to designated admin principals.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 'governance',
+    title: '7. Governance',
+    content: (
+      <div className="prose-content">
+        <p>
+          The IPGT platform is governed by a decentralized model that ensures the registry remains
+          neutral, accessible, and resistant to capture by any single entity.
+        </p>
+        <h3>7.1 Protocol Governance</h3>
+        <p>
+          Protocol upgrades and parameter changes are subject to community governance processes.
+          Major changes require broad consensus among stakeholders before implementation.
+        </p>
+        <h3>7.2 Registry Integrity</h3>
+        <p>
+          The immutability of the blockchain ensures that no single party — including the platform
+          developers — can alter or delete existing IP records. This provides strong guarantees of
+          registry integrity to all participants.
+        </p>
+        <h3>7.3 Dispute Resolution</h3>
+        <p>
+          While the registry itself is immutable, the platform provides mechanisms for flagging
+          disputed records and recording the outcomes of legal proceedings. This allows the registry
+          to reflect the current legal status of IP rights without compromising historical integrity.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 'legal',
+    title: '8. Legal Framework',
+    content: (
+      <div className="prose-content">
+        <p>
+          IPGT operates within the existing international IP legal framework while providing
+          technological enhancements that complement traditional registration systems.
+        </p>
+        <h3>8.1 Complementary Registration</h3>
+        <p>
+          IPGT registration provides cryptographic proof of creation date and ownership that can
+          supplement traditional IP filings. The blockchain timestamp establishes a clear priority
+          date that can be referenced in legal proceedings.
+        </p>
+        <h3>8.2 International Frameworks</h3>
+        <p>
+          The platform is designed to be compatible with major international IP frameworks and
+          conventions. Registrants are encouraged to pursue formal registration through appropriate
+          national and international authorities in addition to their IPGT registration.
+        </p>
+        <h3>8.3 Evidence of Ownership</h3>
+        <p>
+          The cryptographic proof provided by IPGT registration — including the SHA-256 document hash,
+          blockchain timestamp, and owner principal — constitutes strong evidence of IP ownership
+          and creation date that can be presented in legal and commercial contexts.
+        </p>
+        <h3>8.4 Disclaimer</h3>
+        <p>
+          IPGT registration does not constitute legal IP protection in any jurisdiction. Users are
+          advised to consult qualified IP attorneys regarding the legal status of their intellectual
+          property rights.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 'roadmap',
+    title: '9. Roadmap',
+    content: (
+      <div className="prose-content">
+        <h3>Phase 1 — Foundation (Current)</h3>
+        <ul>
+          <li>Core IP registry canister deployment on ICP mainnet</li>
+          <li>Patent, trademark, and copyright registration</li>
+          <li>SHA-256 document hashing and verification</li>
+          <li>Global search and filter capabilities</li>
+          <li>Internet Identity authentication integration</li>
+        </ul>
+        <h3>Phase 2 — Enhancement</h3>
+        <ul>
+          <li>Multi-signature ownership support</li>
+          <li>IP licensing and transfer mechanisms</li>
+          <li>Enhanced search with semantic capabilities</li>
+          <li>API access for third-party integrations</li>
+          <li>Mobile application development</li>
+        </ul>
+        <h3>Phase 3 — Ecosystem</h3>
+        <ul>
+          <li>Cross-chain IP verification bridges</li>
+          <li>Integration with legal document management systems</li>
+          <li>Automated conflict detection and notification</li>
+          <li>IP marketplace and licensing platform</li>
+          <li>Institutional partnership program</li>
+        </ul>
+      </div>
+    ),
+  },
+  {
+    id: 'tokenomics',
+    title: '10. Economic Model',
+    content: (
+      <div className="prose-content">
+        <p>
+          The IPGT platform is designed with a sustainable economic model that aligns incentives
+          across all participants in the ecosystem.
+        </p>
+        <h3>10.1 Registration Fees</h3>
+        <p>
+          IP registration fees are structured to be accessible to individual inventors while
+          providing sustainable revenue for platform maintenance and development. Fee structures
+          vary by IP category and jurisdiction scope.
+        </p>
+        <h3>10.2 Platform Sustainability</h3>
+        <p>
+          Platform operations are funded through registration fees and institutional partnership
+          agreements. A portion of fees is allocated to a development fund for ongoing platform
+          improvements and security audits.
+        </p>
+        <h3>10.3 Incentive Alignment</h3>
+        <p>
+          The economic model is designed to incentivize high-quality registrations, accurate
+          metadata, and active participation in the governance process. Participants who contribute
+          to the health of the registry are rewarded accordingly.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 'security',
+    title: '11. Security Considerations',
+    content: (
+      <div className="prose-content">
+        <p>
+          Security is a foundational concern for any IP registry. IPGT employs multiple layers of
+          security to protect the integrity of the registry and the privacy of registrants.
+        </p>
+        <h3>11.1 Cryptographic Security</h3>
+        <p>
+          All IP records are secured by the cryptographic guarantees of the Internet Computer Protocol.
+          The SHA-256 hashing of documents provides tamper-evident proof of document content.
+          Private keys are managed by Internet Identity, which uses hardware security modules for
+          key storage.
+        </p>
+        <h3>11.2 Smart Contract Auditing</h3>
+        <p>
+          The IPGT canister smart contracts undergo regular security audits by independent third-party
+          security researchers. Audit reports are published publicly to maintain transparency.
+        </p>
+        <h3>11.3 Access Control</h3>
+        <p>
+          Role-based access control ensures that only authorized principals can perform administrative
+          functions. All access control decisions are enforced at the canister level and cannot be
+          bypassed by frontend modifications.
+        </p>
+        <h3>11.4 Data Privacy</h3>
+        <p>
+          While IP records are publicly accessible by design, the platform provides options for
+          registrants to control the visibility of sensitive metadata. Document content is never
+          stored on-chain — only the cryptographic hash is recorded.
+        </p>
+      </div>
+    ),
+  },
+  {
+    id: 'conclusion',
+    title: '12. Conclusion',
+    content: (
+      <div className="prose-content">
+        <p>
+          The IPGT platform represents a significant advancement in the global management of
+          intellectual property rights. By combining the immutability and transparency of blockchain
+          technology with the performance and scalability of the Internet Computer Protocol, IPGT
+          delivers a registry that is more secure, more accessible, and more trustworthy than any
+          existing alternative.
         </p>
         <p>
-          <strong>IPRecord:</strong> id (Nat), title (Text), description (Text), category (IPCategory), owner (Principal), registrationDate (Int), documentHash (Blob), jurisdiction (Text), hash (Text)
+          The fragmentation, opacity, and vulnerability of traditional IP systems impose enormous
+          costs on innovators worldwide. IPGT offers a path to a more efficient, equitable, and
+          effective global IP ecosystem — one where creators can protect their innovations instantly,
+          affordably, and with cryptographic certainty.
+        </p>
+        <p>
+          We invite inventors, creators, legal professionals, and institutions to join us in building
+          this new foundation for global intellectual property protection. The future of innovation
+          deserves infrastructure worthy of it.
         </p>
       </div>
     ),
@@ -306,7 +405,7 @@ const sections: Section[] = [
 ];
 
 export default function Whitepaper() {
-  const [activeSection, setActiveSection] = useState(sections[0].id);
+  const [activeSection, setActiveSection] = useState('abstract');
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
 
   useEffect(() => {
@@ -328,114 +427,82 @@ export default function Whitepaper() {
     return () => observer.disconnect();
   }, []);
 
-  const scrollToSection = (id: string) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  const handlePrint = () => window.print();
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: 'oklch(0.08 0 0)' }}>
-      {/* Page header */}
-      <div
-        className="border-b py-10 px-4 sm:px-6 lg:px-8"
-        style={{
-          backgroundColor: 'oklch(0.10 0 0)',
-          borderColor: 'oklch(0.78 0.15 85 / 0.2)',
-        }}
-      >
-        <div className="max-w-7xl mx-auto flex items-start justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <BookOpen className="w-5 h-5" style={{ color: 'oklch(0.78 0.15 85)' }} />
-              <span className="text-xs font-semibold tracking-widest uppercase" style={{ color: 'oklch(0.78 0.15 85)' }}>
-                Whitepaper
-              </span>
-            </div>
-            <h1
-              className="text-3xl sm:text-4xl font-bold mb-2"
-              style={{ color: 'oklch(0.97 0 0)', fontFamily: 'Playfair Display, serif' }}
+    <div className="min-h-screen bg-black text-white">
+      {/* Header */}
+      <div className="border-b border-gold-900/30 py-12 px-4 text-center">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-gold-500 text-sm font-medium uppercase tracking-widest mb-3">Technical Whitepaper</div>
+          <h1 className="font-serif text-4xl sm:text-5xl font-bold text-white mb-4">
+            IPGT Platform
+          </h1>
+          <p className="text-white/60 text-lg mb-6">
+            Decentralized Intellectual Property Registry on the Internet Computer Protocol
+          </p>
+          <div className="flex items-center justify-center gap-6 text-sm text-white/40">
+            <span>Version 1.0</span>
+            <span>•</span>
+            <span>March 2026</span>
+            <span>•</span>
+            <button
+              onClick={handlePrint}
+              className="flex items-center gap-1.5 text-gold-500 hover:text-gold-400 transition-colors"
             >
-              IP Global Terminal
-            </h1>
-            <p className="text-sm" style={{ color: 'oklch(0.55 0 0)' }}>
-              Decentralised Intellectual Property Registration on the Internet Computer Protocol
-            </p>
+              <Printer className="w-4 h-4" />
+              Print / PDF
+            </button>
           </div>
-          <button
-            onClick={() => window.print()}
-            className="no-print flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors shrink-0"
-            style={{
-              backgroundColor: 'oklch(0.78 0.15 85 / 0.12)',
-              border: '1px solid oklch(0.78 0.15 85 / 0.35)',
-              color: 'oklch(0.78 0.15 85)',
-            }}
-          >
-            <Printer className="w-4 h-4" />
-            Print PDF
-          </button>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex gap-10">
-          {/* Sticky sidebar TOC */}
-          <aside className="no-print hidden lg:block w-64 shrink-0">
-            <div
-              className="sticky top-24 rounded-xl p-4"
-              style={{
-                backgroundColor: 'oklch(0.11 0 0)',
-                border: '1px solid oklch(0.22 0.02 85 / 0.4)',
-              }}
-            >
-              <p className="text-xs font-semibold tracking-widest uppercase mb-4" style={{ color: 'oklch(0.78 0.15 85)' }}>
-                Contents
-              </p>
-              <nav className="space-y-1">
-                {sections.map((section) => (
-                  <button
-                    key={section.id}
-                    onClick={() => scrollToSection(section.id)}
-                    className="w-full text-left px-3 py-2 rounded-lg text-xs transition-all duration-150 flex items-center gap-2"
-                    style={{
-                      backgroundColor: activeSection === section.id ? 'oklch(0.78 0.15 85 / 0.12)' : 'transparent',
-                      color: activeSection === section.id ? 'oklch(0.78 0.15 85)' : 'oklch(0.55 0 0)',
-                      borderLeft: activeSection === section.id ? '2px solid oklch(0.78 0.15 85)' : '2px solid transparent',
-                    }}
-                  >
-                    {activeSection === section.id && <ChevronRight className="w-3 h-3 shrink-0" />}
-                    <span className={activeSection === section.id ? 'font-medium' : ''}>{section.title}</span>
-                  </button>
-                ))}
-              </nav>
-            </div>
-          </aside>
-
-          {/* Main content */}
-          <main className="flex-1 min-w-0">
-            <div className="space-y-14">
+      <div className="max-w-7xl mx-auto px-4 py-12 flex gap-8">
+        {/* Sidebar TOC */}
+        <aside className="hidden lg:block w-64 flex-shrink-0">
+          <div className="sticky top-24">
+            <h2 className="text-xs font-semibold uppercase tracking-widest text-white/40 mb-4">
+              Table of Contents
+            </h2>
+            <nav className="space-y-1">
               {sections.map((section) => (
-                <article
+                <a
                   key={section.id}
-                  id={section.id}
-                  ref={(el) => { sectionRefs.current[section.id] = el; }}
-                  className="scroll-mt-24"
+                  href={`#${section.id}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    sectionRefs.current[section.id]?.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-sm text-sm transition-colors ${
+                    activeSection === section.id
+                      ? 'text-gold-400 bg-gold-900/20 border-l-2 border-gold-500'
+                      : 'text-white/50 hover:text-white/80 hover:bg-white/5'
+                  }`}
                 >
-                  <h2
-                    className="text-2xl font-bold mb-6 pb-3 border-b"
-                    style={{
-                      color: 'oklch(0.97 0 0)',
-                      fontFamily: 'Playfair Display, serif',
-                      borderColor: 'oklch(0.78 0.15 85 / 0.2)',
-                    }}
-                  >
-                    {section.title}
-                  </h2>
-                  {section.content}
-                </article>
+                  {activeSection === section.id && <ChevronRight className="w-3 h-3 flex-shrink-0" />}
+                  <span>{section.title}</span>
+                </a>
               ))}
-            </div>
-          </main>
-        </div>
+            </nav>
+          </div>
+        </aside>
+
+        {/* Content */}
+        <main className="flex-1 max-w-3xl">
+          {sections.map((section) => (
+            <section
+              key={section.id}
+              id={section.id}
+              ref={(el) => { sectionRefs.current[section.id] = el; }}
+              className="mb-16 scroll-mt-24"
+            >
+              <h2 className="font-serif text-2xl sm:text-3xl font-bold text-white mb-6 pb-3 border-b border-gold-900/30">
+                {section.title}
+              </h2>
+              <div className="text-white/70 leading-relaxed">{section.content}</div>
+            </section>
+          ))}
+        </main>
       </div>
     </div>
   );

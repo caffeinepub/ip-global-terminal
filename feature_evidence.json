@@ -2,31 +2,12 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-in-animatedworldmap-tsx-change-the-continent-fill-outline-color-from-blue-to-near-black-e-g-0a0a0a-or-111111-so-continents-match-the-black-gold-white-theme-instead-of-appearing-blue",
-      "featureTitle": "In AnimatedWorldMap.tsx, change the continent fill/outline color from blue to near-black (e.g., #0a0a0a or #111111) so continents match the Black, Gold & White theme instead of appearing blue.",
+      "featureId": "feature-require-internet-identity-authentication-before-a-user-can-submit-a-new-ip-registration-on-the-register-ip-page-if-the-user-is-not-authenticated-show-a-prompt-button-to-sign-in-via-internet-identity-the-registration-form-and-submission-action-must-be-blocked-until-the-user-is-logged-in",
+      "featureTitle": "Require Internet Identity authentication before a user can submit a new IP registration. On the Register IP page, if the user is not authenticated, show a prompt/button to sign in via Internet Identity. The registration form and submission action must be blocked until the user is logged in.",
       "files": [
-        "frontend/src/components/AnimatedWorldMap.tsx"
-      ],
-      "components": [
-        "authorization@4.0.0",
-        "blob-storage@4.0.0",
-        "core-infrastructure@1.0.2",
-        "shadcn-ui@1.0.0",
-        "build-template-react@1.0.0",
-        "initial-app@1.0.0",
-        "github-export-icp-cli@1.0.0"
-      ],
-      "testIds": [
-        "REQ-1"
-      ],
-      "confidence": "high"
-    },
-    {
-      "featureId": "feature-reduce-pixelation-and-blurriness-on-the-hero-background-in-home-tsx-and-any-related-background-image-or-canvas-rendering-ensure-the-background-appears-sharp-and-crisp-use-higher-resolution-rendering-avoid-css-scaling-artifacts-and-set-image-rendering-to-crisp-or-pixelated-where-appropriate",
-      "featureTitle": "Reduce pixelation and blurriness on the hero background in Home.tsx and any related background image or canvas rendering. Ensure the background appears sharp and crisp — use higher-resolution rendering, avoid CSS scaling artifacts, and set image-rendering to crisp or pixelated where appropriate.",
-      "files": [
-        "frontend/src/components/AnimatedWorldMap.tsx",
-        "frontend/src/pages/Home.tsx"
+        "frontend/src/components/Layout.tsx",
+        "frontend/src/components/ProfileSetupModal.tsx",
+        "frontend/src/pages/RegisterIP.tsx"
       ],
       "components": [
         "authorization@4.0.0",

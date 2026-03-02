@@ -1,52 +1,101 @@
 {
   "kind": "build_request",
-  "title": "Darken continents to near-black and sharpen background",
-  "priority": "normal",
+  "title": "Persistent IP Registry with Auth-Gated Submission and Public Search",
+  "projectName": "IPGT Platform",
+  "priority": "high",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "In AnimatedWorldMap.tsx, change the continent fill/outline color from blue to near-black (e.g., #0a0a0a or #111111) so continents match the Black, Gold & White theme instead of appearing blue.",
-      "target": "frontend",
+      "text": "Persist all IP registration form fields to on-chain stable storage in the backend. The backend actor must store submitted IP records in a stable data structure (e.g., stable var array or HashMap) so that records survive canister upgrades and accumulate over time as a growing database.",
+      "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-1",
+          "msg-2"
         ],
         "quotes": [
-          "The contintents are blue make them darker and black"
+          "all fields should be saved from a registered IP into our database. This should be committed to memory and searchable.",
+          "every submission is committed to memory and searchable by everyone"
         ]
       },
       "acceptanceCriteria": [
-        "Continents on the animated world map render in a near-black color, not blue",
-        "Continent color is visually consistent with the Black, Gold & White theme"
+        "All fields from the Register IP form are saved when a user submits a registration.",
+        "Saved records persist across canister upgrades (stable storage).",
+        "Records submitted by different users all appear in the database.",
+        "The number of stored records grows with each new submission."
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Reduce pixelation and blurriness on the hero background in Home.tsx and any related background image or canvas rendering. Ensure the background appears sharp and crisp — use higher-resolution rendering, avoid CSS scaling artifacts, and set image-rendering to crisp or pixelated where appropriate.",
-      "target": "frontend",
+      "text": "Require Internet Identity authentication before a user can submit a new IP registration. On the Register IP page, if the user is not authenticated, show a prompt/button to sign in via Internet Identity. The registration form and submission action must be blocked until the user is logged in.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-3",
+          "msg-4"
+        ],
+        "quotes": [
+          "for people I share the link with they should still need to sign in or create an account like before to create an IP",
+          "users must sign in or create an account via Internet Identity before registering a new IP"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Unauthenticated users visiting the Register IP page see a sign-in prompt instead of the registration form.",
+        "After signing in via Internet Identity, the registration form becomes accessible.",
+        "Submitting an IP record without an active Internet Identity session is rejected."
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "text": "Allow anyone with the link to browse and search all submitted IP records on the IP Database page without requiring login. The backend must expose a public query endpoint for listing and searching all records, and the frontend must not gate the IP Database page behind authentication.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-1",
+          "msg-3"
+        ],
+        "quotes": [
+          "they should be viewable by everyone",
+          "Viewing records: Everyone can see and search the IP database (no login needed)"
+        ]
+      },
+      "acceptanceCriteria": [
+        "The IP Database page loads and displays all submitted records for unauthenticated visitors.",
+        "Search and filter functionality works without login.",
+        "Records submitted by any user are visible to all visitors.",
+        "No authentication prompt is shown on the IP Database page."
+      ]
+    },
+    {
+      "id": "REQ-4",
+      "text": "Expose backend query functions to support full-text or field-based search across all persisted IP records (by title, category, jurisdiction, description, etc.) so the existing search and filter UI on the IP Database page operates against real on-chain data.",
+      "target": "backend",
       "source": {
         "messageIds": [
           "msg-1"
         ],
         "quotes": [
-          "its still blurry please clear up the background so its let pixelated"
+          "This should be committed to memory and searchable."
         ]
       },
       "acceptanceCriteria": [
-        "The hero section background is visually sharp with no noticeable pixelation or blur",
-        "Background does not appear stretched or scaled in a lossy way",
-        "Sharpness is consistent across common viewport sizes"
+        "A public query function returns all IP records matching a search term or filter criteria.",
+        "The IP Database frontend search and filter controls return live results from the backend.",
+        "Searching by title, category, and jurisdiction returns the correct matching records."
       ]
     }
   ],
   "constraints": [
-    "Do not alter the Black, Gold & White color palette or overall theme",
-    "Do not modify files listed in frontend.immutablePaths"
+    "All data must be stored on-chain in the Internet Computer canister using Motoko stable storage — no external databases.",
+    "Authentication must use Internet Identity only.",
+    "Public browsing and search must not require any login.",
+    "Do not edit any files listed in frontend.immutablePaths."
   ],
   "nonGoals": [
-    "Adding new features or sections to the home page",
-    "Changes to backend logic",
-    "Modifying the gold pulsing dots or arc animations"
+    "Admin moderation or record deletion is not in scope.",
+    "Email notifications or off-chain data storage are not in scope.",
+    "Paid submission or token-gating is not in scope.",
+    "Editing or updating previously submitted IP records is not in scope."
   ],
   "imageRequirements": {
     "required": [],

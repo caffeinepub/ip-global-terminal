@@ -1,46 +1,53 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Darken continents to near-black and sharpen background",
+  "title": "Frontend Auth-Gated IP Registration with Public Search",
   "requirements": [
     {
-      "id": "REQ-1",
-      "summary": "Change continent fill/outline color from blue to near-black in AnimatedWorldMap.tsx to match the Black, Gold & White theme",
+      "id": "REQ-2",
+      "summary": "Gate the Register IP page behind Internet Identity authentication while keeping the form and submission logic intact",
       "acceptanceCriteria": [
-        "Continents on the animated world map render in a near-black color, not blue",
-        "Continent color is visually consistent with the Black, Gold & White theme"
+        "Unauthenticated users visiting the Register IP page see a sign-in prompt instead of the registration form.",
+        "After signing in via Internet Identity, the registration form becomes accessible.",
+        "Submitting an IP record without an active Internet Identity session is rejected."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/components/AnimatedWorldMap.tsx",
+          "path": "frontend/src/pages/RegisterIP.tsx",
           "operation": "modify",
-          "description": "Update the continent stroke color from the current blue (#0ea5e9) to near-black (#0a0a0a or #111111). Locate the stroke style assignment for continent paths in the canvas rendering loop and replace the color value with a near-black hex value that matches the app's Black, Gold & White theme."
+          "description": "Add authentication check using useInternetIdentity hook. When the user is not authenticated, render a centered sign-in prompt with a login button instead of the registration form. The prompt should explain that authentication is required to register IP. Only show the existing registration form when identity is present. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/ProfileSetupModal.tsx",
+          "operation": "modify",
+          "description": "Implement the ProfileSetupModal component to prompt first-time users for their name, email (optional), and organisation after Internet Identity login. Use useGetCallerUserProfile hook to check if a profile exists, and useSaveCallerUserProfile mutation to save the profile. Show this modal only when the user is authenticated, profile data has been fetched, and no profile exists yet. Include proper loading states to prevent modal flash. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add useGetCallerUserProfile hook that fetches the current user's profile via actor.getCallerUserProfile(). Return custom state with isLoading that accounts for both actorFetching and query.isLoading, and isFetched that checks both actor availability and query.isFetched. Add useSaveCallerUserProfile mutation hook that calls actor.saveCallerUserProfile(profile) and invalidates the currentUserProfile query key on success. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
+        },
+        {
+          "path": "frontend/src/components/Layout.tsx",
+          "operation": "modify",
+          "description": "Import and render the ProfileSetupModal component within the Layout so it appears on top of all pages when needed. The modal should check authentication state and profile existence to determine visibility. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
         }
       ]
     },
     {
-      "id": "REQ-2",
-      "summary": "Reduce pixelation and blurriness on the hero background to ensure sharp, crisp rendering across viewport sizes",
+      "id": "REQ-3",
+      "summary": "Ensure the IP Database page remains publicly accessible without authentication requirements",
       "acceptanceCriteria": [
-        "The hero section background is visually sharp with no noticeable pixelation or blur",
-        "Background does not appear stretched or scaled in a lossy way",
-        "Sharpness is consistent across common viewport sizes"
+        "The IP Database page loads and displays all submitted records for unauthenticated visitors.",
+        "Search and filter functionality works without login.",
+        "Records submitted by any user are visible to all visitors.",
+        "No authentication prompt is shown on the IP Database page."
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/Home.tsx",
+          "path": "frontend/src/pages/IPDatabase.tsx",
           "operation": "modify",
-          "description": "Improve background image sharpness in the hero section by setting image-rendering CSS property to 'crisp-edges' or 'pixelated', ensuring the background image uses the highest-resolution asset available (frontend/public/assets/generated/world-map-bg-4k.dim_3840x2160.png), and applying object-fit and object-position properties to prevent lossy scaling. Verify that no CSS transform or filter properties introduce blur artifacts."
-        },
-        {
-          "path": "frontend/src/components/AnimatedWorldMap.tsx",
-          "operation": "modify",
-          "description": "Ensure the canvas renders at native resolution without pixelation by setting canvas width/height attributes to match the CSS display size multiplied by devicePixelRatio, then scaling the canvas context accordingly. This prevents the canvas overlay from contributing to perceived blur or pixelation on high-DPI displays."
-        },
-        {
-          "path": "frontend/src/index.css",
-          "operation": "modify",
-          "description": "Add a global CSS rule for image-rendering to prevent browser interpolation on background images. Apply 'image-rendering: crisp-edges' or 'image-rendering: -webkit-optimize-contrast' to relevant selectors to ensure sharp rendering across browsers. Ensure this does not conflict with other image assets that need smooth rendering."
+          "description": "Review the existing IPDatabase page implementation to ensure it does not check for authentication before rendering. The page should call backend query functions (getAllIPs, searchByTitleOrHash, filterByCategory, filterByJurisdiction) using an actor instance that works for both authenticated and anonymous users. Confirm that useActor hook provides an anonymous actor when no identity is present, allowing public queries to succeed. No authentication gates should be added to this page."
         }
       ]
     }
