@@ -10,9 +10,7 @@ import MixinStorage "blob-storage/Mixin";
 import Storage "blob-storage/Storage";
 import AccessControl "authorization/access-control";
 import MixinAuthorization "authorization/MixinAuthorization";
-import Migration "migration";
 
-(with migration = Migration.run)
 actor {
   include MixinStorage();
 
@@ -71,10 +69,20 @@ actor {
     hash : Text;
   };
 
+  public type IPDatabaseRecord = {
+    ipAddress : Text;
+    owner : Text;
+    country : Text;
+    city : Text;
+    registrationDate : Int;
+    status : Text;
+  };
+
   // ── State ─────────────────────────────────────────────────────────────────
 
   let ipRecords = Map.empty<Nat, IPRecord>();
   var nextIpId = 0;
+  let ipDatabase = Map.empty<Text, IPDatabaseRecord>();
 
   // ── IP registration (authentication required) ─────────────────────────────
 
@@ -109,6 +117,84 @@ actor {
     nextIpId += 1;
 
     newIpId;
+  };
+
+  // ── IP Database CRUD endpoints ─────────────────────────────────────────────
+
+  /// Add a new IP database record. Requires user authentication.
+  public shared ({ caller }) func addIPRecord(record : IPDatabaseRecord) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can add records");
+    };
+
+    ipDatabase.add(record.ipAddress, record);
+  };
+
+  /// Update an existing IP database record. Requires user authentication.
+  public shared ({ caller }) func updateIPRecord(ipAddress : Text, updatedRecord : IPDatabaseRecord) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can update records");
+    };
+
+    switch (ipDatabase.get(ipAddress)) {
+      case (null) { Runtime.trap("Record not found") };
+      case (?_) {
+        ipDatabase.add(ipAddress, updatedRecord);
+      };
+    };
+  };
+
+  /// Delete an IP database record. Requires user authentication.
+  public shared ({ caller }) func deleteIPRecord(ipAddress : Text) : async () {
+    if (not (AccessControl.hasPermission(accessControlState, caller, #user))) {
+      Runtime.trap("Unauthorized: Only authenticated users can delete records");
+    };
+
+    switch (ipDatabase.get(ipAddress)) {
+      case (null) { Runtime.trap("Record not found") };
+      case (?_) {
+        ipDatabase.remove(ipAddress);
+      };
+    };
+  };
+
+  /// Query all IP database records. No authentication required.
+  public query func getAllIPRecords() : async [IPDatabaseRecord] {
+    ipDatabase.values().toArray();
+  };
+
+  /// Query a specific IP database record by IP address. No authentication required.
+  public query func getIPRecord(ipAddress : Text) : async ?IPDatabaseRecord {
+    ipDatabase.get(ipAddress);
+  };
+
+  /// Search IP database records by owner/organization (case-insensitive).
+  public query func searchByOwner(owner : Text) : async [IPDatabaseRecord] {
+    let lowerOwner = owner.toLower();
+    ipDatabase.values().toArray().filter(
+      func(record : IPDatabaseRecord) : Bool {
+        record.owner.toLower().contains(#text(lowerOwner));
+      }
+    );
+  };
+
+  /// Search IP database records by country (case-insensitive).
+  public query func searchByCountry(country : Text) : async [IPDatabaseRecord] {
+    let lowerCountry = country.toLower();
+    ipDatabase.values().toArray().filter(
+      func(record : IPDatabaseRecord) : Bool {
+        record.country.toLower().contains(#text(lowerCountry));
+      }
+    );
+  };
+
+  /// Filter IP database records by status (e.g., "active", "inactive").
+  public query func filterByStatus(status : Text) : async [IPDatabaseRecord] {
+    ipDatabase.values().toArray().filter(
+      func(record : IPDatabaseRecord) : Bool {
+        record.status == status;
+      }
+    );
   };
 
   // ── IP query layer (no authentication required) ───────────────────────────

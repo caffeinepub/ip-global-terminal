@@ -1,53 +1,162 @@
 {
   "kind": "implementation_plan",
   "version": "1.0",
-  "title": "Frontend Auth-Gated IP Registration with Public Search",
+  "title": "Add Mock IP Database with Search, Filter, and Frontend-Backend Integration",
   "requirements": [
     {
-      "id": "REQ-2",
-      "summary": "Gate the Register IP page behind Internet Identity authentication while keeping the form and submission logic intact",
+      "id": "REQ-1",
+      "summary": "Add a new IP Database page that pre-loads at least 20 mock IP records on the frontend with fields: IP address, owner/organization, country, city, registration date, and status (active/flagged/blocked). Mock data should be hardcoded in frontend source only.",
       "acceptanceCriteria": [
-        "Unauthenticated users visiting the Register IP page see a sign-in prompt instead of the registration form.",
-        "After signing in via Internet Identity, the registration form becomes accessible.",
-        "Submitting an IP record without an active Internet Identity session is rejected."
+        "At least 20 mock IP records are visible on the IP Database page on first load",
+        "Each record displays: IP address, owner/organization, country, city, registration date, and status badge",
+        "Mock data is defined in frontend source only (no backend calls for initial data)"
       ],
       "file_operations": [
         {
-          "path": "frontend/src/pages/RegisterIP.tsx",
-          "operation": "modify",
-          "description": "Add authentication check using useInternetIdentity hook. When the user is not authenticated, render a centered sign-in prompt with a login button instead of the registration form. The prompt should explain that authentication is required to register IP. Only show the existing registration form when identity is present. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
+          "path": "frontend/src/data/mockIPDatabase.ts",
+          "operation": "create",
+          "description": "Create a new data module that exports an array of at least 20 mock IP database records. Each record should include: IP address (string), owner/organization (string), country (string), city (string), registrationDate (Date or number), and status ('active' | 'flagged' | 'blocked'). Use diverse sample data covering multiple countries and statuses."
         },
         {
-          "path": "frontend/src/components/ProfileSetupModal.tsx",
+          "path": "frontend/src/pages/IPDatabase.tsx",
           "operation": "modify",
-          "description": "Implement the ProfileSetupModal component to prompt first-time users for their name, email (optional), and organisation after Internet Identity login. Use useGetCallerUserProfile hook to check if a profile exists, and useSaveCallerUserProfile mutation to save the profile. Show this modal only when the user is authenticated, profile data has been fetched, and no profile exists yet. Include proper loading states to prevent modal flash. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/hooks/useQueries.ts",
-          "operation": "modify",
-          "description": "Add useGetCallerUserProfile hook that fetches the current user's profile via actor.getCallerUserProfile(). Return custom state with isLoading that accounts for both actorFetching and query.isLoading, and isFetched that checks both actor availability and query.isFetched. Add useSaveCallerUserProfile mutation hook that calls actor.saveCallerUserProfile(profile) and invalidates the currentUserProfile query key on success. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
-        },
-        {
-          "path": "frontend/src/components/Layout.tsx",
-          "operation": "modify",
-          "description": "Import and render the ProfileSetupModal component within the Layout so it appears on top of all pages when needed. The modal should check authentication state and profile existence to determine visibility. Use the authorization component to support this requirement. Verify the component's usage instructions before implementing."
+          "description": "Import the mock IP database records from frontend/src/data/mockIPDatabase.ts. Initialize local state to hold the combined list of mock records and backend-persisted records. On mount, merge the mock data with any backend records fetched via React Query. Render the combined list in a table or card grid, displaying all fields including a status badge styled according to the status value (active/flagged/blocked). Ensure the existing search and filter UI integrates with this combined data set."
         }
       ]
     },
     {
-      "id": "REQ-3",
-      "summary": "Ensure the IP Database page remains publicly accessible without authentication requirements",
+      "id": "REQ-2",
+      "summary": "Implement search functionality on the IP Database page allowing users to search for IP records by IP address, filtering results in real-time or on submit.",
       "acceptanceCriteria": [
-        "The IP Database page loads and displays all submitted records for unauthenticated visitors.",
-        "Search and filter functionality works without login.",
-        "Records submitted by any user are visible to all visitors.",
-        "No authentication prompt is shown on the IP Database page."
+        "A search input is present on the IP Database page",
+        "Typing an IP address or partial IP filters the displayed records",
+        "Search works across both mock frontend data and any backend-persisted entries"
       ],
       "file_operations": [
         {
           "path": "frontend/src/pages/IPDatabase.tsx",
           "operation": "modify",
-          "description": "Review the existing IPDatabase page implementation to ensure it does not check for authentication before rendering. The page should call backend query functions (getAllIPs, searchByTitleOrHash, filterByCategory, filterByJurisdiction) using an actor instance that works for both authenticated and anonymous users. Confirm that useActor hook provides an anonymous actor when no identity is present, allowing public queries to succeed. No authentication gates should be added to this page."
+          "description": "Add a search input field above the IP records list. Implement local state for the search query. Filter the combined (mock + backend) records array in real-time based on whether the IP address field includes the search query (case-insensitive). Update the displayed records to show only matching results. Ensure the search input is clearly labeled (e.g., 'Search by IP Address') and integrates with the existing gold-and-black theme."
+        }
+      ]
+    },
+    {
+      "id": "REQ-3",
+      "summary": "Add filter controls on the IP Database page to filter records by status (active/flagged/blocked), country, and at least one additional field (organization). Filters should be combinable and include a clear/reset option.",
+      "acceptanceCriteria": [
+        "Dropdown or toggle filters for status and country are present",
+        "Selecting a filter narrows the displayed records accordingly",
+        "Multiple filters can be applied simultaneously",
+        "A clear/reset filters option is available"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/pages/IPDatabase.tsx",
+          "operation": "modify",
+          "description": "Add filter controls (dropdowns or select inputs) for status, country, and organization above or alongside the search input. Implement local state for each filter. When filters are applied, narrow the displayed records by combining all active filters (status AND country AND organization, if set). Provide a 'Clear Filters' button that resets all filter states to their defaults. Ensure the filter UI is responsive and styled consistently with the gold-and-black theme."
+        }
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "summary": "Add an 'Add IP' form/modal on the IP Database page that allows users to submit a new IP record (IP address, owner/organization, country, city, registration date, status). On submission, the new record is persisted to the Motoko backend canister and immediately reflected in the displayed list.",
+      "acceptanceCriteria": [
+        "A button opens an 'Add IP Record' form/modal with all required fields",
+        "On successful submission, the record is saved to the backend canister",
+        "The new record appears in the IP Database list without a full page reload",
+        "Form validates required fields before submission",
+        "IP address format is validated (IPv4/IPv6)"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/AddIPRecordModal.tsx",
+          "operation": "create",
+          "description": "Create a modal component that renders a form for adding a new IP database record. Include input fields for: IP address (text with IPv4/IPv6 validation), owner/organization (text), country (text or dropdown), city (text), registration date (date picker or text), and status (dropdown with options: active, flagged, blocked). Implement client-side validation for required fields and IP address format. On form submission, call the backend addIPRecord method via a React Query mutation hook. On success, close the modal, refetch the backend IP records, and display a success notification. Use the authorization component's usage instructions to ensure the user is authenticated before allowing submission. Verify the component's usage instructions before implementing. Style the modal consistently with the gold-and-black theme and existing modal patterns (see ProfileSetupModal.tsx and RegistrationSuccessModal.tsx for reference)."
+        },
+        {
+          "path": "frontend/src/pages/IPDatabase.tsx",
+          "operation": "modify",
+          "description": "Import and wire the AddIPRecordModal component into the IPDatabase page. Add a button labeled 'Add IP Record' or similar, positioned prominently above the IP records list. Implement local state to control the modal's open/closed state. When the button is clicked, open the AddIPRecordModal. After a successful submission (detected via the mutation's onSuccess callback), automatically refetch the backend IP records and merge them with the mock data to reflect the newly added record in the displayed list."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new React Query mutation hook (e.g., useAddIPRecord) that calls the backend addIPRecord method. The mutation should accept an IPDatabaseRecord object and return a promise. On success, invalidate the query key used for fetching all IP records (e.g., ['ipDatabaseRecords']) to trigger a refetch. Handle errors gracefully and return error state to the calling component."
+        }
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "summary": "Add edit functionality to IP Database records. Clicking 'Edit' on a record opens a pre-filled form/modal. On save, backend-persisted records are updated via the updateIPRecord endpoint; mock-only records are updated locally in frontend state.",
+      "acceptanceCriteria": [
+        "Each record row/card has an Edit button",
+        "Clicking Edit opens a pre-filled form/modal",
+        "Saving a backend record calls updateIPRecord and refreshes the list",
+        "Editing a frontend-only mock record updates it in local state"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/EditIPRecordModal.tsx",
+          "operation": "create",
+          "description": "Create a modal component for editing an existing IP database record. Accept a record prop and pre-fill all form fields (IP address, owner/organization, country, city, registration date, status). Include a flag or metadata to distinguish backend-persisted records from mock-only records. On save, if the record is backend-persisted, call the backend updateIPRecord method via a React Query mutation. If the record is mock-only, emit an event or callback to update the frontend state. Validate required fields and IP address format before submission. Use the authorization component's usage instructions to ensure the user is authenticated before allowing updates to backend records. Verify the component's usage instructions before implementing. Style consistently with the gold-and-black theme."
+        },
+        {
+          "path": "frontend/src/pages/IPDatabase.tsx",
+          "operation": "modify",
+          "description": "Add an 'Edit' button to each displayed IP record row/card. Import and wire the EditIPRecordModal component. Implement local state to track which record is being edited and to control the modal's open/closed state. When the Edit button is clicked, open the EditIPRecordModal and pass the selected record as a prop. For backend-persisted records, on successful update, refetch the backend IP records and merge with mock data. For mock-only records, update the local state array directly to reflect the edited values."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new React Query mutation hook (e.g., useUpdateIPRecord) that calls the backend updateIPRecord method. The mutation should accept an IP address (string) and an updated IPDatabaseRecord object. On success, invalidate the query key for fetching all IP records to trigger a refetch. Handle errors gracefully and return error state to the calling component."
+        }
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "summary": "Add delete functionality to IP Database records. Clicking 'Delete' on a record removes it. For backend-persisted records, call the deleteIPRecord endpoint; for frontend-only mock records, remove from local state. Show a confirmation prompt before deletion.",
+      "acceptanceCriteria": [
+        "Each record row/card has a Delete button",
+        "A confirmation dialog is shown before deletion",
+        "Deleting a backend record calls deleteIPRecord and removes it from the list",
+        "Deleting a mock-only record removes it from local state immediately"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/components/DeleteIPRecordConfirmation.tsx",
+          "operation": "create",
+          "description": "Create a confirmation dialog component for deleting an IP database record. Accept a record prop and display the IP address and owner/organization for confirmation. Include 'Cancel' and 'Delete' buttons. On confirmation, emit a callback to the parent component to proceed with deletion. Style consistently with the gold-and-black theme and existing modal patterns."
+        },
+        {
+          "path": "frontend/src/pages/IPDatabase.tsx",
+          "operation": "modify",
+          "description": "Add a 'Delete' button to each displayed IP record row/card. Import and wire the DeleteIPRecordConfirmation component. Implement local state to track which record is being deleted and to control the confirmation dialog's open/closed state. When the Delete button is clicked, open the confirmation dialog and pass the selected record as a prop. On confirmation, check if the record is backend-persisted or mock-only. For backend records, call the backend deleteIPRecord method via a React Query mutation hook. For mock-only records, remove the record directly from the local state array. After successful deletion, refetch backend records (if applicable) and update the displayed list."
+        },
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new React Query mutation hook (e.g., useDeleteIPRecord) that calls the backend deleteIPRecord method. The mutation should accept an IP address (string) as the identifier for the record to delete. On success, invalidate the query key for fetching all IP records to trigger a refetch. Handle errors gracefully and return error state to the calling component."
+        }
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "summary": "Wire the IP Database page to load backend-persisted records (from getAllIPRecords) on mount and merge them with the frontend mock data for display. Use React Query for fetching and caching backend records, consistent with the existing useQueries.ts pattern.",
+      "acceptanceCriteria": [
+        "On page load, backend-persisted IP records are fetched and displayed alongside mock data",
+        "React Query is used for fetching backend records (consistent with useQueries.ts)",
+        "Loading and error states are handled gracefully in the UI"
+      ],
+      "file_operations": [
+        {
+          "path": "frontend/src/hooks/useQueries.ts",
+          "operation": "modify",
+          "description": "Add a new React Query hook (e.g., useGetAllIPRecords) that calls the backend getAllIPRecords method. The query should be enabled when the actor is available and return an array of IPDatabaseRecord objects. Set up appropriate caching and refetching strategies. Handle loading and error states gracefully. Export the hook for use in the IPDatabase page."
+        },
+        {
+          "path": "frontend/src/pages/IPDatabase.tsx",
+          "operation": "modify",
+          "description": "Import the useGetAllIPRecords hook from frontend/src/hooks/useQueries.ts. On component mount, fetch backend-persisted IP records using the hook. Merge the fetched backend records with the mock data from frontend/src/data/mockIPDatabase.ts into a single combined array for display. Implement a loading spinner or skeleton UI while the backend records are being fetched. Display an error message if the fetch fails. Ensure the combined data is used for all search, filter, edit, and delete operations. Use the actor from the useActor hook to confirm the backend is available before attempting to fetch."
         }
       ]
     }

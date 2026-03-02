@@ -1,44 +1,45 @@
 {
   "kind": "spec_vs_diff_report",
   "version": "1.0",
-  "generatedAt": "2026-03-02T00:17:26.723Z",
-  "summary": "The diff implements all four requirements: stable on-chain storage for IP records (REQ-1), Internet Identity auth gate on the Register IP page (REQ-2), public access to the IP Database page (REQ-3), and backend query functions for search/filter (REQ-4). All major acceptance criteria appear covered by the backend main.mo and frontend RegisterIP.tsx changes.",
-  "missing_requirements": [],
-  "hallucinated_features": [
+  "generatedAt": "2026-03-02T03:20:38.555Z",
+  "summary": "The diff implements the vast majority of requirements. All 8 REQs have corresponding implementations: mock data (REQ-1), search (REQ-2), filters (REQ-3), backend CRUD (REQ-4), Add modal (REQ-5), Edit modal (REQ-6), Delete confirmation (REQ-7), and React Query integration (REQ-8). One notable gap is that the backend storage does not appear to use stable variables, potentially failing the REQ-4 AC about surviving canister upgrades. Additionally, REQ-4 requires a unique ID assigned by the backend per record, but the implementation uses IP address as the key rather than a separate auto-incremented ID.",
+  "missing_requirements": [
     {
-      "description": "ProfileSetupModal: A first-login profile setup flow that collects display name, organisation, and email is added, requiring users to create a profile after first login.",
-      "reason": "The build request does not mention user profiles, display names, or an onboarding modal. This feature was not requested.",
-      "evidence": [
-        "frontend/src/components/ProfileSetupModal.tsx",
-        "frontend/src/components/Layout.tsx",
-        "frontend-file-summaries.txt"
-      ]
-    },
-    {
-      "description": "User profile storage and retrieval endpoints (getCallerUserProfile, getUserProfile, saveCallerUserProfile) added to the backend.",
-      "reason": "No user profile management was requested in any requirement. The build request is limited to IP record registration and search.",
+      "id": "REQ-4",
+      "requirement": "IP records are stored in stable memory and survive canister upgrades",
+      "reason": "The backend uses 'let ipDatabase = Map.empty<Text, IPDatabaseRecord>()' which is a non-stable variable. There is no 'stable var' declaration for the IP database map, so data will not survive canister upgrades.",
       "evidence": [
         "backend/main.mo"
       ]
     },
     {
-      "description": "useRegisterIP mutation configured to work with anonymous actors with no auth dependency at the hook level.",
-      "reason": "REQ-2 requires submission to be blocked for unauthenticated users. While the UI auth gate exists, configuring the mutation hook to use anonymous actors was not requested and may weaken the intended auth enforcement.",
+      "id": "REQ-4",
+      "requirement": "Each record has a unique ID assigned by the backend",
+      "reason": "The backend uses the IP address string as the map key rather than assigning a separate unique numeric ID. The IPDatabaseRecord type has no 'id' field and the map key is the IP address itself.",
       "evidence": [
-        "frontend/src/hooks/useQueries.ts",
-        "frontend-file-summaries.txt"
+        "backend/main.mo"
+      ]
+    }
+  ],
+  "hallucinated_features": [
+    {
+      "description": "A two-tab layout on the IPDatabase page combining an 'IP Address Database' tab and an existing 'IP Registry' tab",
+      "reason": "The build request only asked to add or expand an IP Database page; it did not request merging it into a tabbed view with the existing IP registry functionality.",
+      "evidence": [
+        "frontend/src/pages/IPDatabase.tsx"
       ]
     }
   ],
   "confidence": 0.82,
   "changed_files": [
     "backend/main.mo",
-    "backend/migration.mo",
     "frontend-file-summaries.txt",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/Layout.tsx",
-    "frontend/src/components/ProfileSetupModal.tsx",
-    "frontend/src/pages/RegisterIP.tsx",
+    "frontend/src/components/AddIPRecordModal.tsx",
+    "frontend/src/components/DeleteIPRecordConfirmation.tsx",
+    "frontend/src/components/EditIPRecordModal.tsx",
+    "frontend/src/data/mockIPDatabase.ts",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/IPDatabase.tsx",
     "project_state.json"
   ]
 }

@@ -1,101 +1,183 @@
 {
   "kind": "build_request",
-  "title": "Persistent IP Registry with Auth-Gated Submission and Public Search",
-  "projectName": "IPGT Platform",
-  "priority": "high",
+  "title": "Add Mock IP Database with Search, Filter, and Backend Persistence",
+  "projectName": "IPGT Registry",
+  "priority": "normal",
   "requirements": [
     {
       "id": "REQ-1",
-      "text": "Persist all IP registration form fields to on-chain stable storage in the backend. The backend actor must store submitted IP records in a stable data structure (e.g., stable var array or HashMap) so that records survive canister upgrades and accumulate over time as a growing database.",
-      "target": "backend",
+      "text": "Add a new 'IP Database' page (or expand the existing IPDatabase page) that pre-loads a set of at least 20 mock IP records on the frontend with the following fields: IP address, owner/organization, country, city, registration date, and status (active/flagged/blocked). These records should be hardcoded as frontend sample data and do not need to be stored in the backend.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-2"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "all fields should be saved from a registered IP into our database. This should be committed to memory and searchable.",
-          "every submission is committed to memory and searchable by everyone"
+          "mock data should just be front end",
+          "Pre-loaded sample data on the frontend with fields: IP address, owner/organization, country, city, registration date, and status (active/flagged/blocked)"
         ]
       },
       "acceptanceCriteria": [
-        "All fields from the Register IP form are saved when a user submits a registration.",
-        "Saved records persist across canister upgrades (stable storage).",
-        "Records submitted by different users all appear in the database.",
-        "The number of stored records grows with each new submission."
+        "At least 20 mock IP records are visible on the IP Database page on first load",
+        "Each record displays: IP address, owner/organization, country, city, registration date, and status badge",
+        "Mock data is defined in frontend source only (no backend calls for initial data)"
       ]
     },
     {
       "id": "REQ-2",
-      "text": "Require Internet Identity authentication before a user can submit a new IP registration. On the Register IP page, if the user is not authenticated, show a prompt/button to sign in via Internet Identity. The registration form and submission action must be blocked until the user is logged in.",
-      "target": "both",
+      "text": "Implement search and lookup functionality on the IP Database page allowing users to search for IP records by IP address. Results should filter in real-time or on submit.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-3",
-          "msg-4"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "for people I share the link with they should still need to sign in or create an account like before to create an IP",
-          "users must sign in or create an account via Internet Identity before registering a new IP"
+          "Search & lookup by IP address"
         ]
       },
       "acceptanceCriteria": [
-        "Unauthenticated users visiting the Register IP page see a sign-in prompt instead of the registration form.",
-        "After signing in via Internet Identity, the registration form becomes accessible.",
-        "Submitting an IP record without an active Internet Identity session is rejected."
+        "A search input is present on the IP Database page",
+        "Typing an IP address or partial IP filters the displayed records",
+        "Search works across both mock frontend data and any backend-persisted entries"
       ]
     },
     {
       "id": "REQ-3",
-      "text": "Allow anyone with the link to browse and search all submitted IP records on the IP Database page without requiring login. The backend must expose a public query endpoint for listing and searching all records, and the frontend must not gate the IP Database page behind authentication.",
-      "target": "both",
+      "text": "Add filter controls on the IP Database page to filter records by status (active/flagged/blocked), country, and at minimum one additional field (e.g., organization). Filters should be combinable.",
+      "target": "frontend",
       "source": {
         "messageIds": [
-          "msg-1",
-          "msg-3"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "they should be viewable by everyone",
-          "Viewing records: Everyone can see and search the IP database (no login needed)"
+          "Browse & filter by status, country, and more"
         ]
       },
       "acceptanceCriteria": [
-        "The IP Database page loads and displays all submitted records for unauthenticated visitors.",
-        "Search and filter functionality works without login.",
-        "Records submitted by any user are visible to all visitors.",
-        "No authentication prompt is shown on the IP Database page."
+        "Dropdown or toggle filters for status and country are present",
+        "Selecting a filter narrows the displayed records accordingly",
+        "Multiple filters can be applied simultaneously",
+        "A clear/reset filters option is available"
       ]
     },
     {
       "id": "REQ-4",
-      "text": "Expose backend query functions to support full-text or field-based search across all persisted IP records (by title, category, jurisdiction, description, etc.) so the existing search and filter UI on the IP Database page operates against real on-chain data.",
+      "text": "Add a backend Motoko data structure and CRUD endpoints to store IP database records with fields: IP address, owner/organization, country, city, registration date, and status. Expose functions to add, update, delete, and query these records.",
       "target": "backend",
       "source": {
         "messageIds": [
-          "msg-1"
+          "msg-4",
+          "msg-6"
         ],
         "quotes": [
-          "This should be committed to memory and searchable."
+          "any added IP should be added to the backend in the canisters",
+          "Add new IPs — persisted to the Motoko backend canister",
+          "Edit & delete entries from both frontend and backend"
         ]
       },
       "acceptanceCriteria": [
-        "A public query function returns all IP records matching a search term or filter criteria.",
-        "The IP Database frontend search and filter controls return live results from the backend.",
-        "Searching by title, category, and jurisdiction returns the correct matching records."
+        "Backend actor exposes addIPRecord, updateIPRecord, deleteIPRecord, and listIPRecords (or getIPRecord) functions",
+        "IP records are stored in stable memory and survive canister upgrades",
+        "Each record has a unique ID assigned by the backend"
+      ]
+    },
+    {
+      "id": "REQ-5",
+      "text": "Add an 'Add IP' form/modal on the IP Database page that allows users to submit a new IP record (IP address, owner/organization, country, city, registration date, status). On submission, the new record must be persisted to the Motoko backend canister via the addIPRecord endpoint and immediately reflected in the displayed list.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6"
+        ],
+        "quotes": [
+          "Add new IPs — persisted to the Motoko backend canister",
+          "any added IP should be added to the backend in the canisters"
+        ]
+      },
+      "acceptanceCriteria": [
+        "A button opens an 'Add IP Record' form/modal with all required fields",
+        "On successful submission, the record is saved to the backend canister",
+        "The new record appears in the IP Database list without a full page reload",
+        "Form validates required fields before submission",
+        "IP address format is validated (IPv4/IPv6)"
+      ]
+    },
+    {
+      "id": "REQ-6",
+      "text": "Add edit functionality to IP Database records. Clicking 'Edit' on a record (both mock and backend-persisted entries) opens a pre-filled form/modal. On save, backend-persisted records are updated via the updateIPRecord endpoint; mock-only records are updated locally in frontend state.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6"
+        ],
+        "quotes": [
+          "Edit & delete entries from both frontend and backend",
+          "combination"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each record row/card has an Edit button",
+        "Clicking Edit opens a pre-filled form/modal",
+        "Saving a backend record calls updateIPRecord and refreshes the list",
+        "Editing a frontend-only mock record updates it in local state"
+      ]
+    },
+    {
+      "id": "REQ-7",
+      "text": "Add delete functionality to IP Database records. Clicking 'Delete' on a record removes it. For backend-persisted records, call the deleteIPRecord endpoint; for frontend-only mock records, remove from local state. Show a confirmation prompt before deletion.",
+      "target": "both",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6"
+        ],
+        "quotes": [
+          "Edit & delete entries from both frontend and backend"
+        ]
+      },
+      "acceptanceCriteria": [
+        "Each record row/card has a Delete button",
+        "A confirmation dialog is shown before deletion",
+        "Deleting a backend record calls deleteIPRecord and removes it from the list",
+        "Deleting a mock-only record removes it from local state immediately"
+      ]
+    },
+    {
+      "id": "REQ-8",
+      "text": "Wire the IP Database page to load backend-persisted records (from listIPRecords) on mount and merge them with the frontend mock data for display. Use React Query for fetching and caching backend records, consistent with the existing useQueries.ts pattern.",
+      "target": "frontend",
+      "source": {
+        "messageIds": [
+          "msg-4",
+          "msg-6"
+        ],
+        "quotes": [
+          "combination"
+        ]
+      },
+      "acceptanceCriteria": [
+        "On page load, backend-persisted IP records are fetched and displayed alongside mock data",
+        "React Query is used for fetching backend records (consistent with useQueries.ts)",
+        "Loading and error states are handled gracefully in the UI"
       ]
     }
   ],
   "constraints": [
-    "All data must be stored on-chain in the Internet Computer canister using Motoko stable storage — no external databases.",
-    "Authentication must use Internet Identity only.",
-    "Public browsing and search must not require any login.",
-    "Do not edit any files listed in frontend.immutablePaths."
+    "All Motoko logic must remain in backend/main.mo (single-actor architecture)",
+    "Do not modify files under frontend/src/hooks/useInternetIdentity.ts, frontend/src/hooks/useActor.ts, frontend/src/main.tsx, or frontend/src/components/ui",
+    "Mock/sample data must be defined only in the frontend — it must not be seeded into the backend canister",
+    "Maintain the existing gold-and-black dark theme and Tailwind CSS styling conventions"
   ],
   "nonGoals": [
-    "Admin moderation or record deletion is not in scope.",
-    "Email notifications or off-chain data storage are not in scope.",
-    "Paid submission or token-gating is not in scope.",
-    "Editing or updating previously submitted IP records is not in scope."
+    "Seeding or migrating mock frontend data into the Motoko backend",
+    "IP geolocation API integration (all location data is manual/mock)",
+    "Authentication requirements for browsing or searching the IP database",
+    "Pagination beyond basic display of all records"
   ],
   "imageRequirements": {
     "required": [],

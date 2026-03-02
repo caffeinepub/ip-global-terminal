@@ -1,13 +1,16 @@
 # Specification
 
 ## Summary
-**Goal:** Add persistent on-chain IP record storage, auth-gated submission, and public search to the IPGT Platform.
+**Goal:** Add a fully functional IP Database page with mock frontend data, search/filter controls, and backend persistence via a Motoko canister.
 
 **Planned changes:**
-- Store all IP registration form fields in stable backend storage (survives canister upgrades, accumulates over time)
-- Expose public backend query functions for listing and searching all IP records by title, category, jurisdiction, description, etc.
-- Require Internet Identity authentication to access the Register IP form; show a sign-in prompt to unauthenticated users
-- Allow the IP Database page to load and search all records without any login requirement
-- Wire the IP Database search and filter UI to live on-chain data from the backend
+- Add at least 20 hardcoded mock IP records on the frontend with fields: IP address, owner/organization, country, city, registration date, and status (active/flagged/blocked)
+- Add search input to filter records by IP address in real-time
+- Add filter controls for status, country, and organization that can be combined, with a clear/reset option
+- Add Motoko backend data structure and CRUD functions: `addIPRecord`, `updateIPRecord`, `deleteIPRecord`, and `listIPRecords`, stored in stable memory
+- Add an "Add IP Record" form/modal that validates and persists new records to the backend canister
+- Add edit functionality per record — pre-filled modal that updates backend records via `updateIPRecord` or updates mock records in local state
+- Add delete functionality per record — confirmation prompt before calling `deleteIPRecord` or removing from local state
+- On page load, fetch backend-persisted records via React Query and merge with frontend mock data for a unified display
 
-**User-visible outcome:** Authenticated users can register new IP records that are permanently stored on-chain. Anyone with the link can browse, search, and filter all submitted IP records on the IP Database page without logging in.
+**User-visible outcome:** Users can browse a pre-loaded IP database, search and filter records, add new IP entries that are persisted to the canister, and edit or delete both mock and backend records from the UI.

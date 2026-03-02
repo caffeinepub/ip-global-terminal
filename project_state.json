@@ -1,20 +1,67 @@
 {
   "schemaVersion": "1.0.0",
   "projectStateVersion": 3,
-  "summary": "An IP registry application (Internet Computer) where users can register intellectual property records. Submissions require Internet Identity authentication, but browsing and searching all registered IPs is open to the public. All form data is persisted on-chain in stable storage and is searchable by everyone.",
+  "summary": "IP intelligence/lookup tool with a mock IP database. Frontend holds pre-loaded sample data; newly added IPs are persisted to the Motoko backend canister.",
   "architectural_notes": [
-    "Backend uses Internet Computer stable storage for persistent IP registry data",
-    "Authentication via Internet Identity is required to register/submit IP records",
-    "All IP records are publicly readable without authentication"
+    "Mock/sample IP data lives on the frontend only; newly added IPs are persisted to the Motoko backend canister",
+    "IP record fields: IP address, owner/organization, country, city, registration date, status (active/flagged/blocked)"
   ],
   "known_issues": [],
   "isFixRequest": false,
   "existing_features": [
     {
-      "id": "feature-require-internet-identity-authentication-before-a-user-can-submit-a-new-ip-registration-on-the-register-ip-page-if-the-user-is-not-authenticated-show-a-prompt-button-to-sign-in-via-internet-identity-the-registration-form-and-submission-action-must-be-blocked-until-the-user-is-logged-in",
-      "title": "Require Internet Identity authentication before a user can submit a new IP registration. On the Register IP page, if the user is not authenticated, show a prompt/button to sign in via Internet Identity. The registration form and submission action must be blocked until the user is logged in.",
+      "id": "feature-add-a-new-ip-database-page-or-expand-the-existing-ipdatabase-page-that-pre-loads-a-set-of-at-least-20-mock-ip-records-on-the-frontend-with-the-following-fields-ip-address-owner-organization-country-city-registration-date-and-status-active-flagged-blocked-these-records-should-be-hardcoded-as-frontend-sample-data-and-do-not-need-to-be-stored-in-the-backend",
+      "title": "Add a new 'IP Database' page (or expand the existing IPDatabase page) that pre-loads a set of at least 20 mock IP records on the frontend with the following fields: IP address, owner/organization, country, city, registration date, and status (active/flagged/blocked). These records should be hardcoded as frontend sample data and do not need to be stored in the backend.",
+      "reqIds": [
+        "REQ-1"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-implement-search-and-lookup-functionality-on-the-ip-database-page-allowing-users-to-search-for-ip-records-by-ip-address-results-should-filter-in-real-time-or-on-submit",
+      "title": "Implement search and lookup functionality on the IP Database page allowing users to search for IP records by IP address. Results should filter in real-time or on submit.",
       "reqIds": [
         "REQ-2"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-filter-controls-on-the-ip-database-page-to-filter-records-by-status-active-flagged-blocked-country-and-at-minimum-one-additional-field-e-g-organization-filters-should-be-combinable",
+      "title": "Add filter controls on the IP Database page to filter records by status (active/flagged/blocked), country, and at minimum one additional field (e.g., organization). Filters should be combinable.",
+      "reqIds": [
+        "REQ-3"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-an-add-ip-form-modal-on-the-ip-database-page-that-allows-users-to-submit-a-new-ip-record-ip-address-owner-organization-country-city-registration-date-status-on-submission-the-new-record-must-be-persisted-to-the-motoko-backend-canister-via-the-addiprecord-endpoint-and-immediately-reflected-in-the-displayed-list",
+      "title": "Add an 'Add IP' form/modal on the IP Database page that allows users to submit a new IP record (IP address, owner/organization, country, city, registration date, status). On submission, the new record must be persisted to the Motoko backend canister via the addIPRecord endpoint and immediately reflected in the displayed list.",
+      "reqIds": [
+        "REQ-5"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-edit-functionality-to-ip-database-records-clicking-edit-on-a-record-both-mock-and-backend-persisted-entries-opens-a-pre-filled-form-modal-on-save-backend-persisted-records-are-updated-via-the-updateiprecord-endpoint-mock-only-records-are-updated-locally-in-frontend-state",
+      "title": "Add edit functionality to IP Database records. Clicking 'Edit' on a record (both mock and backend-persisted entries) opens a pre-filled form/modal. On save, backend-persisted records are updated via the updateIPRecord endpoint; mock-only records are updated locally in frontend state.",
+      "reqIds": [
+        "REQ-6"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-add-delete-functionality-to-ip-database-records-clicking-delete-on-a-record-removes-it-for-backend-persisted-records-call-the-deleteiprecord-endpoint-for-frontend-only-mock-records-remove-from-local-state-show-a-confirmation-prompt-before-deletion",
+      "title": "Add delete functionality to IP Database records. Clicking 'Delete' on a record removes it. For backend-persisted records, call the deleteIPRecord endpoint; for frontend-only mock records, remove from local state. Show a confirmation prompt before deletion.",
+      "reqIds": [
+        "REQ-7"
+      ],
+      "version": 1
+    },
+    {
+      "id": "feature-wire-the-ip-database-page-to-load-backend-persisted-records-from-listiprecords-on-mount-and-merge-them-with-the-frontend-mock-data-for-display-use-react-query-for-fetching-and-caching-backend-records-consistent-with-the-existing-usequeries-ts-pattern",
+      "title": "Wire the IP Database page to load backend-persisted records (from listIPRecords) on mount and merge them with the frontend mock data for display. Use React Query for fetching and caching backend records, consistent with the existing useQueries.ts pattern.",
+      "reqIds": [
+        "REQ-8"
       ],
       "version": 1
     }
@@ -22,41 +69,31 @@
   "new_feature_requests": [
     {
       "id": "AR-1",
-      "summary": "Persist all IP registration form fields to on-chain stable storage database",
+      "summary": "Mock IP database with pre-loaded frontend sample data (IP, owner/org, country, city, registration date, status)",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-2",
-      "summary": "Require Internet Identity authentication to submit/register a new IP",
+      "summary": "Search & lookup IP addresses in the database",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-3",
-      "summary": "Allow public browsing and searching of all submitted IP records without login",
+      "summary": "Browse & filter IP records by status, country, and other fields",
       "reqIds": [],
       "status": "pending"
     },
     {
       "id": "AR-4",
-      "summary": "Persist all IP registration form fields to on-chain stable storage in the backend. The backend actor must store submitted IP records in a stable data structure (e.g., stable var array or HashMap) so that records survive canister upgrades and accumulate over time as a growing database.",
-      "reqIds": [
-        "REQ-1"
-      ],
+      "summary": "Add new IPs persisted to Motoko backend canister; edit & delete entries from frontend and backend",
+      "reqIds": [],
       "status": "pending"
     },
     {
-      "id": "AR-6",
-      "summary": "Allow anyone with the link to browse and search all submitted IP records on the IP Database page without requiring login. The backend must expose a public query endpoint for listing and searching all records, and the frontend must not gate the IP Database page behind authentication.",
-      "reqIds": [
-        "REQ-3"
-      ],
-      "status": "pending"
-    },
-    {
-      "id": "AR-7",
-      "summary": "Expose backend query functions to support full-text or field-based search across all persisted IP records (by title, category, jurisdiction, description, etc.) so the existing search and filter UI on the IP Database page operates against real on-chain data.",
+      "id": "AR-8",
+      "summary": "Add a backend Motoko data structure and CRUD endpoints to store IP database records with fields: IP address, owner/organization, country, city, registration date, and status. Expose functions to add, update, delete, and query these records.",
       "reqIds": [
         "REQ-4"
       ],
@@ -64,7 +101,7 @@
     }
   ],
   "gameProjectType": "none",
-  "projectName": "IP Registry",
+  "projectName": "IPGT Registry",
   "clarification_mode": "instant",
   "clarification_rounds": 0
 }

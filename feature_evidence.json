@@ -2,12 +2,31 @@
   "kind": "feature_evidence_report",
   "features": [
     {
-      "featureId": "feature-require-internet-identity-authentication-before-a-user-can-submit-a-new-ip-registration-on-the-register-ip-page-if-the-user-is-not-authenticated-show-a-prompt-button-to-sign-in-via-internet-identity-the-registration-form-and-submission-action-must-be-blocked-until-the-user-is-logged-in",
-      "featureTitle": "Require Internet Identity authentication before a user can submit a new IP registration. On the Register IP page, if the user is not authenticated, show a prompt/button to sign in via Internet Identity. The registration form and submission action must be blocked until the user is logged in.",
+      "featureId": "feature-add-a-new-ip-database-page-or-expand-the-existing-ipdatabase-page-that-pre-loads-a-set-of-at-least-20-mock-ip-records-on-the-frontend-with-the-following-fields-ip-address-owner-organization-country-city-registration-date-and-status-active-flagged-blocked-these-records-should-be-hardcoded-as-frontend-sample-data-and-do-not-need-to-be-stored-in-the-backend",
+      "featureTitle": "Add a new 'IP Database' page (or expand the existing IPDatabase page) that pre-loads a set of at least 20 mock IP records on the frontend with the following fields: IP address, owner/organization, country, city, registration date, and status (active/flagged/blocked). These records should be hardcoded as frontend sample data and do not need to be stored in the backend.",
       "files": [
-        "frontend/src/components/Layout.tsx",
-        "frontend/src/components/ProfileSetupModal.tsx",
-        "frontend/src/pages/RegisterIP.tsx"
+        "frontend/src/data/mockIPDatabase.ts",
+        "frontend/src/pages/IPDatabase.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-1"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-implement-search-and-lookup-functionality-on-the-ip-database-page-allowing-users-to-search-for-ip-records-by-ip-address-results-should-filter-in-real-time-or-on-submit",
+      "featureTitle": "Implement search and lookup functionality on the IP Database page allowing users to search for IP records by IP address. Results should filter in real-time or on submit.",
+      "files": [
+        "frontend/src/pages/IPDatabase.tsx"
       ],
       "components": [
         "authorization@4.0.0",
@@ -20,6 +39,113 @@
       ],
       "testIds": [
         "REQ-2"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-filter-controls-on-the-ip-database-page-to-filter-records-by-status-active-flagged-blocked-country-and-at-minimum-one-additional-field-e-g-organization-filters-should-be-combinable",
+      "featureTitle": "Add filter controls on the IP Database page to filter records by status (active/flagged/blocked), country, and at minimum one additional field (e.g., organization). Filters should be combinable.",
+      "files": [
+        "frontend/src/pages/IPDatabase.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-3"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-an-add-ip-form-modal-on-the-ip-database-page-that-allows-users-to-submit-a-new-ip-record-ip-address-owner-organization-country-city-registration-date-status-on-submission-the-new-record-must-be-persisted-to-the-motoko-backend-canister-via-the-addiprecord-endpoint-and-immediately-reflected-in-the-displayed-list",
+      "featureTitle": "Add an 'Add IP' form/modal on the IP Database page that allows users to submit a new IP record (IP address, owner/organization, country, city, registration date, status). On submission, the new record must be persisted to the Motoko backend canister via the addIPRecord endpoint and immediately reflected in the displayed list.",
+      "files": [
+        "frontend/src/components/AddIPRecordModal.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/IPDatabase.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-5"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-edit-functionality-to-ip-database-records-clicking-edit-on-a-record-both-mock-and-backend-persisted-entries-opens-a-pre-filled-form-modal-on-save-backend-persisted-records-are-updated-via-the-updateiprecord-endpoint-mock-only-records-are-updated-locally-in-frontend-state",
+      "featureTitle": "Add edit functionality to IP Database records. Clicking 'Edit' on a record (both mock and backend-persisted entries) opens a pre-filled form/modal. On save, backend-persisted records are updated via the updateIPRecord endpoint; mock-only records are updated locally in frontend state.",
+      "files": [
+        "frontend/src/components/EditIPRecordModal.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/IPDatabase.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-6"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-add-delete-functionality-to-ip-database-records-clicking-delete-on-a-record-removes-it-for-backend-persisted-records-call-the-deleteiprecord-endpoint-for-frontend-only-mock-records-remove-from-local-state-show-a-confirmation-prompt-before-deletion",
+      "featureTitle": "Add delete functionality to IP Database records. Clicking 'Delete' on a record removes it. For backend-persisted records, call the deleteIPRecord endpoint; for frontend-only mock records, remove from local state. Show a confirmation prompt before deletion.",
+      "files": [
+        "frontend/src/components/DeleteIPRecordConfirmation.tsx",
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/IPDatabase.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-7"
+      ],
+      "confidence": "high"
+    },
+    {
+      "featureId": "feature-wire-the-ip-database-page-to-load-backend-persisted-records-from-listiprecords-on-mount-and-merge-them-with-the-frontend-mock-data-for-display-use-react-query-for-fetching-and-caching-backend-records-consistent-with-the-existing-usequeries-ts-pattern",
+      "featureTitle": "Wire the IP Database page to load backend-persisted records (from listIPRecords) on mount and merge them with the frontend mock data for display. Use React Query for fetching and caching backend records, consistent with the existing useQueries.ts pattern.",
+      "files": [
+        "frontend/src/hooks/useQueries.ts",
+        "frontend/src/pages/IPDatabase.tsx"
+      ],
+      "components": [
+        "authorization@4.0.0",
+        "blob-storage@4.0.0",
+        "core-infrastructure@1.0.2",
+        "shadcn-ui@1.0.0",
+        "build-template-react@1.0.0",
+        "initial-app@1.0.0",
+        "github-export-icp-cli@1.0.0"
+      ],
+      "testIds": [
+        "REQ-8"
       ],
       "confidence": "high"
     }

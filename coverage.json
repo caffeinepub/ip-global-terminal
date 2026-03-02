@@ -1,67 +1,133 @@
 {
   "kind": "coverage_report",
   "version": "1.0",
-  "generatedAt": "2026-03-02T00:17:26.726Z",
+  "generatedAt": "2026-03-02T03:20:38.558Z",
   "sources": {
     "buildRequest": true,
     "implementationPlan": true
   },
   "requirements": {
-    "total": 4,
-    "implemented": 1,
+    "total": 8,
+    "implemented": 7,
     "items": [
       {
         "id": "REQ-1",
-        "summary": "Persist all IP registration form fields to on-chain stable storage in the backend. The backend actor must store submitted IP records in a stable data structure (e.g., stable var array or HashMap) so that records survive canister upgrades and accumulate over time as a growing database.",
-        "status": "unknown",
-        "plannedFiles": [],
-        "matchedFiles": []
+        "summary": "Add a new 'IP Database' page (or expand the existing IPDatabase page) that pre-loads a set of at least 20 mock IP records on the frontend with the following fields: IP address, owner/organization, country, city, registration date, and status (active/flagged/blocked). These records should be hardcoded as frontend sample data and do not need to be stored in the backend.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/data/mockIPDatabase.ts",
+          "frontend/src/pages/IPDatabase.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/data/mockIPDatabase.ts",
+          "frontend/src/pages/IPDatabase.tsx"
+        ]
       },
       {
         "id": "REQ-2",
-        "summary": "Require Internet Identity authentication before a user can submit a new IP registration. On the Register IP page, if the user is not authenticated, show a prompt/button to sign in via Internet Identity. The registration form and submission action must be blocked until the user is logged in.",
+        "summary": "Implement search and lookup functionality on the IP Database page allowing users to search for IP records by IP address. Results should filter in real-time or on submit.",
         "status": "implemented",
         "plannedFiles": [
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/components/ProfileSetupModal.tsx",
-          "frontend/src/hooks/useQueries.ts",
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/pages/IPDatabase.tsx"
         ],
         "matchedFiles": [
-          "frontend/src/pages/RegisterIP.tsx",
-          "frontend/src/components/ProfileSetupModal.tsx",
-          "frontend/src/components/Layout.tsx"
+          "frontend/src/pages/IPDatabase.tsx"
         ]
       },
       {
         "id": "REQ-3",
-        "summary": "Allow anyone with the link to browse and search all submitted IP records on the IP Database page without requiring login. The backend must expose a public query endpoint for listing and searching all records, and the frontend must not gate the IP Database page behind authentication.",
-        "status": "missing",
+        "summary": "Add filter controls on the IP Database page to filter records by status (active/flagged/blocked), country, and at minimum one additional field (e.g., organization). Filters should be combinable.",
+        "status": "implemented",
         "plannedFiles": [
           "frontend/src/pages/IPDatabase.tsx"
         ],
-        "matchedFiles": []
+        "matchedFiles": [
+          "frontend/src/pages/IPDatabase.tsx"
+        ]
       },
       {
         "id": "REQ-4",
-        "summary": "Expose backend query functions to support full-text or field-based search across all persisted IP records (by title, category, jurisdiction, description, etc.) so the existing search and filter UI on the IP Database page operates against real on-chain data.",
+        "summary": "Add a backend Motoko data structure and CRUD endpoints to store IP database records with fields: IP address, owner/organization, country, city, registration date, and status. Expose functions to add, update, delete, and query these records.",
         "status": "unknown",
         "plannedFiles": [],
         "matchedFiles": []
+      },
+      {
+        "id": "REQ-5",
+        "summary": "Add an 'Add IP' form/modal on the IP Database page that allows users to submit a new IP record (IP address, owner/organization, country, city, registration date, status). On submission, the new record must be persisted to the Motoko backend canister via the addIPRecord endpoint and immediately reflected in the displayed list.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/AddIPRecordModal.tsx",
+          "frontend/src/pages/IPDatabase.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/AddIPRecordModal.tsx",
+          "frontend/src/pages/IPDatabase.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-6",
+        "summary": "Add edit functionality to IP Database records. Clicking 'Edit' on a record (both mock and backend-persisted entries) opens a pre-filled form/modal. On save, backend-persisted records are updated via the updateIPRecord endpoint; mock-only records are updated locally in frontend state.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/EditIPRecordModal.tsx",
+          "frontend/src/pages/IPDatabase.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/EditIPRecordModal.tsx",
+          "frontend/src/pages/IPDatabase.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-7",
+        "summary": "Add delete functionality to IP Database records. Clicking 'Delete' on a record removes it. For backend-persisted records, call the deleteIPRecord endpoint; for frontend-only mock records, remove from local state. Show a confirmation prompt before deletion.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/components/DeleteIPRecordConfirmation.tsx",
+          "frontend/src/pages/IPDatabase.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ],
+        "matchedFiles": [
+          "frontend/src/components/DeleteIPRecordConfirmation.tsx",
+          "frontend/src/pages/IPDatabase.tsx",
+          "frontend/src/hooks/useQueries.ts"
+        ]
+      },
+      {
+        "id": "REQ-8",
+        "summary": "Wire the IP Database page to load backend-persisted records (from listIPRecords) on mount and merge them with the frontend mock data for display. Use React Query for fetching and caching backend records, consistent with the existing useQueries.ts pattern.",
+        "status": "implemented",
+        "plannedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/IPDatabase.tsx"
+        ],
+        "matchedFiles": [
+          "frontend/src/hooks/useQueries.ts",
+          "frontend/src/pages/IPDatabase.tsx"
+        ]
       }
     ]
   },
   "changedFiles": [
     "backend/main.mo",
-    "backend/migration.mo",
     "build-request.json",
     "feature_evidence.json",
     "frontend-file-summaries.txt",
     "frontend-implementation-plan.json",
-    "frontend/src/components/Header.tsx",
-    "frontend/src/components/Layout.tsx",
-    "frontend/src/components/ProfileSetupModal.tsx",
-    "frontend/src/pages/RegisterIP.tsx",
+    "frontend/src/backend.d.ts",
+    "frontend/src/backend.ts",
+    "frontend/src/components/AddIPRecordModal.tsx",
+    "frontend/src/components/DeleteIPRecordConfirmation.tsx",
+    "frontend/src/components/EditIPRecordModal.tsx",
+    "frontend/src/data/mockIPDatabase.ts",
+    "frontend/src/declarations/backend.did.d.ts",
+    "frontend/src/declarations/backend.did.js",
+    "frontend/src/hooks/useQueries.ts",
+    "frontend/src/pages/IPDatabase.tsx",
     "project_state.json",
     "scratch/component-selection.json",
     "spec.md",

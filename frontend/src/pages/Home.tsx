@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router';
 import { Shield, Globe, Lock, Search, FileCheck, Zap, ArrowRight, CheckCircle, PenLine } from 'lucide-react';
-import AnimatedWorldMap from '../components/AnimatedWorldMap';
+import React from 'react';
 
 const panelStyle: React.CSSProperties = {
   backgroundColor: 'rgba(0, 0, 0, 0.40)',
@@ -10,16 +10,20 @@ const panelStyle: React.CSSProperties = {
   boxShadow: '0 0 20px oklch(0.78 0.15 85 / 0.15)',
 };
 
-import React from 'react';
-
 export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Hero Section */}
       <section className="relative overflow-hidden" style={{ minHeight: '90vh' }}>
-        {/* World map background */}
+        {/* 4K AI-generated hero background image */}
         <div className="absolute inset-0 z-0">
-          <AnimatedWorldMap />
+          <img
+            src="/assets/generated/homepage-hero.dim_3840x2160.png"
+            alt="IPGT Hero Background"
+            className="w-full h-full object-cover object-center"
+            loading="eager"
+            decoding="async"
+          />
         </div>
 
         {/* Vignette overlay */}
