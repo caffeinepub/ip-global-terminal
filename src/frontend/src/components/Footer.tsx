@@ -3,9 +3,6 @@ import { Shield } from "lucide-react";
 
 export default function Footer() {
   const year = new Date().getFullYear();
-  const appId = encodeURIComponent(
-    typeof window !== "undefined" ? window.location.hostname : "ipgt-app",
-  );
 
   return (
     <footer className="bg-black border-t border-gold-800/30 text-white/70">
@@ -94,17 +91,6 @@ export default function Footer() {
 
         <div className="mt-10 pt-6 border-t border-gold-800/20 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/40">
           <span>© {year} IPGT — Global IP Registry. All rights reserved.</span>
-          <span>
-            Built with <span className="text-gold-400">♥</span> using{" "}
-            <a
-              href={`https://caffeine.ai/?utm_source=Caffeine-footer&utm_medium=referral&utm_content=${appId}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-gold-400 hover:text-gold-300 transition-colors"
-            >
-              caffeine.ai
-            </a>
-          </span>
         </div>
       </div>
     </footer>
