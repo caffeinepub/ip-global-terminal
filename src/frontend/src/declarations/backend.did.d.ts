@@ -14,14 +14,6 @@ export type ExternalBlob = Uint8Array;
 export type IPCategory = { 'trademark' : null } |
   { 'copyright' : null } |
   { 'patent' : null };
-export interface IPDatabaseRecord {
-  'status' : string,
-  'country' : string,
-  'owner' : string,
-  'city' : string,
-  'registrationDate' : bigint,
-  'ipAddress' : string,
-}
 export interface IPRecord {
   'id' : bigint,
   'documentHash' : Uint8Array,
@@ -70,15 +62,7 @@ export interface _SERVICE {
   >,
   '_caffeineStorageUpdateGatewayPrincipals' : ActorMethod<[], undefined>,
   '_initializeAccessControlWithSecret' : ActorMethod<[string], undefined>,
-  /**
-   * / Add a new IP database record. Requires user authentication.
-   */
-  'addIPRecord' : ActorMethod<[IPDatabaseRecord], undefined>,
   'assignCallerUserRole' : ActorMethod<[Principal, UserRole], undefined>,
-  /**
-   * / Delete an IP database record. Requires user authentication.
-   */
-  'deleteIPRecord' : ActorMethod<[string], undefined>,
   /**
    * / Filter IPs by category.
    */
@@ -92,14 +76,6 @@ export interface _SERVICE {
    */
   'filterByOwner' : ActorMethod<[Principal], Array<IPRecord>>,
   /**
-   * / Filter IP database records by status (e.g., "active", "inactive").
-   */
-  'filterByStatus' : ActorMethod<[string], Array<IPDatabaseRecord>>,
-  /**
-   * / Query all IP database records. No authentication required.
-   */
-  'getAllIPRecords' : ActorMethod<[], Array<IPDatabaseRecord>>,
-  /**
    * / List all registered IPs (paginated). Pass offset=0 and limit=50 for the
    * / first page.
    */
@@ -110,10 +86,6 @@ export interface _SERVICE {
    * / Retrieve a single IP record by its unique ID.
    */
   'getIP' : ActorMethod<[bigint], [] | [IPRecord]>,
-  /**
-   * / Query a specific IP database record by IP address. No authentication required.
-   */
-  'getIPRecord' : ActorMethod<[string], [] | [IPDatabaseRecord]>,
   'getUserProfile' : ActorMethod<[Principal], [] | [UserProfile]>,
   'isCallerAdmin' : ActorMethod<[], boolean>,
   'registerIP' : ActorMethod<
@@ -130,14 +102,6 @@ export interface _SERVICE {
   >,
   'saveCallerUserProfile' : ActorMethod<[UserProfile], undefined>,
   /**
-   * / Search IP database records by country (case-insensitive).
-   */
-  'searchByCountry' : ActorMethod<[string], Array<IPDatabaseRecord>>,
-  /**
-   * / Search IP database records by owner/organization (case-insensitive).
-   */
-  'searchByOwner' : ActorMethod<[string], Array<IPDatabaseRecord>>,
-  /**
    * / Search IPs whose title contains the given keyword (case-sensitive).
    */
   'searchByTitle' : ActorMethod<[string], Array<IPRecord>>,
@@ -145,10 +109,6 @@ export interface _SERVICE {
    * / Search IPs by title or hash (case-insensitive for titles, case-insensitive for hashes).
    */
   'searchByTitleOrHash' : ActorMethod<[string], Array<IPRecord>>,
-  /**
-   * / Update an existing IP database record. Requires user authentication.
-   */
-  'updateIPRecord' : ActorMethod<[string, IPDatabaseRecord], undefined>,
 }
 export declare const idlService: IDL.ServiceClass;
 export declare const idlInitArgs: IDL.Type[];

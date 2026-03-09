@@ -1,10 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import type {
-  IPCategory,
-  IPDatabaseRecord,
-  IPRecord,
-  UserProfile,
-} from "../backend";
+import type { IPCategory, IPRecord, UserProfile } from "../backend";
 import type { ExternalBlob } from "../backend";
 import { useActor } from "./useActor";
 
@@ -146,72 +141,6 @@ export function useRegisterIP() {
       queryClient.invalidateQueries({ queryKey: ["searchByTitleOrHash"] });
       queryClient.invalidateQueries({ queryKey: ["filterByCategory"] });
       queryClient.invalidateQueries({ queryKey: ["filterByJurisdiction"] });
-    },
-  });
-}
-
-// ── IP Database CRUD ──────────────────────────────────────────────────────────
-
-export function useGetAllIPRecords() {
-  const { actor, isFetching: actorFetching } = useActor();
-
-  return useQuery<IPDatabaseRecord[]>({
-    queryKey: ["ipDatabaseRecords"],
-    queryFn: async () => {
-      if (!actor) return [];
-      return actor.getAllIPRecords();
-    },
-    enabled: !!actor && !actorFetching,
-  });
-}
-
-export function useAddIPRecord() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (record: IPDatabaseRecord): Promise<void> => {
-      if (!actor) throw new Error("Actor not available");
-      return actor.addIPRecord(record);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ipDatabaseRecords"] });
-    },
-  });
-}
-
-export function useUpdateIPRecord() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async ({
-      ipAddress,
-      updatedRecord,
-    }: {
-      ipAddress: string;
-      updatedRecord: IPDatabaseRecord;
-    }): Promise<void> => {
-      if (!actor) throw new Error("Actor not available");
-      return actor.updateIPRecord(ipAddress, updatedRecord);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ipDatabaseRecords"] });
-    },
-  });
-}
-
-export function useDeleteIPRecord() {
-  const { actor } = useActor();
-  const queryClient = useQueryClient();
-
-  return useMutation({
-    mutationFn: async (ipAddress: string): Promise<void> => {
-      if (!actor) throw new Error("Actor not available");
-      return actor.deleteIPRecord(ipAddress);
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["ipDatabaseRecords"] });
     },
   });
 }

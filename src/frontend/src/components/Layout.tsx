@@ -2,6 +2,7 @@ import { Outlet } from "@tanstack/react-router";
 import React from "react";
 import Footer from "./Footer";
 import Header from "./Header";
+import ProfileSetupModal from "./ProfileSetupModal";
 
 export default function Layout() {
   return (
@@ -14,6 +15,7 @@ export default function Layout() {
         <Outlet />
       </main>
       <Footer />
+      <ProfileSetupModal />
     </div>
   );
 }

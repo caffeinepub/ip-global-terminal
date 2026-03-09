@@ -1,15 +1,18 @@
 import { useNavigate } from "@tanstack/react-router";
 import {
   AlertCircle,
+  CheckCircle,
+  Copy,
   FileText,
   Hash,
   Loader2,
   LogIn,
+  RefreshCw,
   Shield,
   Upload,
 } from "lucide-react";
 import type React from "react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { IPCategory } from "../backend";
 import RegistrationSuccessModal from "../components/RegistrationSuccessModal";
 import { useInternetIdentity } from "../hooks/useInternetIdentity";
@@ -47,6 +50,11 @@ async function sha256Hex(buffer: ArrayBuffer): Promise<string> {
     .join("");
 }
 
+async function generateRandomHash(): Promise<string> {
+  const randomBytes = crypto.getRandomValues(new Uint8Array(32));
+  return sha256Hex(randomBytes.buffer as ArrayBuffer);
+}
+
 export default function RegisterIP() {
   const navigate = useNavigate();
   const registerMutation = useRegisterIP();
@@ -60,10 +68,36 @@ export default function RegisterIP() {
   const [jurisdiction, setJurisdiction] = useState("Global");
   const [file, setFile] = useState<File | null>(null);
   const [fileHash, setFileHash] = useState("");
+  const [autoHash, setAutoHash] = useState("");
+  const [hashCopied, setHashCopied] = useState(false);
   const [dragOver, setDragOver] = useState(false);
   const [successOpen, setSuccessOpen] = useState(false);
   const [registeredId, setRegisteredId] = useState<bigint | null>(null);
   const [error, setError] = useState("");
+
+  // Generate a random hash on mount
+  useEffect(() => {
+    generateRandomHash().then(setAutoHash);
+  }, []);
+
+  const regenerateHash = async () => {
+    const h = await generateRandomHash();
+    setAutoHash(h);
+    setFileHash(""); // clear any file-derived hash so auto hash is used
+    setFile(null);
+  };
+
+  const copyHash = async () => {
+    const hashToCopy = fileHash || autoHash;
+    if (!hashToCopy) return;
+    try {
+      await navigator.clipboard.writeText(hashToCopy);
+      setHashCopied(true);
+      setTimeout(() => setHashCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
 
   const handleFile = useCallback(async (f: File) => {
     setFile(f);
@@ -87,15 +121,6 @@ export default function RegisterIP() {
     e.preventDefault();
     setError("");
 
-    if (!isAuthenticated) {
-      try {
-        await login();
-      } catch {
-        // login popup closed or failed — user can try again
-      }
-      return;
-    }
-
     if (!title.trim()) {
       setError("Title is required.");
       return;
@@ -106,9 +131,10 @@ export default function RegisterIP() {
     }
 
     try {
-      const docHashBytes = fileHash
+      const activeHash = fileHash || autoHash;
+      const docHashBytes = activeHash
         ? new Uint8Array(
-            fileHash.match(/.{2}/g)!.map((h) => Number.parseInt(h, 16)),
+            activeHash.match(/.{2}/g)!.map((h) => Number.parseInt(h, 16)),
           )
         : new Uint8Array(32);
 
@@ -119,7 +145,7 @@ export default function RegisterIP() {
         documentHash: docHashBytes,
         fileBlob: null,
         jurisdiction,
-        hash: fileHash,
+        hash: activeHash,
       });
 
       setRegisteredId(id);
@@ -150,10 +176,146 @@ export default function RegisterIP() {
     marginBottom: "0.5rem",
   };
 
-  // ── Submit handler with inline auth gate ──────────────────────────────────
-  // (form is always visible; login prompt appears inline when not authenticated)
+  // ── Auth gate ──────────────────────────────────────────────────────────────
+  if (!isAuthenticated) {
+    return (
+      <div
+        className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center"
+        style={{ backgroundColor: "oklch(0.08 0 0)" }}
+      >
+        <div className="max-w-md w-full text-center">
+          {/* Icon */}
+          <div
+            className="inline-flex items-center justify-center w-16 h-16 rounded-full mb-6"
+            style={{
+              backgroundColor: "oklch(0.78 0.15 85 / 0.12)",
+              border: "1px solid oklch(0.78 0.15 85 / 0.4)",
+            }}
+          >
+            <Shield
+              className="w-8 h-8"
+              style={{ color: "oklch(0.78 0.15 85)" }}
+            />
+          </div>
 
-  // ── Registration form (always visible) ────────────────────────────────────
+          <h1
+            className="text-3xl font-bold mb-3"
+            style={{
+              color: "oklch(0.97 0 0)",
+              fontFamily: "Playfair Display, serif",
+            }}
+          >
+            Sign In to Register IP
+          </h1>
+          <p
+            className="text-sm mb-8 leading-relaxed"
+            style={{ color: "oklch(0.55 0 0)" }}
+          >
+            Authentication is required to register intellectual property on the
+            blockchain. Sign in or create an account to get started — it only
+            takes a moment.
+          </p>
+
+          {/* Sign-in card */}
+          <div
+            className="rounded-xl p-8"
+            style={{
+              backgroundColor: "rgba(0, 0, 0, 0.40)",
+              border: "1.5px solid oklch(0.78 0.15 85 / 0.30)",
+              backdropFilter: "blur(12px)",
+              WebkitBackdropFilter: "blur(12px)",
+              boxShadow: "0 0 20px oklch(0.78 0.15 85 / 0.15)",
+            }}
+          >
+            <div className="space-y-4">
+              <div
+                className="flex items-start gap-3 p-3 rounded-lg text-left"
+                style={{
+                  backgroundColor: "oklch(0.78 0.15 85 / 0.06)",
+                  border: "1px solid oklch(0.78 0.15 85 / 0.15)",
+                }}
+              >
+                <Shield
+                  className="w-4 h-4 mt-0.5 shrink-0"
+                  style={{ color: "oklch(0.78 0.15 85)" }}
+                />
+                <p
+                  className="text-xs leading-relaxed"
+                  style={{ color: "oklch(0.65 0 0)" }}
+                >
+                  Your identity is secured by Internet Identity — a
+                  privacy-preserving authentication system on the Internet
+                  Computer.
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => login()}
+                disabled={isLoggingIn}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
+                style={{
+                  backgroundColor: "oklch(0.78 0.15 85)",
+                  color: "oklch(0.08 0 0)",
+                  boxShadow: "0 0 20px oklch(0.78 0.15 85 / 0.30)",
+                }}
+                onMouseEnter={(e) => {
+                  if (!isLoggingIn) {
+                    (
+                      e.currentTarget as HTMLButtonElement
+                    ).style.backgroundColor = "oklch(0.85 0.14 85)";
+                    (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                      "0 0 28px oklch(0.78 0.15 85 / 0.45)";
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  (e.currentTarget as HTMLButtonElement).style.backgroundColor =
+                    "oklch(0.78 0.15 85)";
+                  (e.currentTarget as HTMLButtonElement).style.boxShadow =
+                    "0 0 20px oklch(0.78 0.15 85 / 0.30)";
+                }}
+              >
+                {isLoggingIn ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Signing in…
+                  </>
+                ) : (
+                  <>
+                    <LogIn className="w-4 h-4" />
+                    Sign In / Create Account
+                  </>
+                )}
+              </button>
+
+              <p className="text-xs" style={{ color: "oklch(0.40 0 0)" }}>
+                The IP Database is publicly viewable without signing in.
+              </p>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => navigate({ to: "/database" })}
+            className="mt-6 text-sm underline underline-offset-4 transition-colors"
+            style={{ color: "oklch(0.55 0 0)" }}
+            onMouseEnter={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "oklch(0.78 0.15 85)";
+            }}
+            onMouseLeave={(e) => {
+              (e.currentTarget as HTMLButtonElement).style.color =
+                "oklch(0.55 0 0)";
+            }}
+          >
+            Browse the IP Database instead →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // ── Registration form (authenticated) ─────────────────────────────────────
   return (
     <div
       className="min-h-screen py-12 px-4 sm:px-6 lg:px-8"
@@ -202,11 +364,11 @@ export default function RegisterIP() {
           <form onSubmit={handleSubmit} className="space-y-6">
             {/* Title */}
             <div>
-              <label htmlFor="reg-title" style={labelStyle}>
+              <label htmlFor="ip-title" style={labelStyle}>
                 Title *
               </label>
               <input
-                id="reg-title"
+                id="ip-title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
@@ -225,11 +387,11 @@ export default function RegisterIP() {
 
             {/* Description */}
             <div>
-              <label htmlFor="reg-description" style={labelStyle}>
+              <label htmlFor="ip-description" style={labelStyle}>
                 Description *
               </label>
               <textarea
-                id="reg-description"
+                id="ip-description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Describe your intellectual property in detail..."
@@ -249,11 +411,11 @@ export default function RegisterIP() {
             {/* Category & Jurisdiction */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label htmlFor="reg-category" style={labelStyle}>
+                <label htmlFor="ip-category" style={labelStyle}>
                   Category
                 </label>
                 <select
-                  id="reg-category"
+                  id="ip-category"
                   value={category}
                   onChange={(e) => setCategory(e.target.value as IPCategory)}
                   style={inputStyle}
@@ -264,11 +426,11 @@ export default function RegisterIP() {
                 </select>
               </div>
               <div>
-                <label htmlFor="reg-jurisdiction" style={labelStyle}>
+                <label htmlFor="ip-jurisdiction" style={labelStyle}>
                   Jurisdiction
                 </label>
                 <select
-                  id="reg-jurisdiction"
+                  id="ip-jurisdiction"
                   value={jurisdiction}
                   onChange={(e) => setJurisdiction(e.target.value)}
                   style={inputStyle}
@@ -284,10 +446,12 @@ export default function RegisterIP() {
 
             {/* File upload */}
             <div>
-              <p style={labelStyle}>Document (optional)</p>
-              <label
-                htmlFor="file-input"
-                className="rounded-lg p-6 text-center cursor-pointer transition-all duration-200 block"
+              <label htmlFor="file-input" style={labelStyle}>
+                Document (optional)
+              </label>
+              <button
+                type="button"
+                className="w-full rounded-lg p-6 text-center cursor-pointer transition-all duration-200"
                 style={{
                   border: `2px dashed ${dragOver ? "oklch(0.78 0.15 85)" : "oklch(0.78 0.15 85 / 0.30)"}`,
                   backgroundColor: dragOver
@@ -300,6 +464,7 @@ export default function RegisterIP() {
                 }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={handleDrop}
+                onClick={() => document.getElementById("file-input")?.click()}
               >
                 <input
                   id="file-input"
@@ -352,36 +517,82 @@ export default function RegisterIP() {
                     </p>
                   </div>
                 )}
-              </label>
+              </button>
 
-              {fileHash && (
-                <div
-                  className="mt-3 flex items-start gap-2 p-3 rounded-lg"
-                  style={{
-                    backgroundColor: "oklch(0.78 0.15 85 / 0.08)",
-                    border: "1px solid oklch(0.78 0.15 85 / 0.25)",
-                  }}
-                >
-                  <Hash
-                    className="w-4 h-4 shrink-0 mt-0.5"
-                    style={{ color: "oklch(0.78 0.15 85)" }}
-                  />
-                  <div className="min-w-0">
-                    <p
-                      className="text-xs font-semibold mb-0.5"
+              {/* SHA-256 hash — always shown, auto-generated or from file */}
+              <div
+                className="mt-3 rounded-lg p-3"
+                style={{
+                  backgroundColor: "oklch(0.78 0.15 85 / 0.08)",
+                  border: "1px solid oklch(0.78 0.15 85 / 0.25)",
+                }}
+              >
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <Hash
+                      className="w-3.5 h-3.5"
+                      style={{ color: "oklch(0.78 0.15 85)" }}
+                    />
+                    <span
+                      className="text-xs font-semibold uppercase tracking-wide"
                       style={{ color: "oklch(0.78 0.15 85)" }}
                     >
-                      SHA-256
-                    </p>
-                    <p
-                      className="text-xs font-mono break-all"
-                      style={{ color: "oklch(0.70 0 0)" }}
+                      SHA-256{" "}
+                      {fileHash ? "(from document)" : "(auto-generated)"}
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {!fileHash && (
+                      <button
+                        type="button"
+                        onClick={regenerateHash}
+                        title="Generate new hash"
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs transition-colors"
+                        style={{
+                          color: "oklch(0.65 0 0)",
+                          backgroundColor: "transparent",
+                        }}
+                        onMouseEnter={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.color =
+                            "oklch(0.78 0.15 85)";
+                        }}
+                        onMouseLeave={(e) => {
+                          (e.currentTarget as HTMLButtonElement).style.color =
+                            "oklch(0.65 0 0)";
+                        }}
+                      >
+                        <RefreshCw className="w-3 h-3" />
+                        Regenerate
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      onClick={copyHash}
+                      className="flex items-center gap-1 px-2 py-1 rounded text-xs font-medium transition-colors"
+                      style={{
+                        color: hashCopied
+                          ? "oklch(0.72 0.18 145)"
+                          : "oklch(0.78 0.15 85)",
+                        backgroundColor: "oklch(0.78 0.15 85 / 0.12)",
+                        border: "1px solid oklch(0.78 0.15 85 / 0.30)",
+                      }}
                     >
-                      {fileHash}
-                    </p>
+                      {hashCopied ? (
+                        <CheckCircle className="w-3 h-3" />
+                      ) : (
+                        <Copy className="w-3 h-3" />
+                      )}
+                      {hashCopied ? "Copied!" : "Copy"}
+                    </button>
                   </div>
                 </div>
-              )}
+                <p
+                  className="text-xs font-mono break-all leading-relaxed"
+                  style={{ color: "oklch(0.70 0 0)" }}
+                >
+                  {fileHash || autoHash || "Generating…"}
+                </p>
+              </div>
             </div>
 
             {/* Error */}
@@ -403,33 +614,10 @@ export default function RegisterIP() {
               </div>
             )}
 
-            {/* Inline sign-in notice (only when not authenticated) */}
-            {!isAuthenticated && (
-              <div
-                className="flex items-start gap-3 p-4 rounded-lg"
-                style={{
-                  backgroundColor: "oklch(0.78 0.15 85 / 0.06)",
-                  border: "1px solid oklch(0.78 0.15 85 / 0.25)",
-                }}
-              >
-                <LogIn
-                  className="w-4 h-4 mt-0.5 shrink-0"
-                  style={{ color: "oklch(0.78 0.15 85)" }}
-                />
-                <p
-                  className="text-xs leading-relaxed"
-                  style={{ color: "oklch(0.65 0 0)" }}
-                >
-                  You'll be asked to sign in when you submit. It only takes a
-                  moment and your identity is secured by Internet Identity.
-                </p>
-              </div>
-            )}
-
             {/* Submit */}
             <button
               type="submit"
-              disabled={registerMutation.isPending || isLoggingIn}
+              disabled={registerMutation.isPending}
               className="w-full flex items-center justify-center gap-2 py-3 rounded-lg font-semibold text-sm transition-all duration-200 disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
                 backgroundColor: "oklch(0.78 0.15 85)",
@@ -437,7 +625,7 @@ export default function RegisterIP() {
                 boxShadow: "0 0 20px oklch(0.78 0.15 85 / 0.30)",
               }}
               onMouseEnter={(e) => {
-                if (!registerMutation.isPending && !isLoggingIn) {
+                if (!registerMutation.isPending) {
                   (e.currentTarget as HTMLButtonElement).style.backgroundColor =
                     "oklch(0.85 0.14 85)";
                   (e.currentTarget as HTMLButtonElement).style.boxShadow =
@@ -451,12 +639,7 @@ export default function RegisterIP() {
                   "0 0 20px oklch(0.78 0.15 85 / 0.30)";
               }}
             >
-              {isLoggingIn ? (
-                <>
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                  Signing in…
-                </>
-              ) : registerMutation.isPending ? (
+              {registerMutation.isPending ? (
                 <>
                   <Loader2 className="w-4 h-4 animate-spin" />
                   Registering on Blockchain…
@@ -464,7 +647,7 @@ export default function RegisterIP() {
               ) : (
                 <>
                   <Shield className="w-4 h-4" />
-                  Register to Blockchain
+                  Register IP On-Chain
                 </>
               )}
             </button>
@@ -476,6 +659,7 @@ export default function RegisterIP() {
         open={successOpen}
         ipId={registeredId}
         ipTitle={title}
+        ipHash={fileHash || autoHash}
         onClose={() => {
           setSuccessOpen(false);
           setTitle("");
@@ -484,6 +668,7 @@ export default function RegisterIP() {
           setJurisdiction("Global");
           setFile(null);
           setFileHash("");
+          generateRandomHash().then(setAutoHash);
           navigate({ to: "/database" });
         }}
       />

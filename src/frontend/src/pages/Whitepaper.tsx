@@ -14,7 +14,7 @@ const sections: Section[] = [
     content: (
       <div className="prose-content">
         <p>
-          The Intellectual Property Global Token (IPGT) platform presents a
+          The Intellectual Property Global Terminal (IPGT) platform presents a
           decentralized, blockchain-based registry for intellectual property
           (IP) rights. By leveraging the Internet Computer Protocol (ICP), IPGT
           provides an immutable, transparent, and globally accessible ledger for

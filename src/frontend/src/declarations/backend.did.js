@@ -19,14 +19,6 @@ export const _CaffeineStorageRefillResult = IDL.Record({
   'success' : IDL.Opt(IDL.Bool),
   'topped_up_amount' : IDL.Opt(IDL.Nat),
 });
-export const IPDatabaseRecord = IDL.Record({
-  'status' : IDL.Text,
-  'country' : IDL.Text,
-  'owner' : IDL.Text,
-  'city' : IDL.Text,
-  'registrationDate' : IDL.Int,
-  'ipAddress' : IDL.Text,
-});
 export const UserRole = IDL.Variant({
   'admin' : IDL.Null,
   'user' : IDL.Null,
@@ -84,23 +76,14 @@ export const idlService = IDL.Service({
     ),
   '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
   '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-  'addIPRecord' : IDL.Func([IPDatabaseRecord], [], []),
   'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-  'deleteIPRecord' : IDL.Func([IDL.Text], [], []),
   'filterByCategory' : IDL.Func([IPCategory], [IDL.Vec(IPRecord)], ['query']),
   'filterByJurisdiction' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
   'filterByOwner' : IDL.Func([IDL.Principal], [IDL.Vec(IPRecord)], ['query']),
-  'filterByStatus' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(IPDatabaseRecord)],
-      ['query'],
-    ),
-  'getAllIPRecords' : IDL.Func([], [IDL.Vec(IPDatabaseRecord)], ['query']),
   'getAllIPs' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Vec(IPRecord)], ['query']),
   'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
   'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
   'getIP' : IDL.Func([IDL.Nat], [IDL.Opt(IPRecord)], ['query']),
-  'getIPRecord' : IDL.Func([IDL.Text], [IDL.Opt(IPDatabaseRecord)], ['query']),
   'getUserProfile' : IDL.Func(
       [IDL.Principal],
       [IDL.Opt(UserProfile)],
@@ -121,19 +104,8 @@ export const idlService = IDL.Service({
       [],
     ),
   'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-  'searchByCountry' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(IPDatabaseRecord)],
-      ['query'],
-    ),
-  'searchByOwner' : IDL.Func(
-      [IDL.Text],
-      [IDL.Vec(IPDatabaseRecord)],
-      ['query'],
-    ),
   'searchByTitle' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
   'searchByTitleOrHash' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
-  'updateIPRecord' : IDL.Func([IDL.Text, IPDatabaseRecord], [], []),
 });
 
 export const idlInitArgs = [];
@@ -149,14 +121,6 @@ export const idlFactory = ({ IDL }) => {
   const _CaffeineStorageRefillResult = IDL.Record({
     'success' : IDL.Opt(IDL.Bool),
     'topped_up_amount' : IDL.Opt(IDL.Nat),
-  });
-  const IPDatabaseRecord = IDL.Record({
-    'status' : IDL.Text,
-    'country' : IDL.Text,
-    'owner' : IDL.Text,
-    'city' : IDL.Text,
-    'registrationDate' : IDL.Int,
-    'ipAddress' : IDL.Text,
   });
   const UserRole = IDL.Variant({
     'admin' : IDL.Null,
@@ -215,9 +179,7 @@ export const idlFactory = ({ IDL }) => {
       ),
     '_caffeineStorageUpdateGatewayPrincipals' : IDL.Func([], [], []),
     '_initializeAccessControlWithSecret' : IDL.Func([IDL.Text], [], []),
-    'addIPRecord' : IDL.Func([IPDatabaseRecord], [], []),
     'assignCallerUserRole' : IDL.Func([IDL.Principal, UserRole], [], []),
-    'deleteIPRecord' : IDL.Func([IDL.Text], [], []),
     'filterByCategory' : IDL.Func([IPCategory], [IDL.Vec(IPRecord)], ['query']),
     'filterByJurisdiction' : IDL.Func(
         [IDL.Text],
@@ -225,21 +187,10 @@ export const idlFactory = ({ IDL }) => {
         ['query'],
       ),
     'filterByOwner' : IDL.Func([IDL.Principal], [IDL.Vec(IPRecord)], ['query']),
-    'filterByStatus' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(IPDatabaseRecord)],
-        ['query'],
-      ),
-    'getAllIPRecords' : IDL.Func([], [IDL.Vec(IPDatabaseRecord)], ['query']),
     'getAllIPs' : IDL.Func([IDL.Nat, IDL.Nat], [IDL.Vec(IPRecord)], ['query']),
     'getCallerUserProfile' : IDL.Func([], [IDL.Opt(UserProfile)], ['query']),
     'getCallerUserRole' : IDL.Func([], [UserRole], ['query']),
     'getIP' : IDL.Func([IDL.Nat], [IDL.Opt(IPRecord)], ['query']),
-    'getIPRecord' : IDL.Func(
-        [IDL.Text],
-        [IDL.Opt(IPDatabaseRecord)],
-        ['query'],
-      ),
     'getUserProfile' : IDL.Func(
         [IDL.Principal],
         [IDL.Opt(UserProfile)],
@@ -260,23 +211,12 @@ export const idlFactory = ({ IDL }) => {
         [],
       ),
     'saveCallerUserProfile' : IDL.Func([UserProfile], [], []),
-    'searchByCountry' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(IPDatabaseRecord)],
-        ['query'],
-      ),
-    'searchByOwner' : IDL.Func(
-        [IDL.Text],
-        [IDL.Vec(IPDatabaseRecord)],
-        ['query'],
-      ),
     'searchByTitle' : IDL.Func([IDL.Text], [IDL.Vec(IPRecord)], ['query']),
     'searchByTitleOrHash' : IDL.Func(
         [IDL.Text],
         [IDL.Vec(IPRecord)],
         ['query'],
       ),
-    'updateIPRecord' : IDL.Func([IDL.Text, IPDatabaseRecord], [], []),
   });
 };
 

@@ -10,7 +10,7 @@ import {
   Shield,
   Zap,
 } from "lucide-react";
-import type React from "react";
+import AnimatedWorldMap from "../components/AnimatedWorldMap";
 
 const panelStyle: React.CSSProperties = {
   backgroundColor: "rgba(0, 0, 0, 0.40)",
@@ -20,6 +20,8 @@ const panelStyle: React.CSSProperties = {
   boxShadow: "0 0 20px oklch(0.78 0.15 85 / 0.15)",
 };
 
+import type React from "react";
+
 export default function Home() {
   return (
     <div className="min-h-screen bg-black text-white">
@@ -28,15 +30,9 @@ export default function Home() {
         className="relative overflow-hidden"
         style={{ minHeight: "90vh" }}
       >
-        {/* 4K AI-generated hero background image */}
+        {/* World map background */}
         <div className="absolute inset-0 z-0">
-          <img
-            src="/assets/generated/homepage-hero.dim_3840x2160.png"
-            alt="IPGT Hero Background"
-            className="w-full h-full object-cover object-center"
-            loading="eager"
-            decoding="async"
-          />
+          <AnimatedWorldMap />
         </div>
 
         {/* Vignette overlay */}

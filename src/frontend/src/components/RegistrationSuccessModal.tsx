@@ -5,7 +5,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { CheckCircle, Copy, ExternalLink, Shield } from "lucide-react";
+import { CheckCircle, Copy, ExternalLink, Hash, Shield } from "lucide-react";
 import { useState } from "react";
 
 interface RegistrationSuccessModalProps {
@@ -13,6 +13,7 @@ interface RegistrationSuccessModalProps {
   onClose: () => void;
   ipId: bigint | null;
   ipTitle: string;
+  ipHash?: string;
 }
 
 export default function RegistrationSuccessModal({
@@ -20,16 +21,29 @@ export default function RegistrationSuccessModal({
   onClose,
   ipId,
   ipTitle,
+  ipHash,
 }: RegistrationSuccessModalProps) {
-  const [copied, setCopied] = useState(false);
+  const [idCopied, setIdCopied] = useState(false);
+  const [hashCopied, setHashCopied] = useState(false);
 
   const idStr = ipId !== null ? ipId.toString() : "—";
 
   const copyId = async () => {
     try {
       await navigator.clipboard.writeText(idStr);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setIdCopied(true);
+      setTimeout(() => setIdCopied(false), 2000);
+    } catch {
+      // ignore
+    }
+  };
+
+  const copyHash = async () => {
+    if (!ipHash) return;
+    try {
+      await navigator.clipboard.writeText(ipHash);
+      setHashCopied(true);
+      setTimeout(() => setHashCopied(false), 2000);
     } catch {
       // ignore
     }
@@ -71,18 +85,47 @@ export default function RegistrationSuccessModal({
               onClick={copyId}
               className="flex items-center gap-1 text-xs text-gold-500 hover:text-gold-400 transition-colors"
             >
-              {copied ? (
+              {idCopied ? (
                 <CheckCircle className="w-3.5 h-3.5" />
               ) : (
                 <Copy className="w-3.5 h-3.5" />
               )}
-              {copied ? "Copied" : "Copy"}
+              {idCopied ? "Copied" : "Copy"}
             </button>
           </div>
           <div className="font-mono text-gold-400 text-lg font-bold">
             #{idStr}
           </div>
         </div>
+
+        {/* SHA-256 Hash */}
+        {ipHash && (
+          <div className="border border-gold-800/30 rounded-sm px-4 py-3">
+            <div className="flex items-center justify-between mb-1.5">
+              <div className="flex items-center gap-1.5">
+                <Hash className="w-3.5 h-3.5 text-gold-600" />
+                <span className="text-xs text-white/40 uppercase tracking-wider">
+                  SHA-256 Hash
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={copyHash}
+                className="flex items-center gap-1 text-xs text-gold-500 hover:text-gold-400 transition-colors"
+              >
+                {hashCopied ? (
+                  <CheckCircle className="w-3.5 h-3.5" />
+                ) : (
+                  <Copy className="w-3.5 h-3.5" />
+                )}
+                {hashCopied ? "Copied" : "Copy"}
+              </button>
+            </div>
+            <div className="font-mono text-gold-300 text-xs break-all leading-relaxed">
+              {ipHash}
+            </div>
+          </div>
+        )}
 
         {/* On-chain confirmation */}
         <div className="flex items-start gap-3 bg-gold-900/10 border border-gold-700/20 rounded-sm px-4 py-3">
@@ -108,7 +151,8 @@ export default function RegistrationSuccessModal({
             </li>
             <li className="flex items-start gap-2">
               <ExternalLink className="w-3.5 h-3.5 text-gold-600 mt-0.5 flex-shrink-0" />
-              Save your IP ID as proof of your registration date
+              Save your IP ID and SHA-256 hash as proof of your registration
+              date
             </li>
             <li className="flex items-start gap-2">
               <ExternalLink className="w-3.5 h-3.5 text-gold-600 mt-0.5 flex-shrink-0" />
